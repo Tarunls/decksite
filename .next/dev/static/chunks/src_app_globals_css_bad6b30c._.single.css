@@ -2113,10 +2113,6 @@
     padding-bottom: -10vh;
   }
 
-  .pb-\[-100vh\] {
-    padding-bottom: -100vh;
-  }
-
   .pl-2 {
     padding-left: calc(var(--spacing) * 2);
   }
@@ -3840,26 +3836,26 @@
   }
 
   @media (min-width: 64rem) {
-    .lg\:pr-10 {
-      padding-right: calc(var(--spacing) * 10);
-    }
-  }
-
-  @media (min-width: 64rem) {
     .lg\:pr-24 {
       padding-right: calc(var(--spacing) * 24);
     }
   }
 
   @media (min-width: 64rem) {
-    .lg\:pr-100 {
-      padding-right: calc(var(--spacing) * 100);
+    .lg\:pl-6 {
+      padding-left: calc(var(--spacing) * 6);
     }
   }
 
   @media (min-width: 64rem) {
-    .lg\:pl-0 {
-      padding-left: calc(var(--spacing) * 0);
+    .lg\:pl-7 {
+      padding-left: calc(var(--spacing) * 7);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .lg\:pl-8 {
+      padding-left: calc(var(--spacing) * 8);
     }
   }
 
@@ -3870,26 +3866,14 @@
   }
 
   @media (min-width: 64rem) {
-    .lg\:pl-65 {
-      padding-left: calc(var(--spacing) * 65);
-    }
-  }
-
-  @media (min-width: 64rem) {
-    .lg\:pl-75 {
-      padding-left: calc(var(--spacing) * 75);
+    .lg\:pl-70 {
+      padding-left: calc(var(--spacing) * 70);
     }
   }
 
   @media (min-width: 64rem) {
     .lg\:pl-80 {
       padding-left: calc(var(--spacing) * 80);
-    }
-  }
-
-  @media (min-width: 64rem) {
-    .lg\:pl-100 {
-      padding-left: calc(var(--spacing) * 100);
     }
   }
 
