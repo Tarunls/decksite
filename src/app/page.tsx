@@ -11,10 +11,82 @@ import { ContactSection } from './components/ContactSection';
 import { cardImages, antiCardImages } from '../lib/constants';
 import { cinzel } from '../lib/fonts';
 
+function MobileWarning() {
+  return (
+    <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black px-8 text-center lg:hidden overflow-hidden">
+      {/* 3D Background Suits - Adjusted for Mobile Visibility */}
+      <div className="absolute inset-0 pointer-events-none perspective-[1000px]">
+        
+        {/* Top Left Spade */}
+        <motion.div 
+          className="absolute text-[60vw] text-zinc-800/40 select-none font-serif leading-none"
+          style={{ 
+            top: '-5%', 
+            left: '-10%',
+            transformStyle: "preserve-3d" 
+          }}
+          initial={{ rotateY: -20, rotateX: 20 }}
+          animate={{ 
+            rotateY: [-20, -10, -20],
+            rotateX: [20, 30, 20],
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        >
+          ♠
+        </motion.div>
+
+        {/* Bottom Right Diamond */}
+        <motion.div 
+          className="absolute text-[50vw] text-zinc-800/30 select-none font-serif leading-none"
+          style={{ 
+            bottom: '-15%', 
+            right: '-15%',
+            transformStyle: "preserve-3d",
+            color: 'rgba(153, 27, 27, 0.4)'
+          }}
+          initial={{ rotateY: 30, rotateX: -10 }}
+          animate={{ 
+            rotateY: [30, 15, 30],
+            rotateX: [-10, -25, -10],
+          }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        >
+          ❤︎⁠
+        </motion.div>
+      </div>
+
+      {/* Main Content (remains the same) */}
+      <div className="absolute inset-4 border border-zinc-800/50 pointer-events-none" />
+      
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="relative z-10"
+      >
+        <h2 
+          className="text-white text-3xl mb-4 tracking-[0.2em] uppercase font-bold"
+          style={{ fontFamily: "var(--font-cinzel), serif" }}
+        >
+          No <br /> Deck Space
+        </h2>
+        <div className="h-px w-24 mx-auto bg-white/20 mb-6" />
+        <p className="text-zinc-500 font-mono text-[10px] tracking-[0.2em] uppercase max-w-[250px]">
+          Please view on a <span className="text-zinc-200">Larger Screen</span> for the full experience.
+        </p>
+      </motion.div>
+    </div>
+  );
+}
+
+
 // --- NEW "SPOTLIGHT SCANNER" LOADER ---
 function LoadingScreen() {
   const suits = ["♠", "♥", "♣", "♦"];
   
+  // Custom shadow strings for ultra-smooth glow
+  const whiteGlow = "0 0 10px rgba(255,255,255,0.8), 0 0 20px rgba(110, 110, 110, 0.4)";
+  const redGlow = "0 0 10px rgba(220,38,38,0.8), 0 0 20px rgba(126, 18, 18, 0.4)";
+
   return (
     <motion.div
       key="loader"
@@ -22,33 +94,38 @@ function LoadingScreen() {
       initial={{ opacity: 1 }}
       exit={{ 
         opacity: 0, 
-        y: -50, 
         transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] } 
       }}
     >
       <div className="relative">
-        <div className="flex gap-8 md:gap-12 text-zinc-800 text-5xl md:text-7xl font-serif select-none">
+        {/* Background Layer: Dim Static Suits */}
+        <div className="flex gap-8 md:gap-12 text-zinc-900 text-5xl md:text-7xl font-serif select-none">
           {suits.map((suit, i) => (
             <span key={i}>{suit}</span>
           ))}
         </div>
 
+        {/* Foreground Layer: The Scanner */}
         <motion.div
           className="absolute inset-0 flex gap-8 md:gap-12 text-5xl md:text-7xl font-serif select-none"
           initial={{ clipPath: "inset(0 100% 0 0)" }} 
-          animate={{ clipPath: "inset(0 0% 0 0)" }}   
+          animate={{ clipPath: "inset(0 -10% 0 0)" }}   
           transition={{ 
-            duration: 1.5, 
+            duration: 1.8, 
             ease: "easeInOut",
             repeat: Infinity,       
             repeatType: "mirror",   
-            repeatDelay: 0.5 
+            repeatDelay: 0.2 
           }}
         >
           {suits.map((suit, i) => (
             <span 
               key={i} 
-              className={`${(i === 1 || i === 3) ? "text-red-600 drop-shadow-[0_0_15px_rgba(220,38,38,0.8)]" : "text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]"}`}
+              className={(i === 1 || i === 3) ? "text-red-800" : "text-white"}
+              style={{ 
+                // Using textShadow instead of drop-shadow to prevent blocky artifacts
+                textShadow: (i === 1 || i === 3) ? redGlow : whiteGlow 
+              }}
             >
               {suit}
             </span>
@@ -56,22 +133,23 @@ function LoadingScreen() {
         </motion.div>
       </div>
 
-      <div className="mt-12 w-48 h-0.5 bg-zinc-900 rounded-full overflow-hidden relative">
+      {/* Loading Bar */}
+      <div className="mt-12 w-48 h-[1px] bg-zinc-900 overflow-hidden relative">
         <motion.div 
-          className="absolute inset-0 bg-white shadow-[0_0_10px_white]"
+          className="absolute inset-0 bg-white"
           initial={{ x: "-100%" }}
           animate={{ x: "0%" }}
           transition={{ duration: 2.2, ease: "easeInOut" }}
+          style={{ boxShadow: "0 0 15px white" }}
         />
       </div>
       
       <motion.p 
-        className="mt-4 text-[10px] font-mono uppercase tracking-[0.3em] text-zinc-500"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
+        className="mt-6 text-[9px] font-mono uppercase tracking-[0.5em] text-zinc-600"
+        animate={{ opacity: [0.4, 1, 0.4] }}
+        transition={{ duration: 1.5, repeat: Infinity }}
       >
-        Initializing Deck...
+        Initializing Deck
       </motion.p>
     </motion.div>
   );
@@ -155,6 +233,8 @@ export default function App() {
 
   return (
     <div className="relative min-h-[100dvh] w-full overflow-hidden transition-colors duration-1000 bg-black">
+
+        <MobileWarning />
       
       <AnimatePresence mode="wait">
         {isLoading && <LoadingScreen />}
