@@ -77,8 +77,8 @@ function LoadingScreen() {
 }
 
 export default function App() {
-  const heroCardUrl = 'cover.jpg';
-  const heroBackUrl = 'anticover.jpeg'; 
+  const heroCardUrl = '/cover.jpg';
+  const heroBackUrl = '/anticover.jpeg'; 
   const backgroundCardUrl = '/cards/time702-copy_51164800263_l.jpg';
 
   const [isLoading, setIsLoading] = useState(true);
@@ -94,8 +94,6 @@ export default function App() {
       heroCardUrl,
       heroBackUrl,
       backgroundCardUrl,
-      '/work/project1.jpg',
-      '/work/project2.jpg',
       ...cardImages,
       ...antiCardImages
     ];
