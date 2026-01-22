@@ -1196,7 +1196,7 @@ function AboutOverlay({ isOpen, onClose, isFlipped }) {
                                                         children: [
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                 className: `text-xs font-mono uppercase tracking-[0.3em] mb-2 ${textSub}`,
-                                                                children: "Rare • Legendary"
+                                                                children: "What's • Up"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/components/AboutOverlay.tsx",
                                                                 lineNumber: 94,
@@ -1205,13 +1205,12 @@ function AboutOverlay({ isOpen, onClose, isFlipped }) {
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
                                                                 className: `text-4xl md:text-6xl font-serif font-bold ${textMain}`,
                                                                 children: [
-                                                                    "The",
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                                                                         fileName: "[project]/src/app/components/AboutOverlay.tsx",
                                                                         lineNumber: 98,
-                                                                        columnNumber: 28
+                                                                        columnNumber: 25
                                                                     }, this),
-                                                                    "Architect"
+                                                                    "Caino"
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/components/AboutOverlay.tsx",
@@ -1229,7 +1228,7 @@ function AboutOverlay({ isOpen, onClose, isFlipped }) {
                                                         children: [
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                 className: `text-xs font-mono uppercase tracking-widest ${textSub}`,
-                                                                children: "Level"
+                                                                children: "Age"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/components/AboutOverlay.tsx",
                                                                 lineNumber: 102,
@@ -1237,7 +1236,7 @@ function AboutOverlay({ isOpen, onClose, isFlipped }) {
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                 className: `text-3xl font-light ${textMain}`,
-                                                                children: "21"
+                                                                children: "20"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/components/AboutOverlay.tsx",
                                                                 lineNumber: 103,
@@ -1301,7 +1300,7 @@ function AboutOverlay({ isOpen, onClose, isFlipped }) {
                                                 className: `text-base md:text-lg leading-relaxed font-light ${textSub}`,
                                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                     children: [
-                                                        "I build digital ecosystems where performance meets aesthetics. Specializing in ",
+                                                        "I'm just a goofy goober for now. Specializing in ",
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("b", {
                                                             className: textMain,
                                                             children: "Next.js"
@@ -1319,7 +1318,7 @@ function AboutOverlay({ isOpen, onClose, isFlipped }) {
                                                             lineNumber: 118,
                                                             columnNumber: 79
                                                         }, this),
-                                                        ", I push the browser to its limit."
+                                                        "."
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/components/AboutOverlay.tsx",
@@ -1550,8 +1549,8 @@ function WorkSection({ onGoHome, isFlipped }) {
                 },
                 animate: {
                     opacity: 1,
-                    backdropFilter: "blur(12px)",
-                    backgroundColor: isDarkMode ? "rgba(0,0,0,0.6)" : "rgba(255,255,255,0.6)" // Adapt overlay color
+                    backdropFilter: "blur(20px)",
+                    backgroundColor: isDarkMode ? "rgba(0,0,0,0.7)" : "rgba(255,255,255,0.7)"
                 },
                 exit: {
                     opacity: 0,
@@ -1573,7 +1572,7 @@ function WorkSection({ onGoHome, isFlipped }) {
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "relative w-full h-full flex items-center justify-center perspective-[2000px] pointer-events-none z-10",
+                className: "relative w-full h-full flex items-end justify-center perspective-[2000px] pointer-events-none z-10 pb-[-10vh]",
                 children: workItems.map((item, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(CarouselCard, {
                         item: item,
                         index: index,
@@ -1861,12 +1860,12 @@ function CarouselCard({ item, index, focusedIndex, setFocusedIndex, setExpandedI
     ]);
     const offset = index - focusedIndex;
     const isFocused = offset === 0;
-    const spacing = 260;
+    const spacing = isFocused ? 0 : 180;
     const x = offset * spacing;
-    const y = isFocused ? 0 : 30;
-    const scale = isFocused ? 1.1 : 0.9;
+    const y = isFocused ? 200 : 300; // Focused card "pops up" out of the hand
+    const scale = isFocused ? 1.0 : 0.8; // Hand cards are smaller
+    const baseRotateZ = offset * 12; // Increased tilt for the fan effect
     const zIndex = 50 - Math.abs(offset) * 10;
-    const baseRotateZ = offset * 5;
     // Dynamic Text Colors for the Floating Title
     // If Dark Mode: White Text. If Light Mode: Black Text.
     const titleColor = isDarkMode ? isFocused ? 'text-white' : 'text-white/40' : isFocused ? 'text-black' : 'text-black/40';
@@ -2061,19 +2060,25 @@ function ExpandedCard({ item, onClose, isDarkMode }) {
                 className: "relative w-[95vw] md:w-auto h-[90vh] md:h-[80vh] aspect-[5/7] z-50",
                 initial: {
                     opacity: 0,
-                    scale: 0.9
+                    scale: 0.5,
+                    y: 500,
+                    rotateX: 20
                 },
                 animate: {
                     opacity: 1,
-                    scale: 1
+                    scale: 1,
+                    y: 0,
+                    rotateX: 0
                 },
                 exit: {
                     opacity: 0,
-                    scale: 0.95
+                    scale: 0.5,
+                    y: 500
                 },
                 transition: {
-                    duration: 0.3,
-                    ease: "easeInOut"
+                    type: "spring",
+                    damping: 25,
+                    stiffness: 100
                 },
                 style: {
                     transformStyle: 'preserve-3d',
@@ -2112,17 +2117,17 @@ function ExpandedCard({ item, onClose, isDarkMode }) {
                                     sizes: "(max-width: 768px) 95vw, 600px"
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/components/WorkSection.tsx",
-                                    lineNumber: 383,
+                                    lineNumber: 394,
                                     columnNumber: 21
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/app/components/WorkSection.tsx",
-                                lineNumber: 382,
+                                lineNumber: 393,
                                 columnNumber: 17
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/app/components/WorkSection.tsx",
-                            lineNumber: 378,
+                            lineNumber: 389,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2138,18 +2143,18 @@ function ExpandedCard({ item, onClose, isDarkMode }) {
                                 darkMode: isDarkMode
                             }, void 0, false, {
                                 fileName: "[project]/src/app/components/WorkSection.tsx",
-                                lineNumber: 401,
+                                lineNumber: 412,
                                 columnNumber: 17
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/app/components/WorkSection.tsx",
-                            lineNumber: 393,
+                            lineNumber: 404,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/components/WorkSection.tsx",
-                    lineNumber: 368,
+                    lineNumber: 379,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
@@ -2550,6 +2555,7 @@ __turbopack_context__.s([
     ()=>App
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
+// Hi mom I'm Famous!
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/framer-motion/dist/es/render/components/motion/proxy.mjs [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$components$2f$AnimatePresence$2f$index$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/framer-motion/dist/es/components/AnimatePresence/index.mjs [app-ssr] (ecmascript)");
@@ -2870,7 +2876,7 @@ function App() {
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].p, {
                                             className: "text-white/70 tracking-[0.4em] uppercase mb-4 text-[clamp(0.7rem,1vw,0.9rem)] font-light mix-blend-difference",
-                                            children: "Portfolio of"
+                                            children: "Hi, I'm"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/page.tsx",
                                             lineNumber: 219,
@@ -2920,7 +2926,7 @@ function App() {
                                 columnNumber: 17
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "flex items-center justify-center lg:justify-start px-8 lg:px-16",
+                                className: "flex items-center justify-end lg:justify-start px-8 lg:pr-24 lg:pl-60",
                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "relative",
                                     style: {

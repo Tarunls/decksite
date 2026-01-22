@@ -217,7 +217,7 @@ export default function App() {
                 <div className="flex items-center justify-center lg:justify-end px-8 lg:px-16">
                 <motion.div className="max-w-2xl w-full pointer-events-none">
                     <motion.p className="text-white/70 tracking-[0.4em] uppercase mb-4 text-[clamp(0.7rem,1vw,0.9rem)] font-light mix-blend-difference">
-                    Portfolio of
+                    Hi, I'm
                     </motion.p>
                     
                     <motion.h1
@@ -240,7 +240,7 @@ export default function App() {
                 </div>
 
                 {/* Right Side: 3D Hero Card */}
-                <div className="flex items-center justify-center lg:justify-start px-8 lg:px-16">
+                <div className="flex items-center justify-end lg:justify-start px-8 lg:pr-24 lg:pl-60">
                 <div 
                     className="relative"
                     style={{

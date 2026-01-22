@@ -92,15 +92,15 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
                   <div className={`flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b ${borderColor} pb-6`}>
                     <div>
                       <div className={`text-xs font-mono uppercase tracking-[0.3em] mb-2 ${textSub}`}>
-                          Rare • Legendary
+                          What's • Up
                       </div>
                       <h2 className={`text-4xl md:text-6xl font-serif font-bold ${textMain}`}>
-                        The<br />Architect
+                        <br />Caino
                       </h2>
                     </div>
                     <div className="text-right">
-                      <div className={`text-xs font-mono uppercase tracking-widest ${textSub}`}>Level</div>
-                      <div className={`text-3xl font-light ${textMain}`}>21</div>
+                      <div className={`text-xs font-mono uppercase tracking-widest ${textSub}`}>Age</div>
+                      <div className={`text-3xl font-light ${textMain}`}>20</div>
                     </div>
                   </div>
 
@@ -114,8 +114,8 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
                   {/* Bio */}
                   <div className={`text-base md:text-lg leading-relaxed font-light ${textSub}`}>
                     <p>
-                      I build digital ecosystems where performance meets aesthetics. 
-                      Specializing in <b className={textMain}>Next.js</b> and <b className={textMain}>Python</b>, I push the browser to its limit.
+                      I'm just a goofy goober for now. 
+                      Specializing in <b className={textMain}>Next.js</b> and <b className={textMain}>Python</b>.
                     </p>
                   </div>
 

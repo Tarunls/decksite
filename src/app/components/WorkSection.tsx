@@ -96,8 +96,8 @@ export function WorkSection({ onGoHome, isFlipped }: WorkSectionProps) {
         initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
         animate={{ 
             opacity: 1, 
-            backdropFilter: "blur(12px)",
-            backgroundColor: isDarkMode ? "rgba(0,0,0,0.6)" : "rgba(255,255,255,0.6)" // Adapt overlay color
+            backdropFilter: "blur(20px)", // Heavier blur for foreground focus
+            backgroundColor: isDarkMode ? "rgba(0,0,0,0.7)" : "rgba(255,255,255,0.7)"
         }}
         exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
         transition={{ duration: 0.8 }}
@@ -109,7 +109,7 @@ export function WorkSection({ onGoHome, isFlipped }: WorkSectionProps) {
       />
 
       {/* 2. CAROUSEL LAYER */}
-      <div className="relative w-full h-full flex items-center justify-center perspective-[2000px] pointer-events-none z-10">
+      <div className="relative w-full h-full flex items-end justify-center perspective-[2000px] pointer-events-none z-10 pb-[-10vh]">
         {workItems.map((item, index) => (
           <CarouselCard 
             key={item.id} 
@@ -232,12 +232,12 @@ function CarouselCard({
   const offset = index - focusedIndex;
   const isFocused = offset === 0;
   
-  const spacing = 260; 
+  const spacing = isFocused ? 0 : 180;
   const x = offset * spacing;
-  const y = isFocused ? 0 : 30;
-  const scale = isFocused ? 1.1 : 0.9;
+  const y = isFocused ? 200 : 300; // Focused card "pops up" out of the hand
+  const scale = isFocused ? 1.0 : 0.8; // Hand cards are smaller
+  const baseRotateZ = offset * 12; // Increased tilt for the fan effect
   const zIndex = 50 - Math.abs(offset) * 10;
-  const baseRotateZ = offset * 5; 
 
   // Dynamic Text Colors for the Floating Title
   // If Dark Mode: White Text. If Light Mode: Black Text.
@@ -356,14 +356,25 @@ function ExpandedCard({ item, onClose, isDarkMode }: { item: WorkItem, onClose: 
       {/* MODAL CONTAINER */}
       <motion.div
         className="relative w-[95vw] md:w-auto h-[90vh] md:h-[80vh] aspect-[5/7] z-50"
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
-        style={{ 
-            transformStyle: 'preserve-3d', 
-            willChange: 'transform, opacity' 
+        initial={{ 
+          opacity: 0, 
+          scale: 0.5, 
+          y: 500, // Starts from the bottom "hand" position
+          rotateX: 20 
         }}
+        animate={{ 
+          opacity: 1, 
+          scale: 1, 
+          y: 0,    // Glides to the center
+          rotateX: 0 
+        }}
+        exit={{ opacity: 0, scale: 0.5, y: 500 }}
+        transition={{ 
+          type: "spring", 
+          damping: 25, 
+          stiffness: 100 
+        }}
+        style={{ transformStyle: 'preserve-3d', willChange: 'transform, opacity' }}
       >
         <motion.div 
             className="w-full h-full relative"
