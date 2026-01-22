@@ -9,6 +9,7 @@ import { AboutOverlay } from './components/AboutOverlay';
 import { WorkSection } from './components/WorkSection'; 
 import { ContactSection } from './components/ContactSection';
 import { cardImages, antiCardImages } from '../lib/constants';
+import { cinzel } from '../lib/fonts';
 
 // --- NEW "SPOTLIGHT SCANNER" LOADER ---
 function LoadingScreen() {
@@ -153,7 +154,7 @@ export default function App() {
   };
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden transition-colors duration-1000 bg-black">
+    <div className="relative min-h-[100dvh] w-full overflow-hidden transition-colors duration-1000 bg-black">
       
       <AnimatePresence mode="wait">
         {isLoading && <LoadingScreen />}
@@ -204,38 +205,60 @@ export default function App() {
 
       <AnimatePresence mode="wait">
         {activeSection === 'home' && (
-          <motion.div 
-            key="home-section"
-            className="relative min-h-screen grid grid-cols-1 lg:grid-cols-2"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 0.5 } }}
-          >
-            <div className="flex items-center justify-center lg:justify-end px-8 lg:px-16 py-32 lg:py-0">
-              <motion.div className="max-w-2xl lg:pr-20 pointer-events-none">
-                <motion.p className="text-white tracking-[0.3em] uppercase mb-4 text-sm font-light mix-blend-difference">
-                  Hi, I'm
-                </motion.p>
-                <motion.h1
-                  className="text-white text-6xl md:text-7xl lg:text-8xl mb-8 mix-blend-difference" 
-                  style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, lineHeight: 1.1 }}
-                >
-                  Tarun <br /> Sankar
-                </motion.h1>
-                <motion.div className="h-px bg-gradient-to-r from-white via-white/50 to-transparent mix-blend-difference" />
-              </motion.div>
-            </div>
+            <motion.div 
+                key="home-section"
+                // relative and z-10 ensures this container sits ABOVE the background cards
+                className="relative min-h-[100dvh] grid grid-cols-1 lg:grid-cols-2 overflow-hidden"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0, transition: { duration: 0.5 } }}
+            >
+                {/* Left Side: Name (Scaled for 14-inch laptop) */}
+                <div className="flex items-center justify-center lg:justify-end px-8 lg:px-16">
+                <motion.div className="max-w-2xl w-full pointer-events-none">
+                    <motion.p className="text-white/70 tracking-[0.4em] uppercase mb-4 text-[clamp(0.7rem,1vw,0.9rem)] font-light mix-blend-difference">
+                    Portfolio of
+                    </motion.p>
+                    
+                    <motion.h1
+                    className="text-white mb-8 mix-blend-difference" 
+                    style={{ 
+                        fontFamily: "var(--font-cinzel), serif", 
+                        fontWeight: 700, 
+                        lineHeight: 0.9,
+                        // Fluid typography: Scales perfectly on your 14" screen
+                        fontSize: "clamp(3.5rem, 9vw, 9rem)", 
+                        letterSpacing: "-0.03em",
+                        textShadow: "0 0 30px rgba(0,0,0,0.5)" // Gives depth against bg cards
+                    }}
+                    >
+                    Tarun <br /> Sankar
+                    </motion.h1>
+                    
+                    <motion.div className="h-px w-32 bg-gradient-to-r from-white via-white/50 to-transparent mix-blend-difference" />
+                </motion.div>
+                </div>
 
-            <div className="flex items-center justify-center lg:justify-start px-8 lg:px-16 py-32 lg:py-0">
-              <Hero3DCard 
-                  imageUrl={heroCardUrl} 
-                  backImageUrl={heroBackUrl}
-                  isFlipped={isFlipped}       
-                  onFlip={handleFlipTrigger}  
-              />
-            </div>
-          </motion.div>
-        )}
+                {/* Right Side: 3D Hero Card */}
+                <div className="flex items-center justify-center lg:justify-start px-8 lg:px-16">
+                <div 
+                    className="relative"
+                    style={{
+                    // Card size scales with screen width, but capped for large screens
+                    width: "clamp(260px, 22vw, 420px)",
+                    aspectRatio: "2.5 / 3.5"
+                    }}
+                >
+                    <Hero3DCard 
+                        imageUrl={heroCardUrl} 
+                        backImageUrl={heroBackUrl}
+                        isFlipped={isFlipped}       
+                        onFlip={handleFlipTrigger}  
+                    />
+                </div>
+                </div>
+            </motion.div>
+            )}
 
         {activeSection === 'work' && (
           <WorkSection 

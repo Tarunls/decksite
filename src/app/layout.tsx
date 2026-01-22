@@ -1,5 +1,14 @@
-// app/layout.tsx
+// src/app/layout.tsx
+import { Cinzel, Inter } from "next/font/google";
 import './globals.css';
+
+// 1. Initialize fonts
+const cinzel = Cinzel({ 
+  subsets: ["latin"],
+  variable: '--font-cinzel', 
+});
+
+const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({
   children,
@@ -7,15 +16,19 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    // 2. Add the font variable to the HTML class
+    <html lang="en" className={`${cinzel.variable}`}>
       <head>
-        {/* Preload critical hero images */}
+        {/* 3. Critical image preloading */}
         <link rel="preload" href="/cover.jpg" as="image" fetchPriority="high"/>
         <link rel="preload" href="/anticover.jpeg" as="image" fetchPriority="high"/>
         {/* Preload the card background */}
         <link rel="preload" href="/cards/time702-copy-6_51163893512_l.jpg" as="image" fetchPriority="high"/>
       </head>
-      <body>{children}</body>
+      {/* 4. Apply Inter as the default body font */}
+      <body className={inter.className}>
+        {children}
+      </body>
     </html>
   );
 }

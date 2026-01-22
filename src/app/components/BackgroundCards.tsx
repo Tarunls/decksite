@@ -279,7 +279,7 @@ function Card({ card, index, smoothX, smoothY, imageUrl, isShuffling, isFlipped 
       }}
     >
       <motion.div 
-        className={`w-40 h-56 rounded-lg overflow-hidden border ${isFlipped ? 'border-black/20 bg-gray-100' : 'border-white/10 bg-white'}`}
+        className={`w-[15vw] h-[21vw] max-w-[250px] max-h-[350px] rounded-lg overflow-hidden border ${isFlipped ? 'border-black/20 bg-gray-100' : 'border-white/10 bg-white'}`}
         style={{ 
             opacity: 1, 
             boxShadow: '0 10px 30px -10px rgba(0,0,0,0.5)',
