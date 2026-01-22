@@ -2,12 +2,12 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Navigation, SectionName } from '@/app/components/Navigation';
-import { Hero3DCard } from '@/app/components/Hero3DCard';
-import { BackgroundCards } from '@/app/components/BackgroundCards';
-import { AboutOverlay } from '@/app/components/AboutOverlay';
-import { WorkSection } from '@/app/components/WorkSection'; 
-import { ContactSection } from '@/app/components/ContactSection';
+import { Navigation, SectionName } from './components/Navigation';
+import { Hero3DCard } from './components/Hero3DCard';
+import { BackgroundCards } from './components/BackgroundCards';
+import { AboutOverlay } from './components/AboutOverlay';
+import { WorkSection } from './components/WorkSection'; 
+import { ContactSection } from './components/ContactSection';
 
 // --- NEW "SPOTLIGHT SCANNER" LOADER ---
 function LoadingScreen() {

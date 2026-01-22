@@ -1,7 +1,7 @@
   'use client';
 
   import { motion } from 'motion/react';
-  import { ImageWithFallback } from '@/app/components/figma/ImageWithFallback';
+  import { ImageWithFallback } from './figma/ImageWithFallback';
 
   interface Hero3DCardProps {
     imageUrl: string;

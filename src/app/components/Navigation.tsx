@@ -13,9 +13,10 @@ interface NavigationProps {
   onNavigate?: (section: SectionName) => void;
   // Tells the nav which button should look "active"
   activeSection?: SectionName;
+  onAboutClick?: () => void;
 }
 
-export function Navigation({ onShuffle, isFlipped = false, onNavigate, activeSection }: NavigationProps) {
+export function Navigation({ onShuffle, isFlipped = false, onNavigate, activeSection, onAboutClick }: NavigationProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const navItems = [

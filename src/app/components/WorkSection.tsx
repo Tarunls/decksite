@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'motion/react';
-import { ImageWithFallback } from '@/app/components/figma/ImageWithFallback';
+import { ImageWithFallback } from './figma/ImageWithFallback';
+import { MotionValue } from 'motion/react';
 
 // --- 1. DATA ---
 interface WorkItem {
@@ -13,6 +14,18 @@ interface WorkItem {
   description: string;
   technologies: string[];
   frontImage: string;
+}
+
+interface CarouselCardProps {
+  item: WorkItem;
+  index: number;
+  focusedIndex: number;
+  setFocusedIndex: (index: number) => void;
+  setExpandedId: (id: number | null) => void;
+  isExpanded: boolean;
+  mouseX: MotionValue<number>;
+  mouseY: MotionValue<number>;
+  isDarkMode: boolean;
 }
 
 const workItems: WorkItem[] = [
@@ -168,14 +181,16 @@ function CardBackContent({ item, isExpanded, onClose, darkMode = false }: CardBa
             </div>
             <div className="pt-4">
                 <h5 className={`text-xs font-mono uppercase tracking-widest ${darkMode ? 'text-white/30' : 'text-black/40'} mb-4`}>Technology Inventory</h5>
-                <div className="grid grid-cols-2 gap-3">
-                      {item.technologies.map((tech) => (
-                        <div key={tech} className={`flex items-center gap-2 border p-2 rounded-sm shadow-sm ${tagBg}`}>
-                            <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
-                            <span className={`text-[10px] font-mono uppercase ${textSub}`}>{tech}</span>
-                        </div>
-                      ))}
-                </div>
+                {/* Locate this section inside CardBackContent */}
+              <div className="grid grid-cols-2 gap-3">
+                {item.technologies.map((tech, idx) => (
+                  // Change key={tech} to key={`${tech}-${idx}`}
+                  <div key={`${tech}-${idx}`} className={`flex items-center gap-2 border p-2 rounded-sm shadow-sm ${tagBg}`}>
+                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
+                      <span className={`text-[10px] font-mono uppercase ${textSub}`}>{tech}</span>
+                  </div>
+                ))}
+              </div>
             </div>
             <div className={`pt-12 border-t ${borderClass} mt-12`}>
                 <h5 className={`text-[10px] font-mono uppercase tracking-widest ${darkMode ? 'text-white/20' : 'text-black/30'} mb-4`}>System Logs</h5>
@@ -192,7 +207,17 @@ function CardBackContent({ item, isExpanded, onClose, darkMode = false }: CardBa
 }
 
 // --- 4. CAROUSEL CARD ---
-function CarouselCard({ item, index, focusedIndex, setFocusedIndex, setExpandedId, isExpanded, mouseX, mouseY, isDarkMode }: any) {
+function CarouselCard({ 
+  item, 
+  index, 
+  focusedIndex, 
+  setFocusedIndex, 
+  setExpandedId, 
+  isExpanded, 
+  mouseX, 
+  mouseY, 
+  isDarkMode 
+}: CarouselCardProps) {
   
   // -- PARALLAX PHYSICS --
   const springConfig = { damping: 25, stiffness: 150 }; 

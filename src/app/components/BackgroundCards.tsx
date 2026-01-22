@@ -1,14 +1,25 @@
 'use client';
 
-import { motion, useMotionValue, useSpring, useTransform } from 'motion/react';
-import { ImageWithFallback } from '@/app/components/figma/ImageWithFallback';
-import { useEffect, useMemo } from 'react';
+import { motion, useMotionValue, useSpring, useTransform, MotionValue } from 'motion/react';
+import { ImageWithFallback } from './figma/ImageWithFallback';
+import { useEffect, useMemo, useState } from 'react';
 
 interface BackgroundCardsProps {
   imageUrl?: string;
   shuffleCount?: number;
   isShuffling?: boolean;
   isFlipped?: boolean;
+}
+
+// Define types for the individual Card component to fix red lines
+interface CardProps {
+  card: { x: string; y: string; rotation: number; z: number; parallax: number };
+  index: number;
+  smoothX: MotionValue<number>;
+  smoothY: MotionValue<number>;
+  imageUrl: string;
+  isShuffling: boolean;
+  isFlipped: boolean;
 }
 
 export function BackgroundCards({ 
@@ -18,7 +29,13 @@ export function BackgroundCards({
   isFlipped = false 
 }: BackgroundCardsProps) {
   
-  // 1. ORIGINAL IMAGES (Dark Mode)
+  // MOVED INSIDE: Hooks must be inside the function body
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const cardImages = [
     "/cards/resized_10th/time702-copy_51164800263_l.jpg",
     "/cards/resized_10th/time702-copy-5_51165659585_l.jpg",
@@ -75,8 +92,7 @@ export function BackgroundCards({
     "/cards/resized_10th/time752-copy-5_51163945537_l.jpg",
     "/cards/resized_10th/time752-copy-9_51163945597_l.jpg"
   ];
-  
-  // 2. NEW "ANTI" IMAGES (Light Mode)
+
   const antiCardImages = [
     '/angrygodofwealth/resized_10th/angry-god-of-wealth356-copy-2_50684893661_l.jpg',
     '/angrygodofwealth/resized_10th/angry-god-of-wealth356-copy-4_50684893561_l.jpg',
@@ -138,6 +154,9 @@ export function BackgroundCards({
     : cardImages;
 
   const shuffledIndices = useMemo(() => {
+    // If not mounted, return a fixed order for the server to match HTML
+    if (!isMounted) return Array.from({ length: 60 }, (_, i) => i);
+    
     const length = Math.max(cardImages.length, antiCardImages.length);
     const indices = Array.from({ length }, (_, i) => i);
     for (let i = indices.length - 1; i > 0; i--) {
@@ -145,8 +164,7 @@ export function BackgroundCards({
       [indices[i], indices[j]] = [indices[j], indices[i]];
     }
     return indices;
-  }, [shuffleCount]);
-
+  }, [shuffleCount, isMounted]);
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -189,27 +207,22 @@ export function BackgroundCards({
     { x: '95%', y: '55%', rotation: 35, z: -120, parallax: 0.8 },
     { x: '50%', y: '20%', rotation: -15, z: -150, parallax: 0.3 },
     { x: '60%', y: '80%', rotation: -15, z: -60, parallax: 0.3 },
-     { x: '50%', y: '70%', rotation: -15, z: -60, parallax: 0.5 }
+    { x: '50%', y: '70%', rotation: -15, z: -60, parallax: 0.5 }
   ];
 
   return (
     <>
-      {/* OPTIMIZATION: Use ImageWithFallback here too.
-         This ensures we download the OPTIMIZED version for the cache, 
-         not the full resolution raw image.
-      */}
       <div 
         aria-hidden="true" 
         className="fixed left-0 top-0 w-0 h-0 overflow-hidden opacity-0 pointer-events-none z-[-1]"
       >
         {antiCardImages.map((img, i) => (
            <ImageWithFallback 
-              key={i} 
-              src={img} 
-              alt="" 
-              // Matches the card size below (w-40 = 160px)
-              sizes="160px" 
-              priority
+             key={i} 
+             src={img} 
+             alt="" 
+             sizes="160px" 
+             priority
            />
         ))}
       </div>
@@ -242,7 +255,8 @@ export function BackgroundCards({
   );
 }
 
-function Card({ card, index, smoothX, smoothY, imageUrl, isShuffling, isFlipped }: any) {
+// Fixed 'any' type to avoid red lines
+function Card({ card, index, smoothX, smoothY, imageUrl, isShuffling, isFlipped }: CardProps) {
   const x = useTransform(smoothX, [-1, 1], [-50 * card.parallax, 50 * card.parallax]);
   const y = useTransform(smoothY, [-1, 1], [-50 * card.parallax, 50 * card.parallax]);
   const rotateX = useTransform(smoothY, [-1, 1], [15 * card.parallax, -15 * card.parallax]);
@@ -265,12 +279,10 @@ function Card({ card, index, smoothX, smoothY, imageUrl, isShuffling, isFlipped 
       }}
     >
       <motion.div 
-        // w-40 is 10rem (160px), h-56 is 14rem (224px)
         className={`w-40 h-56 rounded-lg overflow-hidden border ${isFlipped ? 'border-black/20 bg-gray-100' : 'border-white/10 bg-white'}`}
         style={{ 
             opacity: 1, 
             boxShadow: '0 10px 30px -10px rgba(0,0,0,0.5)',
-            // OPTIMIZATION: Tell browser we will animate filter
             willChange: 'filter' 
         }}
         animate={{
@@ -283,7 +295,6 @@ function Card({ card, index, smoothX, smoothY, imageUrl, isShuffling, isFlipped 
             src={imageUrl} 
             alt="Card" 
             className="w-full h-full object-cover" 
-            // OPTIMIZATION: Force small image download
             sizes="160px"
         />
         <div className={`absolute inset-0 ${isFlipped ? 'bg-black/10' : 'bg-white/40'}`} />
