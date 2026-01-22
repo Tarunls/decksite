@@ -240,15 +240,7 @@ export default function App() {
                 </div>
 
                 {/* Right Side: 3D Hero Card */}
-                <div 
-                    className="absolute top-1/2 -translate-y-1/2 flex items-center justify-center"
-                    style={{ 
-                        left: '75%', 
-                        top: '80%',
-                        transform: 'translate(-50%, -50%)', // Centers the card on the 65% line
-                        zIndex: 20 
-                    }}
-                >
+                <div className="flex items-center justify-end lg:justify-start px-8 lg:pr-24 lg:pl-60">
                 <div 
                     className="relative"
                     style={{
