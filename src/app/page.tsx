@@ -1,5 +1,5 @@
 'use client';
-
+// Hi mom I'm Famous!
 import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Navigation, SectionName } from './components/Navigation';
