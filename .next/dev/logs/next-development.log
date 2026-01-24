@@ -2099,3 +2099,11 @@ It can also happen if the client has a browser extension installed which messes 
                         >
                   ...
 
+[02:19:24.020] Server  LOG     ✓ Compiled in 109ms
+[02:19:51.724] Server  LOG     ✓ Compiled in 78ms
+[02:20:45.344] Server  LOG     ✓ Compiled in 78ms
+[02:20:59.484] Server  LOG     ✓ Compiled in 71ms
+[02:21:16.324] Server  LOG     ✓ Compiled in 126ms
+[02:21:23.820] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[02:21:49.881] Server  LOG     ✓ Compiled in 71ms
+[02:45:57.135] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold

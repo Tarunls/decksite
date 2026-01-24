@@ -10,6 +10,7 @@ import { WorkSection } from './components/WorkSection';
 import { ContactSection } from './components/ContactSection';
 import { cardImages, antiCardImages } from '../lib/constants';
 import ProjectContent from './components/ProjectContent';
+import { SecretPortal } from './components/SecretPortal';
 import { cinzel } from '../lib/fonts';
 
 // --- NEW MOTION TOGGLE COMPONENT ---
@@ -211,6 +212,7 @@ export default function App() {
   const [isFlipped, setIsFlipped] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<SectionName>('home');
+  const [isSecretOpen, setIsSecretOpen] = useState(false);
 
   // --- NEW: REDUCED MOTION STATE ---
   const [isReducedMotion, setIsReducedMotion] = useState(false);
@@ -355,12 +357,18 @@ export default function App() {
         isFlipped={isFlipped}
       />
 
+      <SecretPortal 
+        isOpen={isSecretOpen} 
+        onClose={() => setIsSecretOpen(false)} 
+      />
+
       <Navigation 
         onShuffle={handleShuffleTrigger} 
         isFlipped={isFlipped} 
         activeSection={activeSection} 
         onNavigate={handleNavigation} 
         onAboutClick={() => setIsAboutOpen(true)} 
+        onSecretTrigger={() => setIsSecretOpen(true)}
       />
 
       <AnimatePresence mode="wait">

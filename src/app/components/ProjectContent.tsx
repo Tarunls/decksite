@@ -89,7 +89,8 @@ interface InspectableCardProps {
   onUpdatePosition: (index: number, x: number, y: number) => void;
   containerRef: React.RefObject<any>;
   isFlipped: boolean;
-  isReducedMotion: boolean; // <--- Added Prop
+  isReducedMotion: boolean; 
+  hasDealt: boolean; // <--- NEW PROP
 }
 
 function InspectableCard({ 
@@ -103,7 +104,8 @@ function InspectableCard({
   onUpdatePosition, 
   containerRef,
   isFlipped,
-  isReducedMotion 
+  isReducedMotion,
+  hasDealt // <--- Destructure new prop
 }: InspectableCardProps) {
   
   const isDragging = useRef(false);
@@ -138,7 +140,7 @@ function InspectableCard({
           transition: { duration: 0.5 }
         };
       } else {
-        // DEALING STATE
+        // IDLE / DEALING STATE
         animateState = {
           x: position.x, 
           y: position.y, 
@@ -147,8 +149,13 @@ function InspectableCard({
           scale: 1, 
           opacity: 1, 
           zIndex: index,
-          // SLOWER DELAY FOR DEALER EFFECT
-          transition: { duration: 0.8, ease: "easeOut", delay: index * 0.25 }
+          // CRITICAL FIX: Only apply the dealer delay if we haven't dealt yet.
+          // Otherwise (when closing a card), move back instantly.
+          transition: { 
+             duration: 0.8, 
+             ease: "easeOut", 
+             delay: hasDealt ? 0 : index * 0.25 
+          }
         };
       }
   }
@@ -194,41 +201,34 @@ function InspectableCard({
 interface ProjectContentProps {
   onClose: () => void;
   isFlipped?: boolean;
-  isReducedMotion?: boolean; // <--- Accepted Prop
+  isReducedMotion?: boolean;
 }
 
 export default function ProjectContent({ onClose, isFlipped = false, isReducedMotion = false }: ProjectContentProps) {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const containerRef = useRef(null);
   
-  // Use state to hold positions. Initialize with 0s to avoid hydration errors, calculate in useEffect.
+  // Track if initial deal animation is complete
+  const [hasDealt, setHasDealt] = useState(false);
+
   const [positions, setPositions] = useState<Position[]>(
     projects.map(() => ({ x: 0, y: 0, r: 0 }))
   );
 
-  // --- RESPONSIVE DEALING LOGIC ---
+  // --- RESPONSIVE DEALING LOGIC & DEAL TIMER ---
   useEffect(() => {
+    // 1. Position Logic
     const calculatePositions = () => {
       const isMobile = window.innerWidth < 768;
-      
       const newPositions = projects.map((_, index) => {
-        // Calculate center offset
         const centerOffset = index - (projects.length - 1) / 2;
-
         if (isMobile) {
-          // MOBILE: Stack vertically with slight overlap (Deck Style)
-          // Ensures they don't fly off screen
-          return {
-            x: centerOffset * 10,  // Very slight horizontal offset
-            y: centerOffset * 60,  // Vertical stacking
-            r: centerOffset * 3    // Gentle rotation
-          };
+          return { x: centerOffset * 10, y: centerOffset * 60, r: centerOffset * 3 };
         } else {
-          // DESKTOP: Scatter horizontally
           return {
-            x: centerOffset * 250, // Wide spread
-            y: (index % 2 === 0 ? -1 : 1) * 30, // Zig-zag Y
-            r: (index % 2 === 0 ? -5 : 5)       // Zig-zag Rotation
+            x: centerOffset * 250, 
+            y: (index % 2 === 0 ? -1 : 1) * 30, 
+            r: (index % 2 === 0 ? -5 : 5) 
           };
         }
       });
@@ -237,8 +237,20 @@ export default function ProjectContent({ onClose, isFlipped = false, isReducedMo
 
     calculatePositions();
     window.addEventListener('resize', calculatePositions);
-    return () => window.removeEventListener('resize', calculatePositions);
-  }, []); // Run once on mount
+
+    // 2. Deal Timer
+    // Calculate total time: Max Delay (last card) + Duration
+    // Example: 4 cards. Last index 3 * 0.25s = 0.75s delay + 0.8s duration = ~1.6s
+    const totalDealTime = (projects.length * 250) + 800;
+    const dealTimer = setTimeout(() => {
+        setHasDealt(true);
+    }, totalDealTime);
+
+    return () => {
+        window.removeEventListener('resize', calculatePositions);
+        clearTimeout(dealTimer);
+    };
+  }, []); 
 
   const updatePosition = (index: number, newX: number, newY: number) => {
     setPositions(prev => {
@@ -256,14 +268,12 @@ export default function ProjectContent({ onClose, isFlipped = false, isReducedMo
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      {/* BACKDROP */}
       <motion.div 
         className="absolute inset-0 bg-black/0 pointer-events-none transition-colors duration-500"
         animate={{ backgroundColor: selectedId ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0)" }}
         style={{ backdropFilter: selectedId ? "blur(8px)" : "blur(0px)" }}
       />
 
-      {/* CLOSE AREA (Clicking outside cards) */}
       <div 
         onClick={() => {
             if (selectedId) setSelectedId(null);
@@ -272,7 +282,6 @@ export default function ProjectContent({ onClose, isFlipped = false, isReducedMo
         className="absolute inset-0 cursor-pointer"
       />
 
-      {/* HINT TEXT */}
       {!selectedId && (
         <motion.div 
           initial={{ opacity: 0 }}
@@ -284,7 +293,6 @@ export default function ProjectContent({ onClose, isFlipped = false, isReducedMo
         </motion.div>
       )}
 
-      {/* CARDS CONTAINER */}
       <div className="absolute inset-0 pointer-events-none perspective-[1200px] flex items-center justify-center">
         {projects.map((project, index) => (
           <div key={project.id} className="absolute pointer-events-auto flex items-center justify-center">
@@ -302,7 +310,8 @@ export default function ProjectContent({ onClose, isFlipped = false, isReducedMo
                 onClose={() => setSelectedId(null)}
                 
                 isFlipped={isFlipped} 
-                isReducedMotion={isReducedMotion} // Pass down prop
+                isReducedMotion={isReducedMotion}
+                hasDealt={hasDealt} // Pass the state
              />
           </div>
         ))}

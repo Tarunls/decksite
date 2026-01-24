@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'motion/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export type SectionName = 'home' | 'work' | 'project' | 'about' | 'contact';
 
@@ -11,10 +11,45 @@ interface NavigationProps {
   onNavigate?: (section: SectionName) => void;
   activeSection?: SectionName;
   onAboutClick?: () => void;
+  onSecretTrigger: () => void; // <--- ADD THIS
 }
 
-export function Navigation({ onShuffle, isFlipped = false, onNavigate, activeSection }: NavigationProps) {
+export function Navigation({ 
+  onShuffle, 
+  isFlipped = false, 
+  onNavigate, 
+  activeSection,
+  onSecretTrigger // <--- DESTRUCTURE THIS
+}: NavigationProps) {
+  
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  
+  // --- SECRET LOGIC ---
+  const [logoClicks, setLogoClicks] = useState(0);
+
+  useEffect(() => {
+    // Reset clicks if user stops tapping for 1 second
+    if (logoClicks > 0) {
+      const timer = setTimeout(() => setLogoClicks(0), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [logoClicks]);
+
+  const handleLogoClick = () => {
+    // 1. If currently on a section, go home (standard behavior)
+    if (activeSection !== 'home') {
+       onNavigate?.('home');
+    }
+
+    // 2. Track rapid clicks
+    const next = logoClicks + 1;
+    setLogoClicks(next);
+
+    if (next === 5) {
+      onSecretTrigger();
+      setLogoClicks(0);
+    }
+  };
 
   const navItems = [
     { name: 'Home', suit: '♠', section: 'home' as SectionName },
@@ -28,14 +63,16 @@ export function Navigation({ onShuffle, isFlipped = false, onNavigate, activeSec
     <>
       {/* --- DESKTOP NAVIGATION --- */}
       <div className="hidden lg:flex fixed inset-0 z-50 pointer-events-none p-12 flex-col justify-between">
-        {/* TOP ROW */}
         <div className="flex justify-between items-start relative z-10">
+          
+          {/* THE LOGO TRIGGER */}
           <motion.div 
             initial={{ opacity: 0, x: -20 }} 
             animate={{ opacity: 1, x: 0 }} 
             transition={{ delay: 1, duration: 0.8 }}
-            onClick={() => onNavigate?.('home')}
-            className={`${isFlipped ? 'text-black' : 'text-white'} font-serif text-2xl tracking-tighter pointer-events-auto cursor-pointer mix-blend-difference`}
+            onClick={handleLogoClick} // <--- ATTACH CLICK HANDLER
+            className={`${isFlipped ? 'text-black' : 'text-white'} font-serif text-2xl tracking-tighter pointer-events-auto cursor-pointer mix-blend-difference select-none`}
+            whileTap={{ scale: 0.9 }}
           >
             TS<span className="text-xs align-top opacity-50 font-sans ml-1">©</span>
           </motion.div>
@@ -87,9 +124,8 @@ export function Navigation({ onShuffle, isFlipped = false, onNavigate, activeSec
           </motion.nav>
         </div>
 
-        {/* BOTTOM ROW (Shuffle) */}
         <div className="flex justify-between items-end overflow-hidden relative z-10">
-          <div className={`text-[10px] uppercase tracking-[0.2em] font-mono ${isFlipped ? 'text-black' : 'text-white'}`}>SECRET</div>
+          <div className={`text-[10px] uppercase tracking-[0.2em] font-mono ${isFlipped ? 'text-black' : 'text-white'}`}></div>
           <button 
             onClick={onShuffle} 
             className={`flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-mono pointer-events-auto cursor-pointer ${isFlipped ? 'text-black' : 'text-white'}`}
@@ -99,7 +135,7 @@ export function Navigation({ onShuffle, isFlipped = false, onNavigate, activeSec
         </div>
       </div>
 
-      {/* --- MOBILE SHUFFLE BUTTON (Top Right) --- */}
+      {/* --- MOBILE SHUFFLE BUTTON --- */}
       <button 
         onClick={onShuffle}
         className="lg:hidden fixed top-6 right-6 z-50 bg-black/80 backdrop-blur border border-white/10 text-white p-3 rounded-full shadow-lg"
@@ -107,7 +143,7 @@ export function Navigation({ onShuffle, isFlipped = false, onNavigate, activeSec
         ↻
       </button>
 
-      {/* --- MOBILE NAVIGATION DOCK (Bottom) --- */}
+      {/* --- MOBILE NAVIGATION --- */}
       <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-sm">
         <nav className="flex items-center justify-between bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl p-2 shadow-2xl">
           {navItems.map((item) => {
