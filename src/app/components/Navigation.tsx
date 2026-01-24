@@ -108,7 +108,7 @@ export function Navigation({ onShuffle, isFlipped = false, onNavigate, activeSec
 
       {/* --- MOBILE NAVIGATION --- */}
       <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-sm">
-         <div className="absolute -top-12 right-0">
+         <div className="absolute top-2 left-100">
             <button 
               onClick={onShuffle}
               className="bg-black/80 backdrop-blur border border-white/10 text-white p-3 rounded-full shadow-lg"

@@ -723,8 +723,16 @@
     right: calc(var(--spacing) * 10);
   }
 
+  .right-20 {
+    right: calc(var(--spacing) * 20);
+  }
+
   .right-100 {
     right: calc(var(--spacing) * 100);
+  }
+
+  .right-200 {
+    right: calc(var(--spacing) * 200);
   }
 
   .-bottom-12 {
