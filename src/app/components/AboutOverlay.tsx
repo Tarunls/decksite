@@ -7,14 +7,13 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 interface AboutOverlayProps {
   isOpen: boolean;
   onClose: () => void;
-  isFlipped: boolean; // <--- NEW PROP
+  isFlipped: boolean; 
 }
 
 export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) {
   const [showContent, setShowContent] = useState(false);
   const cardBackImage = "coverotate.jpg"; 
 
-  // LOGIC: If isFlipped is false (App is Dark), we want DarkMode card.
   const isDarkMode = !isFlipped;
 
   useEffect(() => {
@@ -37,7 +36,7 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center perspective-[2000px]">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center perspective-[2000px] p-4">
           
           {/* BACKDROP */}
           <motion.div
@@ -56,9 +55,10 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
             transition={{ type: "spring", damping: 25, stiffness: 120, mass: 0.8 }}
             className={`
               relative 
-              aspect-[7/5] 
-              w-[90vw] md:w-auto md:h-[80vh]
-              max-w-[90vw] max-h-[90vh]
+              /* MOBILE: Auto aspect, fixed height to force scroll */
+              w-[95vw] h-[85vh] aspect-auto
+              /* DESKTOP: Fixed aspect ratio, auto height */
+              md:w-auto md:h-auto md:aspect-[7/5] md:max-h-[90vh]
               rounded-2xl shadow-2xl
             `}
             style={{ transformStyle: 'preserve-3d' }}
@@ -69,67 +69,70 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
               className={`absolute inset-0 rounded-2xl overflow-hidden border transition-colors duration-500 ${bgClass} ${borderColor}`}
               style={{ backfaceVisibility: 'hidden' }}
             >
-               {/* CLOSE BUTTON */}
+                {/* CLOSE BUTTON */}
               <motion.button 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: showContent ? 1 : 0 }}
                 onClick={onClose}
-                className={`absolute top-6 right-6 z-50 font-mono text-xs uppercase tracking-widest transition-colors ${closeBtnClass}`}
+                className={`absolute top-4 right-6 z-50 font-mono text-xs uppercase tracking-widest transition-colors ${closeBtnClass}`}
               >
                 [ Close ]
               </motion.button>
 
-              {/* CONTENT */}
+              {/* CONTENT WRAPPER - Added h-full and flex-col to ensure scrolling works */}
               <motion.div 
-                 className="relative z-10 w-full h-full overflow-y-auto p-8 md:p-12 scrollbar-hide"
+                 className="relative z-10 w-full h-full flex flex-col"
                  initial={{ opacity: 0, y: 20 }}
                  animate={{ opacity: showContent ? 1 : 0, y: showContent ? 0 : 20 }}
                  transition={{ duration: 0.5, delay: 0.2 }}
               >
-                <div className="max-w-4xl mx-auto space-y-8 h-full flex flex-col justify-center">
-                  
-                  {/* Header */}
-                  <div className={`flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b ${borderColor} pb-6`}>
-                    <div>
-                      <div className={`text-xs font-mono uppercase tracking-[0.3em] mb-2 ${textSub}`}>
-                          What's • Up
+                {/* SCROLLABLE AREA */}
+                <div className="flex-1 overflow-y-auto p-8 md:p-12 scrollbar-hide">
+                  <div className="max-w-4xl mx-auto space-y-8 min-h-min flex flex-col justify-center">
+                    
+                    {/* Header */}
+                    <div className={`flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b ${borderColor} pb-6 pt-4`}>
+                      <div>
+                        <div className={`text-xs font-mono uppercase tracking-[0.3em] mb-2 ${textSub}`}>
+                            What's • Up
+                        </div>
+                        <h2 className={`text-4xl md:text-6xl font-serif font-bold ${textMain}`}>
+                          <br />Caino
+                        </h2>
                       </div>
-                      <h2 className={`text-4xl md:text-6xl font-serif font-bold ${textMain}`}>
-                        <br />Caino
-                      </h2>
+                      <div className="text-right">
+                        <div className={`text-xs font-mono uppercase tracking-widest ${textSub}`}>Age</div>
+                        <div className={`text-3xl font-light ${textMain}`}>20</div>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <div className={`text-xs font-mono uppercase tracking-widest ${textSub}`}>Age</div>
-                      <div className={`text-3xl font-light ${textMain}`}>20</div>
+
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-3 gap-4">
+                      <StatBlock label="Class" value="Engineer" textColor={textMain} subColor={textSub} borderColor={borderColor} />
+                      <StatBlock label="Guild" value="UTD" textColor={textMain} subColor={textSub} borderColor={borderColor} />
+                      <StatBlock label="Origin" value="Texas" textColor={textMain} subColor={textSub} borderColor={borderColor} />
                     </div>
-                  </div>
 
-                  {/* Stats Grid */}
-                  <div className="grid grid-cols-3 gap-4">
-                    <StatBlock label="Class" value="Engineer" textColor={textMain} subColor={textSub} borderColor={borderColor} />
-                    <StatBlock label="Guild" value="UTD" textColor={textMain} subColor={textSub} borderColor={borderColor} />
-                    <StatBlock label="Origin" value="Texas" textColor={textMain} subColor={textSub} borderColor={borderColor} />
-                  </div>
-
-                  {/* Bio */}
-                  <div className={`text-base md:text-lg leading-relaxed font-light ${textSub}`}>
-                    <p>
-                      I'm just a goofy goober for now. 
-                      Specializing in <b className={textMain}>Next.js</b> and <b className={textMain}>Python</b>.
-                    </p>
-                  </div>
-
-                  {/* Skills */}
-                  <div>
-                    <div className="flex flex-wrap gap-2">
-                      {['React', 'Next.js', 'TypeScript', 'Tailwind', 'Motion', 'Python', 'Node.js', 'Figma'].map((tech) => (
-                        <span key={tech} className={`px-3 py-1 text-[10px] font-mono uppercase tracking-wider border rounded-sm ${tagClass}`}>
-                          {tech}
-                        </span>
-                      ))}
+                    {/* Bio */}
+                    <div className={`text-base md:text-lg leading-relaxed font-light ${textSub}`}>
+                      <p>
+                        I'm just a goofy goober for now. 
+                        Specializing in <b className={textMain}>Next.js</b> and <b className={textMain}>Python</b>.
+                      </p>
                     </div>
-                  </div>
 
+                    {/* Skills */}
+                    <div className="pb-8"> {/* Added padding bottom to ensure last items aren't cut off */}
+                      <div className="flex flex-wrap gap-2">
+                        {['React', 'Next.js', 'TypeScript', 'Tailwind', 'Motion', 'Python', 'Node.js', 'Figma'].map((tech) => (
+                          <span key={tech} className={`px-3 py-1 text-[10px] font-mono uppercase tracking-wider border rounded-sm ${tagClass}`}>
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                  </div>
                 </div>
               </motion.div>
             </div>

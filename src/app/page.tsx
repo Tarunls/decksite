@@ -17,7 +17,11 @@ function MotionToggle({ isReduced, onToggle, isFlipped }: { isReduced: boolean; 
   return (
     <button
       onClick={onToggle}
-      className={`fixed bottom-8 left-8 z-[60] flex items-center gap-3 group focus:outline-none`}
+      // CHANGE HERE: Added 'top-6 left-6' for mobile, and 'lg:top-auto lg:bottom-8 lg:left-8' for desktop
+      className={`fixed z-[60] flex items-center gap-3 group focus:outline-none 
+        top-6 left-6 
+        lg:top-auto lg:bottom-8 lg:left-8
+      `}
     >
       {/* The Switch Track */}
       <div 
@@ -39,7 +43,7 @@ function MotionToggle({ isReduced, onToggle, isFlipped }: { isReduced: boolean; 
         />
       </div>
 
-      {/* The Label */}
+      {/* The Label - Hidden on very small screens if needed, but usually fine at top left */}
       <div className="flex flex-col items-start">
         <span className={`text-[10px] font-mono uppercase tracking-[0.2em] font-bold transition-colors duration-300 ${isFlipped ? 'text-black' : 'text-white'}`}>
           Motion

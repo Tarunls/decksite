@@ -53,10 +53,7 @@ export function Navigation({ onShuffle, isFlipped = false, onNavigate, activeSec
               {navItems.filter(i => i.section !== 'home').map((item, index) => {
                 const isActive = activeSection === item.section;
                 const isHovered = hoveredIndex === index;
-                // It is "active" (white bg) if hovered OR if it's the current section
                 const hasWhiteBackground = isHovered || (isActive && hoveredIndex === null);
-
-                // Determine Suit Color (Red or Black) - only matters if visible
                 const suitColor = ['♥','♦'].includes(item.suit) ? 'text-red-600' : 'text-black';
 
                 return (
@@ -77,15 +74,11 @@ export function Navigation({ onShuffle, isFlipped = false, onNavigate, activeSec
                       hasWhiteBackground ? 'text-black' : 'text-white/60'
                     }`}>
                       {item.name}
-                      
-                      {/* --- UPDATED SUIT SPAN --- */}
                       <span className={`text-xs font-serif transition-opacity duration-300 ${
-                         // If background is white (Hovered or Active), Opacity 1. Otherwise 0.
                          hasWhiteBackground ? `opacity-100 ${suitColor}` : 'opacity-0'
                       }`}>
                         {item.suit}
                       </span>
-
                     </span>
                   </button>
                 );
@@ -96,7 +89,7 @@ export function Navigation({ onShuffle, isFlipped = false, onNavigate, activeSec
 
         {/* BOTTOM ROW (Shuffle) */}
         <div className="flex justify-between items-end overflow-hidden relative z-10">
-          <div className={`text-[10px] uppercase tracking-[0.2em] font-mono ${isFlipped ? 'text-black' : 'text-white'}`}></div>
+          <div className={`text-[10px] uppercase tracking-[0.2em] font-mono ${isFlipped ? 'text-black' : 'text-white'}`}>SECRET</div>
           <button 
             onClick={onShuffle} 
             className={`flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-mono pointer-events-auto cursor-pointer ${isFlipped ? 'text-black' : 'text-white'}`}
@@ -106,21 +99,19 @@ export function Navigation({ onShuffle, isFlipped = false, onNavigate, activeSec
         </div>
       </div>
 
-      {/* --- MOBILE NAVIGATION --- */}
-      <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-sm">
-         <div className="absolute top-2 left-100">
-            <button 
-              onClick={onShuffle}
-              className="bg-black/80 backdrop-blur border border-white/10 text-white p-3 rounded-full shadow-lg"
-            >
-              ↻
-            </button>
-         </div>
+      {/* --- MOBILE SHUFFLE BUTTON (Top Right) --- */}
+      <button 
+        onClick={onShuffle}
+        className="lg:hidden fixed top-6 right-6 z-50 bg-black/80 backdrop-blur border border-white/10 text-white p-3 rounded-full shadow-lg"
+      >
+        ↻
+      </button>
 
+      {/* --- MOBILE NAVIGATION DOCK (Bottom) --- */}
+      <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-sm">
         <nav className="flex items-center justify-between bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl p-2 shadow-2xl">
           {navItems.map((item) => {
              const isActive = activeSection === item.section;
-             // Determine color if active
              const suitColor = ['♥','♦'].includes(item.suit) ? 'text-red-500' : 'text-black';
 
              return (
@@ -129,8 +120,6 @@ export function Navigation({ onShuffle, isFlipped = false, onNavigate, activeSec
                  onClick={() => onNavigate?.(item.section)}
                  className={`flex flex-col items-center justify-center w-full py-2 rounded-xl transition-all duration-300 ${isActive ? 'bg-white text-black' : 'text-white/60'}`}
                >
-                 {/* --- MOBILE UPDATED SUIT SPAN --- */}
-                 {/* Only visible if Active (since mobile has no hover) */}
                  <span className={`text-sm transition-opacity duration-300 ${isActive ? `opacity-100 ${suitColor}` : 'opacity-0'}`}>
                     {item.suit}
                  </span>
