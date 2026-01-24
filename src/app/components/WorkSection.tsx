@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'motion/react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { MotionValue } from 'motion/react';
 
-// --- 1. DATA ---
+
+// --- 1. DATA (Unchanged) ---
 interface WorkItem {
   id: number;
   company: string;
@@ -58,24 +59,26 @@ const workItems: WorkItem[] = [
   },
 ];
 
-// --- 2. MAIN COMPONENT ---
+// --- 2. MAIN COMPONENT (Optimized) ---
 interface WorkSectionProps {
   onGoHome: () => void;
-  isFlipped: boolean; // <--- ADDED PROP
+  isFlipped: boolean; 
 }
 
 export function WorkSection({ onGoHome, isFlipped }: WorkSectionProps) {
   const [focusedIndex, setFocusedIndex] = useState(1);
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
-  // LOGIC: If isFlipped is false (App is Dark), we want DarkMode cards.
   const isDarkMode = !isFlipped; 
 
-  // MOUSE TRACKING FOR PARALLAX
+  // MOUSE TRACKING
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
   const handleMouseMove = (e: React.MouseEvent) => {
+    // Only track mouse if NOT expanded to save resources
+    if (expandedId !== null) return;
+
     const { clientX, clientY } = e;
     const centerX = window.innerWidth / 2;
     const centerY = window.innerHeight / 2;
@@ -91,18 +94,17 @@ export function WorkSection({ onGoHome, isFlipped }: WorkSectionProps) {
       exit={{ opacity: 0 }}
       onMouseMove={handleMouseMove}
     >
-      {/* 1. ATMOSPHERE LAYER (Dynamic based on theme) */}
+      {/* 1. ATMOSPHERE LAYER (Optimized: Removed backdropFilter animation) */}
       <motion.div 
-        initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
+        initial={{ opacity: 0 }}
         animate={{ 
             opacity: 1, 
-            backdropFilter: "blur(20px)", // Heavier blur for foreground focus
-            backgroundColor: isDarkMode ? "rgba(0,0,0,0.7)" : "rgba(255,255,255,0.7)"
+            // Removed backdropFilter here - it is the #1 cause of lag
+            backgroundColor: isDarkMode ? "rgba(0,0,0,0.8)" : "rgba(255,255,255,0.8)"
         }}
-        exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
-        transition={{ duration: 0.8 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.5 }}
         className="absolute inset-0 z-0" 
-        style={{ willChange: "opacity, backdrop-filter" }}
         onClick={() => {
           if (expandedId === null) onGoHome();
         }} 
@@ -121,7 +123,7 @@ export function WorkSection({ onGoHome, isFlipped }: WorkSectionProps) {
             isExpanded={expandedId === item.id}
             mouseX={mouseX}
             mouseY={mouseY}
-            isDarkMode={isDarkMode} // Pass down
+            isDarkMode={isDarkMode} 
           />
         ))}
       </div>
@@ -132,7 +134,7 @@ export function WorkSection({ onGoHome, isFlipped }: WorkSectionProps) {
           <ExpandedCard 
             item={workItems.find(i => i.id === expandedId)!} 
             onClose={() => setExpandedId(null)}
-            isDarkMode={isDarkMode} // Pass down
+            isDarkMode={isDarkMode}
           />
         )}
       </AnimatePresence>
@@ -140,7 +142,7 @@ export function WorkSection({ onGoHome, isFlipped }: WorkSectionProps) {
   );
 }
 
-// --- 3. HELPER: SHARED BACK CONTENT (THEMED) ---
+// --- 3. HELPER: SHARED BACK CONTENT (Unchanged content, same logic) ---
 interface CardBackContentProps { 
   item: WorkItem; 
   isExpanded: boolean; 
@@ -149,7 +151,6 @@ interface CardBackContentProps {
 }
 
 function CardBackContent({ item, isExpanded, onClose, darkMode = false }: CardBackContentProps) {
-  // Define dynamic colors based on darkMode prop
   const bgClass = darkMode ? 'bg-[#1a1a1a]' : 'bg-white';
   const textMain = darkMode ? 'text-white' : 'text-black';
   const textMuted = darkMode ? 'text-white/50' : 'text-black/50';
@@ -181,10 +182,8 @@ function CardBackContent({ item, isExpanded, onClose, darkMode = false }: CardBa
             </div>
             <div className="pt-4">
                 <h5 className={`text-xs font-mono uppercase tracking-widest ${darkMode ? 'text-white/30' : 'text-black/40'} mb-4`}>Technology Inventory</h5>
-                {/* Locate this section inside CardBackContent */}
               <div className="grid grid-cols-2 gap-3">
                 {item.technologies.map((tech, idx) => (
-                  // Change key={tech} to key={`${tech}-${idx}`}
                   <div key={`${tech}-${idx}`} className={`flex items-center gap-2 border p-2 rounded-sm shadow-sm ${tagBg}`}>
                       <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
                       <span className={`text-[10px] font-mono uppercase ${textSub}`}>{tech}</span>
@@ -206,7 +205,7 @@ function CardBackContent({ item, isExpanded, onClose, darkMode = false }: CardBa
   );
 }
 
-// --- 4. CAROUSEL CARD ---
+// --- 4. CAROUSEL CARD (Unchanged logic, just ensure no heavy filters on animate) ---
 function CarouselCard({ 
   item, 
   index, 
@@ -219,28 +218,46 @@ function CarouselCard({
   isDarkMode 
 }: CarouselCardProps) {
   
-  // -- PARALLAX PHYSICS --
+  // --- DETECT MOBILE ---
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    // Check if window is less than 768px (standard md breakpoint)
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile(); // Check on mount
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const springConfig = { damping: 25, stiffness: 150 }; 
   const smoothMouseX = useSpring(mouseX, springConfig);
   const smoothMouseY = useSpring(mouseY, springConfig);
 
   const rotateX = useTransform(smoothMouseY, [-500, 500], [10, -10]); 
   const rotateY = useTransform(smoothMouseX, [-500, 500], [-10, 10]);
+  
+  // --- FIX 1: ADJUST TEXT HEIGHT ---
+  // On Desktop: move text based on mouse. On Mobile: Keep it static and HIGHER up (-50) so it clears the card
   const textX = useTransform(smoothMouseX, [-500, 500], [-15, 15]);
-  const textY = useTransform(smoothMouseY, [-500, 500], [-15, 15]);
+  const textY = useTransform(smoothMouseY, [-500, 500], isMobile ? [-50, -50] : [-15, 15]);
 
   const offset = index - focusedIndex;
   const isFocused = offset === 0;
   
-  const spacing = isFocused ? 0 : 180;
+  // --- FIX 2: TIGHTER SPACING ON MOBILE ---
+  // Desktop: 180px apart. Mobile: 40px apart (very tight overlap, like a hand of cards)
+  const spacing = isFocused ? 0 : (isMobile ? 150 : 180);
+  
   const x = offset * spacing;
-  const y = isFocused ? 200 : 300; // Focused card "pops up" out of the hand
-  const scale = isFocused ? 1.0 : 0.8; // Hand cards are smaller
-  const baseRotateZ = offset * 12; // Increased tilt for the fan effect
+  
+  // Adjust Y: On mobile, focused card needs to pop up MORE to be clear of the "hand"
+  const y = isFocused ? (isMobile ? 100 : 120) : (isMobile ? 100 : 200); 
+  
+  const scale = isFocused ? 1.0 : (isMobile ? 0.85 : 0.8); 
+  
+  // On mobile, fan the rotation out more so the tight spacing doesn't look like a messy pile
+  const baseRotateZ = offset * (isMobile ? 8 : 12); 
   const zIndex = 50 - Math.abs(offset) * 10;
 
-  // Dynamic Text Colors for the Floating Title
-  // If Dark Mode: White Text. If Light Mode: Black Text.
   const titleColor = isDarkMode ? (isFocused ? 'text-white' : 'text-white/40') : (isFocused ? 'text-black' : 'text-black/40');
   const roleColor = isDarkMode ? (isFocused ? 'text-blue-400' : 'text-white/20') : (isFocused ? 'text-blue-600' : 'text-black/20');
 
@@ -275,7 +292,7 @@ function CarouselCard({
         zIndex: 100, 
         transition: { duration: 0.1 } 
       }}
-      className="absolute w-[280px] md:w-[350px] aspect-[5/7] cursor-pointer pointer-events-auto"
+      className="absolute w-[220px] md:w-[350px] aspect-[5/7] cursor-pointer pointer-events-auto"
       onClick={handleClick}
     >
       {/* FLOATING TEXT */}
@@ -304,13 +321,13 @@ function CarouselCard({
       >
         {/* FRONT FACE */}
         <div 
-            className="absolute inset-0 rounded-xl bg-[#0f0f0f] border border-white/20 p-1.5 shadow-2xl"
+            className="absolute inset-0 rounded-xl bg-[#0f0f0f] border shadow-2xl"
             style={{ 
               backfaceVisibility: 'hidden', 
               filter: isFocused ? 'saturate(1.2)' : 'saturate(0.5) brightness(0.8)' 
             }}
         >
-             <div className="relative w-full h-full rounded-lg overflow-hidden bg-black">
+              <div className="relative w-full h-full rounded-lg overflow-hidden bg-black">
                 <ImageWithFallback 
                     src={item.frontImage} 
                     alt={item.company} 
@@ -337,51 +354,62 @@ function CarouselCard({
   );
 }
 
-// --- 5. EXPANDED MODAL CARD ---
+// --- 5. EXPANDED MODAL CARD (Optimized) ---
 function ExpandedCard({ item, onClose, isDarkMode }: { item: WorkItem, onClose: () => void, isDarkMode: boolean }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center perspective-[2000px] pointer-events-auto">
       
-      {/* Backdrop */}
+      {/* Backdrop (Optimized: Removed backdrop-blur-md) */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
         onClick={onClose}
-        className="absolute inset-0 bg-black/80 backdrop-blur-md cursor-pointer"
+        // Replaced blur with a stronger opacity solid color. 
+        // This removes the massive GPU overhead of live blurring.
+        className="absolute inset-0 bg-black/90 cursor-pointer"
         style={{ willChange: "opacity" }}
       />
 
       {/* MODAL CONTAINER */}
       <motion.div
-        className="relative w-[95vw] md:w-auto h-[90vh] md:h-[80vh] aspect-[5/7] z-50"
+        className="relative w-[90vw] md:w-auto h-[75vh] md:h-[80vh] aspect-[5/7] z-50"
         initial={{ 
           opacity: 0, 
-          scale: 0.5, 
-          y: 500, // Starts from the bottom "hand" position
-          rotateX: 20 
+          scale: 0.6, // Less drastic scale change
+          y: 300, 
+          rotateX: 10 
         }}
         animate={{ 
           opacity: 1, 
           scale: 1, 
-          y: 0,    // Glides to the center
+          y: 0,
           rotateX: 0 
         }}
-        exit={{ opacity: 0, scale: 0.5, y: 500 }}
+        exit={{ opacity: 0, scale: 0.6, y: 300 }}
+        // Tweaked Spring: Lower stiffness, higher damping = Creamier, less jittery movement
         transition={{ 
           type: "spring", 
-          damping: 25, 
-          stiffness: 100 
+          damping: 30, 
+          stiffness: 80,
+          mass: 1.2
         }}
-        style={{ transformStyle: 'preserve-3d', willChange: 'transform, opacity' }}
+        style={{ 
+            transformStyle: 'preserve-3d', 
+            willChange: 'transform, opacity' 
+        }}
       >
         <motion.div 
             className="w-full h-full relative"
             initial={{ rotateY: 0 }}
             animate={{ rotateY: 180 }} 
             transition={{ 
-                rotateY: { type: "spring", damping: 20, stiffness: 100 }
+                rotateY: { 
+                    type: "spring", 
+                    damping: 25, // Increased damping to prevent overshooting the flip
+                    stiffness: 70 // Reduced stiffness for smoother rotation
+                }
             }}
             style={{ transformStyle: 'preserve-3d' }}
         >
@@ -408,7 +436,6 @@ function ExpandedCard({ item, onClose, isDarkMode }: { item: WorkItem, onClose: 
                     transform: 'rotateY(180deg)',
                 }}
             >
-                {/* Dynamically set Dark Mode based on the prop */}
                 <CardBackContent item={item} isExpanded={true} onClose={onClose} darkMode={isDarkMode} />
             </div>
         </motion.div>

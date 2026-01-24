@@ -1,7 +1,7 @@
 'use client';
 // Hi mom I'm Famous!
 import { useState, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, MotionConfig } from 'motion/react'; // Import MotionConfig
 import { Navigation, SectionName } from './components/Navigation';
 import { Hero3DCard } from './components/Hero3DCard';
 import { BackgroundCards } from './components/BackgroundCards';
@@ -9,7 +9,48 @@ import { AboutOverlay } from './components/AboutOverlay';
 import { WorkSection } from './components/WorkSection'; 
 import { ContactSection } from './components/ContactSection';
 import { cardImages, antiCardImages } from '../lib/constants';
+import ProjectContent from './components/ProjectContent';
 import { cinzel } from '../lib/fonts';
+
+// --- NEW MOTION TOGGLE COMPONENT ---
+function MotionToggle({ isReduced, onToggle, isFlipped }: { isReduced: boolean; onToggle: () => void; isFlipped: boolean }) {
+  return (
+    <button
+      onClick={onToggle}
+      className={`fixed bottom-8 left-8 z-[60] flex items-center gap-3 group focus:outline-none`}
+    >
+      {/* The Switch Track */}
+      <div 
+        className={`relative w-11 h-6 rounded-full transition-colors duration-300 border ${
+          isFlipped 
+            ? (isReduced ? 'bg-black border-black' : 'bg-gray-200 border-gray-300') 
+            : (isReduced ? 'bg-white border-white' : 'bg-white/10 border-white/20')
+        }`}
+      >
+        {/* The Switch Handle */}
+        <motion.div 
+          className={`absolute top-1 left-1 w-4 h-4 rounded-full shadow-sm transition-colors duration-300 ${
+            isFlipped 
+              ? (isReduced ? 'bg-white' : 'bg-gray-400') 
+              : (isReduced ? 'bg-black' : 'bg-white')
+          }`}
+          animate={{ x: isReduced ? 20 : 0 }}
+          transition={{ type: "spring", stiffness: 500, damping: 30 }}
+        />
+      </div>
+
+      {/* The Label */}
+      <div className="flex flex-col items-start">
+        <span className={`text-[10px] font-mono uppercase tracking-[0.2em] font-bold transition-colors duration-300 ${isFlipped ? 'text-black' : 'text-white'}`}>
+          Motion
+        </span>
+        <span className={`text-[8px] font-mono uppercase tracking-widest transition-colors duration-300 ${isFlipped ? 'text-black/50' : 'text-white/50'}`}>
+          {isReduced ? "Reduced" : "Full"}
+        </span>
+      </div>
+    </button>
+  );
+}
 
 function MobileWarning() {
   return (
@@ -79,7 +120,7 @@ function MobileWarning() {
 }
 
 
-// --- NEW "SPOTLIGHT SCANNER" LOADER ---
+// --- "SPOTLIGHT SCANNER" LOADER ---
 function LoadingScreen() {
   const suits = ["♠", "♥", "♣", "♦"];
   
@@ -167,6 +208,24 @@ export default function App() {
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<SectionName>('home');
 
+  // --- NEW: REDUCED MOTION STATE ---
+  const [isReducedMotion, setIsReducedMotion] = useState(false);
+
+  // Load preference on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('isReducedMotion');
+    if (saved === 'true') setIsReducedMotion(true);
+  }, []);
+
+  // Toggle handler
+  const toggleReducedMotion = () => {
+    setIsReducedMotion(prev => {
+      const newValue = !prev;
+      localStorage.setItem('isReducedMotion', String(newValue));
+      return newValue;
+    });
+  };
+
   // Unified Fail-Safe Preloader
   useEffect(() => {
     const criticalImages = [
@@ -231,10 +290,20 @@ export default function App() {
     }
   };
 
+  // If Motion is reduced, we use a simpler transition config globally
+  // and disable heavy effects
   return (
+    <MotionConfig transition={isReducedMotion ? { duration: 0.1 } : {}}>
     <div className="relative min-h-[100dvh] w-full overflow-hidden transition-colors duration-1000 bg-black">
 
-        <MobileWarning />
+        {/*<MobileWarning /> */}
+        
+        {/* Toggle Button */}
+        <MotionToggle 
+          isReduced={isReducedMotion} 
+          onToggle={toggleReducedMotion} 
+          isFlipped={isFlipped}
+        />
       
       <AnimatePresence mode="wait">
         {isLoading && <LoadingScreen />}
@@ -262,11 +331,18 @@ export default function App() {
         transition={{ duration: 1 }}
       />
 
+      {/* IMPORTANT: You need to update BackgroundCards to accept 'isReducedMotion'.
+        Inside BackgroundCards, if isReducedMotion is true:
+        1. Disable mouse parallax listeners.
+        2. Set animation durations to 0 or use simple fades.
+      */}
       <BackgroundCards 
           imageUrl={backgroundCardUrl} 
           shuffleCount={shuffleCount}
           isShuffling={isShuffling}
           isFlipped={isFlipped} 
+          // @ts-ignore - You need to add this prop to your component interface
+          isReducedMotion={isReducedMotion} 
       />
 
       <AboutOverlay 
@@ -285,60 +361,71 @@ export default function App() {
 
       <AnimatePresence mode="wait">
         {activeSection === 'home' && (
-            <motion.div 
-                key="home-section"
-                // relative and z-10 ensures this container sits ABOVE the background cards
-                className="relative min-h-[100dvh] grid grid-cols-1 lg:grid-cols-2 overflow-hidden"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0, transition: { duration: 0.5 } }}
-            >
-                {/* Left Side: Name (Scaled for 14-inch laptop) */}
-                <div className="flex items-center justify-center lg:justify-end px-8 lg:px-16">
-                <motion.div className="max-w-2xl w-full pointer-events-none">
-                    <motion.p className="text-white/70 tracking-[0.4em] uppercase mb-4 text-[clamp(0.7rem,1vw,0.9rem)] font-light mix-blend-difference">
-                    Hi, I'm
-                    </motion.p>
-                    
-                    <motion.h1
-                    className="text-white mb-8 mix-blend-difference" 
-                    style={{ 
-                        fontFamily: "var(--font-cinzel), serif", 
-                        fontWeight: 700, 
-                        lineHeight: 0.9,
-                        // Fluid typography: Scales perfectly on your 14" screen
-                        fontSize: "clamp(3.5rem, 9vw, 9rem)", 
-                        letterSpacing: "-0.03em",
-                        textShadow: "0 0 30px rgba(0,0,0,0.5)" // Gives depth against bg cards
-                    }}
-                    >
-                    Tarun <br /> Sankar
-                    </motion.h1>
-                    
-                    <motion.div className="h-px w-32 bg-gradient-to-r from-white via-white/50 to-transparent mix-blend-difference" />
-                </motion.div>
-                </div>
-
-                {/* Right Side: 3D Hero Card */}
-                <div className="flex items-center justify-end lg:justify-start px-8 lg:pr-24 lg:pl-60">
-                <div 
-                    className="relative"
-                    style={{
-                    // Card size scales with screen width, but capped for large screens
-                    width: "clamp(260px, 22vw, 420px)",
-                    aspectRatio: "2.5 / 3.5"
-                    }}
+          <motion.div 
+            key="home-section"
+            // CHANGE: Added 'place-items-center' and 'content-center' for mobile vertical alignment
+            className="relative min-h-[100dvh] grid grid-cols-1 lg:grid-cols-2 overflow-hidden place-items-center lg:place-items-stretch"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.5 } }}
+          >
+            {/* Left Side: Name */}
+            {/* CHANGE: Added 'pt-20' to push text down from top edge on mobile */}
+            <div className="flex items-end lg:items-center justify-center lg:justify-end px-8 lg:px-16 pt-32 lg:pt-0 pb-12 lg:pb-0">
+              <motion.div className="max-w-2xl w-full pointer-events-none text-center lg:text-left">
+                <motion.p className="text-white/70 tracking-[0.4em] uppercase mb-4 text-[clamp(0.7rem,1vw,0.9rem)] font-light mix-blend-difference">
+                  Hi, I'm
+                </motion.p>
+                
+                <motion.h1
+                  className="text-white mb-8 mix-blend-difference" 
+                  style={{ 
+                    fontFamily: "var(--font-cinzel), serif", 
+                    fontWeight: 700, 
+                    lineHeight: 0.9,
+                    // CHANGE: Adjusted clamp for better mobile sizing
+                    fontSize: "clamp(3rem, 12vw, 9rem)", 
+                    letterSpacing: "-0.03em",
+                    textShadow: "0 0 30px rgba(0,0,0,0.5)" 
+                  }}
                 >
-                    <Hero3DCard 
-                        imageUrl={heroCardUrl} 
-                        backImageUrl={heroBackUrl}
-                        isFlipped={isFlipped}       
-                        onFlip={handleFlipTrigger}  
-                    />
-                </div>
-                </div>
-            </motion.div>
-            )}
+                  Tarun <br /> Sankar
+                </motion.h1>
+                
+                <motion.div className="h-px w-32 bg-gradient-to-r from-white via-white/50 to-transparent mix-blend-difference mx-auto lg:mx-0" />
+              </motion.div>
+            </div>
+
+            {/* Right Side: 3D Hero Card */}
+            {/* CHANGE: Adjusted padding and alignment for mobile stacking */}
+            <div className="flex items-start lg:items-center justify-center lg:justify-start px-8 lg:pr-24 lg:pl-60 pb-20 lg:pb-0 z-20">
+              <div 
+                className="relative"
+                style={{
+                  // CHANGE: Make card wider on mobile
+                  width: "clamp(240px, 60vw, 420px)",
+                  aspectRatio: "2.5 / 3.5"
+                }}
+              >
+                <Hero3DCard 
+                    imageUrl={heroCardUrl} 
+                    backImageUrl={heroBackUrl}
+                    isFlipped={isFlipped}       
+                    onFlip={handleFlipTrigger}  
+                    // @ts-ignore
+                    isReducedMotion={isReducedMotion}
+                />
+              </div>
+            </div>
+          </motion.div>
+        )}
+        {activeSection === 'project' && (
+          <ProjectContent 
+            key="project-overlay" 
+            onClose={() => setActiveSection('home')} 
+            isFlipped={isFlipped}
+          />
+        )}
 
         {activeSection === 'work' && (
           <WorkSection 
@@ -353,7 +440,7 @@ export default function App() {
         )}
       </AnimatePresence>
       
-      {/* Vignette Overlay */}
+      {/* Vignette Overlay (Reduced Motion: Disable if needed, or keep for visual depth) */}
       <motion.div
         className="absolute inset-0 pointer-events-none"
         animate={{
@@ -364,16 +451,19 @@ export default function App() {
         transition={{ duration: 1 }}
       />
       
-      {/* Scanline Effect */}
-      <motion.div
-        className="absolute inset-0 pointer-events-none opacity-5"
-        animate={{ backgroundPosition: ['0% 0%', '0% 100%'] }}
-        transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
-        style={{
-          backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)',
-          backgroundSize: '100% 4px',
-        }}
-      />
+      {/* Scanline Effect - DISABLED when Reduced Motion is ON */}
+      {!isReducedMotion && (
+        <motion.div
+            className="absolute inset-0 pointer-events-none opacity-5"
+            animate={{ backgroundPosition: ['0% 0%', '0% 100%'] }}
+            transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+            style={{
+            backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)',
+            backgroundSize: '100% 4px',
+            }}
+        />
+      )}
     </div>
+    </MotionConfig>
   );
 }

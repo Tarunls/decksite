@@ -28,6 +28,11 @@ function Navigation({ onShuffle, isFlipped = false, onNavigate, activeSection, o
             section: 'work'
         },
         {
+            name: 'Projects',
+            suit: '♣',
+            section: 'project'
+        },
+        {
             name: 'About',
             suit: '♥',
             section: 'about'
@@ -67,13 +72,13 @@ function Navigation({ onShuffle, isFlipped = false, onNavigate, activeSection, o
                                 children: "©"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/components/Navigation.tsx",
-                                lineNumber: 45,
+                                lineNumber: 46,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/components/Navigation.tsx",
-                        lineNumber: 38,
+                        lineNumber: 39,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].nav, {
@@ -112,7 +117,7 @@ function Navigation({ onShuffle, isFlipped = false, onNavigate, activeSection, o
                                             }
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/components/Navigation.tsx",
-                                            lineNumber: 73,
+                                            lineNumber: 74,
                                             columnNumber: 21
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -127,36 +132,36 @@ function Navigation({ onShuffle, isFlipped = false, onNavigate, activeSection, o
                                                     children: item.suit
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/components/Navigation.tsx",
-                                                    lineNumber: 83,
+                                                    lineNumber: 84,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/components/Navigation.tsx",
-                                            lineNumber: 79,
+                                            lineNumber: 80,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, item.name, true, {
                                     fileName: "[project]/src/app/components/Navigation.tsx",
-                                    lineNumber: 66,
+                                    lineNumber: 67,
                                     columnNumber: 17
                                 }, this);
                             })
                         }, void 0, false, {
                             fileName: "[project]/src/app/components/Navigation.tsx",
-                            lineNumber: 55,
+                            lineNumber: 56,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/app/components/Navigation.tsx",
-                        lineNumber: 49,
+                        lineNumber: 50,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/components/Navigation.tsx",
-                lineNumber: 35,
+                lineNumber: 36,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -178,7 +183,7 @@ function Navigation({ onShuffle, isFlipped = false, onNavigate, activeSection, o
                         children: "SECRET"
                     }, void 0, false, {
                         fileName: "[project]/src/app/components/Navigation.tsx",
-                        lineNumber: 100,
+                        lineNumber: 101,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].button, {
@@ -206,7 +211,7 @@ function Navigation({ onShuffle, isFlipped = false, onNavigate, activeSection, o
                                 children: "Shuffle Deck"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/components/Navigation.tsx",
-                                lineNumber: 119,
+                                lineNumber: 120,
                                 columnNumber: 12
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].span, {
@@ -225,25 +230,25 @@ function Navigation({ onShuffle, isFlipped = false, onNavigate, activeSection, o
                                 children: "↻"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/components/Navigation.tsx",
-                                lineNumber: 120,
+                                lineNumber: 121,
                                 columnNumber: 12
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/components/Navigation.tsx",
-                        lineNumber: 110,
+                        lineNumber: 111,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/components/Navigation.tsx",
-                lineNumber: 97,
+                lineNumber: 98,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/components/Navigation.tsx",
-        lineNumber: 31,
+        lineNumber: 32,
         columnNumber: 5
     }, this);
 }
@@ -1958,7 +1963,7 @@ function CarouselCard({ item, index, focusedIndex, setFocusedIndex, setExpandedI
                 },
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "absolute inset-0 rounded-xl bg-[#0f0f0f] border border-white/20 p-1.5 shadow-2xl",
+                        className: "absolute inset-0 rounded-xl bg-[#0f0f0f] border shadow-2xl",
                         style: {
                             backfaceVisibility: 'hidden',
                             filter: isFocused ? 'saturate(1.2)' : 'saturate(0.5) brightness(0.8)'
@@ -3135,19 +3140,26 @@ function App() {
                         lineNumber: 288,
                         columnNumber: 13
                     }, this),
+                    activeSection === 'project' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(ProjectContent, {
+                        onClose: ()=>setActiveSection('home')
+                    }, "project-overlay", false, {
+                        fileName: "[project]/src/app/page.tsx",
+                        lineNumber: 344,
+                        columnNumber: 11
+                    }, this),
                     activeSection === 'work' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$components$2f$WorkSection$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["WorkSection"], {
                         onGoHome: ()=>setActiveSection('home'),
                         isFlipped: isFlipped
                     }, "work-section", false, {
                         fileName: "[project]/src/app/page.tsx",
-                        lineNumber: 344,
+                        lineNumber: 351,
                         columnNumber: 11
                     }, this),
                     activeSection === 'contact' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$components$2f$ContactSection$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["ContactSection"], {
                         onClose: ()=>setActiveSection('home')
                     }, void 0, false, {
                         fileName: "[project]/src/app/page.tsx",
-                        lineNumber: 352,
+                        lineNumber: 359,
                         columnNumber: 12
                     }, this)
                 ]
@@ -3166,7 +3178,7 @@ function App() {
                 }
             }, void 0, false, {
                 fileName: "[project]/src/app/page.tsx",
-                lineNumber: 357,
+                lineNumber: 364,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -3188,7 +3200,7 @@ function App() {
                 }
             }, void 0, false, {
                 fileName: "[project]/src/app/page.tsx",
-                lineNumber: 368,
+                lineNumber: 375,
                 columnNumber: 7
             }, this)
         ]

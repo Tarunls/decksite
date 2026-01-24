@@ -110,3 +110,42 @@ export const antiCardImages = [
     '/angrygodofwealth/resized_10th/angry-god-of-wealth362-copy-5_50684891281_l.jpg',
     '/angrygodofwealth/resized_10th/angry-god-of-wealth362-copy_50684133988_l.jpg',
   ];
+
+export const projects = [
+  {
+    id: 1,
+    title: 'Example Project A',
+    category: 'Example4',
+    suit: '♠',
+    tags: ['Example5', 'Example6', 'Example7'],
+    description: 'Example description for Project A. This area is currently a placeholder for future content.',
+    link: '#',
+  },
+  {
+    id: 2,
+    title: 'Example Project B',
+    category: 'Example3',
+    suit: '♦',
+    tags: ['Example8', 'Example9', 'Example10'],
+    description: 'Example description for Project B. This area is currently a placeholder for future content.',
+    link: '#',
+  },
+  {
+    id: 3,
+    title: 'Example Project C',
+    category: 'Example1',
+    suit: '♥',
+    tags: ['Example11', 'Example12', 'Example13'],
+    description: 'Example description for Project C. This area is currently a placeholder for future content.',
+    link: '#',
+  },
+  {
+    id: 4,
+    title: 'Example Project D',
+    category: 'Example2',
+    suit: '♣',
+    tags: ['Example14', 'Example15', 'Example16'],
+    description: 'Example description for Project D. This area is currently a placeholder for future content.',
+    link: '#',
+  },
+];
