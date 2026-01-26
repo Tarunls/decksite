@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'motion/react';
 import { useEffect, useState } from 'react';
-import { ImageWithFallback } from './figma/ImageWithFallback';
+import { ImageWithFallback } from './figma/ImageWithFallback'; // Check your path
 
 interface AboutOverlayProps {
   isOpen: boolean;
@@ -12,7 +12,7 @@ interface AboutOverlayProps {
 
 export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) {
   const [showContent, setShowContent] = useState(false);
-  const cardBackImage = "coverotate.jpg"; 
+  const cardBackImage = "/coverotate.jpg"; // Ensure path is correct
 
   const isDarkMode = !isFlipped;
 
@@ -25,7 +25,6 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
     }
   }, [isOpen]);
 
-  // --- DYNAMIC THEME COLORS ---
   const bgClass = isDarkMode ? 'bg-[#1a1a1a]' : 'bg-white';
   const textMain = isDarkMode ? 'text-white' : 'text-gray-900';
   const textSub = isDarkMode ? 'text-white/60' : 'text-gray-600';
@@ -36,7 +35,8 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center perspective-[2000px] p-4">
+        // Added z-[70] to ensure it sits above the MotionToggle (z-60)
+        <div className="fixed inset-0 z-[70] flex items-center justify-center perspective-[2000px] p-4">
           
           {/* BACKDROP */}
           <motion.div
@@ -55,21 +55,26 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
             transition={{ type: "spring", damping: 25, stiffness: 120, mass: 0.8 }}
             className={`
               relative 
-              /* MOBILE: Auto aspect, fixed height to force scroll */
-              w-[95vw] h-[85vh] aspect-auto
-              /* DESKTOP: Fixed aspect ratio, auto height */
-              md:w-auto md:h-auto md:aspect-[7/5] md:max-h-[90vh]
+              /* MOBILE: Fixed viewport based size */
+              w-[95vw] h-[85vh] 
+
+              /* DESKTOP FIX: 
+                 1. Set explicit Width (700px)
+                 2. Set explicit Height (500px) -> This maintains your 7/5 ratio
+                 3. REMOVE 'h-auto' entirely 
+              */
+              md:w-[700px] md:h-[500px] md:max-h-[90vh]
+              
               rounded-2xl shadow-2xl
             `}
             style={{ transformStyle: 'preserve-3d' }}
-          >
+          > 
             
-            {/* FRONT OF CARD (THE CONTENT SIDE) */}
+            {/* FRONT (CONTENT) */}
             <div 
               className={`absolute inset-0 rounded-2xl overflow-hidden border transition-colors duration-500 ${bgClass} ${borderColor}`}
               style={{ backfaceVisibility: 'hidden' }}
             >
-                {/* CLOSE BUTTON */}
               <motion.button 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: showContent ? 1 : 0 }}
@@ -79,18 +84,16 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
                 [ Close ]
               </motion.button>
 
-              {/* CONTENT WRAPPER - Added h-full and flex-col to ensure scrolling works */}
               <motion.div 
                  className="relative z-10 w-full h-full flex flex-col"
                  initial={{ opacity: 0, y: 20 }}
                  animate={{ opacity: showContent ? 1 : 0, y: showContent ? 0 : 20 }}
                  transition={{ duration: 0.5, delay: 0.2 }}
               >
-                {/* SCROLLABLE AREA */}
                 <div className="flex-1 overflow-y-auto p-8 md:p-12 scrollbar-hide">
                   <div className="max-w-4xl mx-auto space-y-8 min-h-min flex flex-col justify-center">
                     
-                    {/* Header */}
+                    {/* HEADER */}
                     <div className={`flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b ${borderColor} pb-6 pt-4`}>
                       <div>
                         <div className={`text-xs font-mono uppercase tracking-[0.3em] mb-2 ${textSub}`}>
@@ -106,14 +109,14 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
                       </div>
                     </div>
 
-                    {/* Stats Grid */}
+                    {/* STATS */}
                     <div className="grid grid-cols-3 gap-4">
                       <StatBlock label="Class" value="Engineer" textColor={textMain} subColor={textSub} borderColor={borderColor} />
                       <StatBlock label="Guild" value="UTD" textColor={textMain} subColor={textSub} borderColor={borderColor} />
                       <StatBlock label="Origin" value="Texas" textColor={textMain} subColor={textSub} borderColor={borderColor} />
                     </div>
 
-                    {/* Bio */}
+                    {/* BIO */}
                     <div className={`text-base md:text-lg leading-relaxed font-light ${textSub}`}>
                       <p>
                         I'm just a goofy goober for now. 
@@ -121,8 +124,8 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
                       </p>
                     </div>
 
-                    {/* Skills */}
-                    <div className="pb-8"> {/* Added padding bottom to ensure last items aren't cut off */}
+                    {/* SKILLS */}
+                    <div className="pb-8"> 
                       <div className="flex flex-wrap gap-2">
                         {['React', 'Next.js', 'TypeScript', 'Tailwind', 'Motion', 'Python', 'Node.js', 'Figma'].map((tech) => (
                           <span key={tech} className={`px-3 py-1 text-[10px] font-mono uppercase tracking-wider border rounded-sm ${tagClass}`}>
@@ -137,7 +140,7 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
               </motion.div>
             </div>
 
-            {/* BACK OF CARD (Entrance Animation Side) */}
+            {/* BACK (COVER) */}
             <div 
               className="absolute inset-0 rounded-2xl overflow-hidden shadow-xl bg-[#1a1a1a]"
               style={{ 
@@ -160,8 +163,7 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
   );
 }
 
-// --- HELPER COMPONENT ---
-function StatBlock({ label, value, textColor, subColor, borderColor }: { label: string, value: string, textColor: string, subColor: string, borderColor: string }) {
+function StatBlock({ label, value, textColor, subColor, borderColor }: any) {
     return (
         <div className={`flex flex-col border-l pl-3 ${borderColor}`}>
             <span className={`text-[10px] font-mono uppercase tracking-widest opacity-70 mb-1 ${subColor}`}>
