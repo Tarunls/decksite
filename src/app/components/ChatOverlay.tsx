@@ -58,8 +58,10 @@ export function ChatOverlay({ onClose, isFlipped }: ChatOverlayProps) {
     setIsTyping(true); // Show typing indicator
 
     try {
-      // 2. Call the Python Backend
-      const res = await fetch('${apiUrl}chat', {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    
+    // 2. Add the /chat endpoint dynamically
+    const res = await fetch(`${baseUrl}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userMsg }),
