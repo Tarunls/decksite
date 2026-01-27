@@ -12,7 +12,10 @@ app = FastAPI()
 # Allow frontend to talk to backend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"], 
+    allow_origins=[
+        "http://localhost:3000",
+        "https://decksite-83y3.vercel.app", # <-- ADD YOUR VERCEL DOMAIN HERE         # <-- ADD CUSTOM DOMAIN IF YOU HAVE ONE
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
