@@ -53,7 +53,7 @@ export function Navigation({
     { name: 'Projects', suit: '♣', section: 'project' as SectionName },
     { name: 'About', suit: '♥', section: 'about' as SectionName },
     { name: 'Contact', suit: '♦', section: 'contact' as SectionName },
-    { name: 'Dealer', suit: '⌘', section: 'chat' as SectionName }
+    { name: 'Dealerbot', suit: '⌘', section: 'chat' as SectionName }
   ];
 
   return (
@@ -147,7 +147,7 @@ export function Navigation({
              
              let suitColor = 'text-black';
              if (['♥','♦'].includes(item.suit)) suitColor = 'text-red-500';
-             if (item.section === 'chat') suitColor = 'text-[#ffb000]';
+             if (item.suit === '卌') suitColor = 'text-yellow-700';
 
              return (
                <button

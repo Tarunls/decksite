@@ -51,21 +51,37 @@ export function ChatOverlay({ onClose, isFlipped }: ChatOverlayProps) {
     if (!input.trim() || isTyping) return;
 
     const userMsg = input.trim();
+    
+    // 1. Add User Message to History Immediately
     setHistory(prev => [...prev, { type: 'user', text: userMsg }]);
     setInput('');
-    setIsTyping(true);
+    setIsTyping(true); // Show typing indicator
 
-    setTimeout(() => {
-      const responses = [
-        "The cards indicate a strong affinity for Python.",
-        "That project was built on a foundation of sleepless nights and Next.js.",
-        "I recall Tarun working on that. It was quite the challenge.",
-      ];
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-      setHistory(prev => [...prev, { type: 'system', text: randomResponse }]);
-      setIsTyping(false);
-    }, 1200);
+    try {
+      // 2. Call the Python Backend
+      const res = await fetch('http://localhost:8000/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMsg }),
+      });
+
+      const data = await res.json();
+
+      // 3. Update History with AI Response
+      if (res.ok) {
+        setHistory(prev => [...prev, { type: 'system', text: data.response }]);
+      } else {
+        setHistory(prev => [...prev, { type: 'system', text: "The cards are silent... " }]);
+      }
+    } catch (error) {
+      console.error("Chat Error:", error);
+      setHistory(prev => [...prev, { type: 'system', text: "The connection to the spirit realm is broken." }]);
+    } finally {
+      setIsTyping(false); // Hide typing indicator
+    }
   };
+
+  
 
   return (
     <AnimatePresence>
@@ -82,14 +98,16 @@ export function ChatOverlay({ onClose, isFlipped }: ChatOverlayProps) {
 
         <div className="absolute inset-0 pointer-events-none flex flex-col md:flex-row">
             
-            {/* LEFT SIDE: THE CHAT CARD (Z-Index increased to sit ON TOP of King on mobile) */}
-            <div className="relative w-full md:w-1/2 h-full flex items-center justify-center p-4 md:p-12 pointer-events-auto z-20">
+            {/* LEFT SIDE: THE CHAT CARD */}
+            <div className="relative w-full md:w-3/4 h-full flex items-center justify-center p-4 md:p-12 pointer-events-auto z-20">
                 <motion.div
-                    initial={{ x: '-20vw', opacity: 0, rotateY: 90 }}
-                    animate={{ x: 0, opacity: 1, rotateY: 0 }}
-                    exit={{ x: '-20vw', opacity: 0, scale: 0.9 }}
-                    transition={{ type: "spring", damping: 20, stiffness: 100 }}
-                    className="relative w-full max-w-[600px] h-[60vh] md:h-[500px] rounded-2xl shadow-2xl will-change-transform"
+                    // --- UPDATED ANIMATION (Copied from AboutOverlay) ---
+                    initial={{ x: '40vw', y: '40vh', scale: 0.2, rotateY: 180, rotateZ: 45 }}
+                    animate={{ x: 0, y: 0, scale: 1, rotateY: 0, rotateZ: 0 }}
+                    exit={{ scale: 0.9, opacity: 0, y: 50, transition: { duration: 0.3 } }}
+                    transition={{ type: "spring", damping: 25, stiffness: 120, mass: 0.8 }}
+                    // ----------------------------------------------------
+                    className="relative w-full max-w-[700px] h-[70vh] md:h-[500px] rounded-2xl shadow-2xl will-change-transform"
                     style={{ transformStyle: 'preserve-3d' }}
                 >
                     {/* FRONT */}
@@ -175,7 +193,6 @@ export function ChatOverlay({ onClose, isFlipped }: ChatOverlayProps) {
             </div>
 
             {/* RIGHT SIDE: THE GHOST KING */}
-            {/* MOBILE LAYOUT FIX: Used 'absolute inset-0' and z-10 for mobile to put it BEHIND the chat */}
             <div className="absolute inset-0 md:relative md:inset-auto w-full md:w-1/2 h-full flex items-center justify-center pointer-events-none perspective-[2000px] z-10 md:z-auto overflow-hidden md:overflow-visible">
                 <motion.div 
                     initial={{ opacity: 0, x: 50, rotateY: 20 }}
@@ -193,16 +210,13 @@ export function ChatOverlay({ onClose, isFlipped }: ChatOverlayProps) {
                         rotateY: { duration: 8, repeat: Infinity, ease: "easeInOut" },
                         rotateZ: { duration: 10, repeat: Infinity, ease: "easeInOut" }
                     }}
-                    // --- CHANGE HERE ---
-                    // 1. pointer-events-auto: Makes the div "catch" the mouse so it doesn't fall through to the clickable background.
-                    // 2. cursor-default: Forces the mouse to be an arrow, not a hand.
                     className="relative w-[300px] h-[450px] md:w-[500px] md:h-[1000px] will-change-transform pointer-events-auto cursor-default" 
                     style={{ transformStyle: 'preserve-3d' }}
                 >
                     <ImageWithFallback 
                         src={kingImage} 
                         alt="Ghost King"
-                        className="w-full h-full object-contain select-none" // Removed pointer-events-none here
+                        className="w-full h-full object-contain select-none" 
                         style={{
                             filter: isFlipped 
                                 ? "brightness(1.0) contrast(1.0)" 

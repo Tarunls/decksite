@@ -233,7 +233,7 @@ function Card({ card, index, smoothX, smoothY, imageUrl, isShuffling, isFlipped,
             filter: (isShuffling && !isReducedMotion) ? 'blur(8px) brightness(0.6)' : 'none',
             scale: (isShuffling && !isReducedMotion) ? 0.9 : 1, 
         }}
-        transition={{ duration: 0.6, ease: 'easeInOut' }}
+        transition={{ duration: 2, ease: 'easeInOut' }}
       >
         <ImageWithFallback 
             src={imageUrl} 

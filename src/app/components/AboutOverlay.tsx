@@ -97,10 +97,10 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
                     <div className={`flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b ${borderColor} pb-6 pt-4`}>
                       <div>
                         <div className={`text-xs font-mono uppercase tracking-[0.3em] mb-2 ${textSub}`}>
-                            What's • Up
+                            Hi, I'm
                         </div>
                         <h2 className={`text-4xl md:text-6xl font-serif font-bold ${textMain}`}>
-                          <br />Caino
+                          <br />Tarun Sankar
                         </h2>
                       </div>
                       <div className="text-right">
@@ -111,7 +111,7 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
 
                     {/* STATS */}
                     <div className="grid grid-cols-3 gap-4">
-                      <StatBlock label="Class" value="Engineer" textColor={textMain} subColor={textSub} borderColor={borderColor} />
+                      <StatBlock label="Class" value="Computer Engineer" textColor={textMain} subColor={textSub} borderColor={borderColor} />
                       <StatBlock label="Guild" value="UTD" textColor={textMain} subColor={textSub} borderColor={borderColor} />
                       <StatBlock label="Origin" value="Texas" textColor={textMain} subColor={textSub} borderColor={borderColor} />
                     </div>
@@ -119,8 +119,9 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
                     {/* BIO */}
                     <div className={`text-base md:text-lg leading-relaxed font-light ${textSub}`}>
                       <p>
-                        I'm just a goofy goober for now. 
-                        Specializing in <b className={textMain}>Next.js</b> and <b className={textMain}>Python</b>.
+                        I create web applications and AI tools that blend functionality with engaging user experiences. 
+
+                        I specialize in Next.js, React, Python, Azure, and AI integrations to build scalable solutions.
                       </p>
                     </div>
 

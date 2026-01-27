@@ -32,30 +32,31 @@ interface CarouselCardProps {
 const workItems: WorkItem[] = [
   {
     id: 1,
-    company: "Example Company A",
-    role: "TBD",
-    period: "2022 - Present",
-    technologies: ["Example", "Example", "Example", "Example"],
+    company: "UT Dallas",
+    role: "Undergraduate Researcher",
+    period: "Aug 2024 - Present",
+    // Updated based on your abstract
+    technologies: ["Python", "GNSS", "Edge Computing", "Parallel Processing"], 
     frontImage: "/cards/time702-copy-6_51163893512_l.jpg",
-    description: "TBD: Content for this section is currently being drafted. This will detail the major achievements and responsibilities held at Example Company A." 
+    description: "Engineered a real-time processing pipeline for the ScintPi 3.0, a low-cost GNSS space weather monitor. Leveraged parallel edge computing to calculate scintillation indices (S4/TEC) onboard, reducing daily data transmission from 2.4GB to <5MB. Deployed a web dashboard for live visualization of ionospheric irregularities, enabling scalable distributed monitoring." 
   },
   {
     id: 2,
-    company: "Example Company B",
-    role: "TBD",
-    period: "2020 - 2022",
-    technologies: ["Example", "Example", "Example"],
+    company: "MyIntent.io",
+    role: "Full Stack Developer",
+    period: "Aug 2024 - Nov 2024",
+    technologies: ["Next.js", "Nest.js", "Gemini", "GPT-5"],
     frontImage: "/cards/time702-copy-6_51163893512_l.jpg",
-    description: "TBD: Content for this section is currently being drafted. This will detail the major achievements and responsibilities held at Example Company B."
+    description: "Designed and engineered a dynamic, minimalistic full-stack platform. Built an automated RFP (Request for Proposal) system using Next.js and Nest.js, integrating advanced LLMs (Gemini and GPT-5) to accurately populate business documents with carefully inputted data."
   },
   {
     id: 3,
-    company: "Example Company C",
-    role: "TBD",
-    period: "2019 - 2020",
-    technologies: ["Example", "Example"],
+    company: "Mathnasium",
+    role: "Lead Instructor", 
+    period: "2023 - 2024",
+    technologies: ["Education", "Communication", "Curriculum Mgmt", "Mentorship"],
     frontImage: "/cards/time702-copy-6_51163893512_l.jpg",
-    description: "TBD: Content for this section is currently being drafted. This will detail the major achievements and responsibilities held at Example Company C."
+    description: "Provided comprehensive mathematics instruction to students of varying skill levels. Developed personalized learning plans to bridge knowledge gaps and fostered a positive, encouraging learning environment to build student confidence."
   },
 ];
 
@@ -171,7 +172,7 @@ function CardBackContent({ item, isExpanded, onClose, darkMode = false }: CardBa
         <div className="max-w-2xl mx-auto space-y-8 pb-32">
             <div className={`border-b ${borderClass} pb-6`}>
                 <div className="flex justify-between items-baseline mb-2">
-                      <h4 className={`text-xs font-mono uppercase tracking-[0.2em] ${textMuted}`}>Confidential Dossier</h4>
+                      <h4 className={`text-xs font-mono uppercase tracking-[0.2em] ${textMuted}`}>...</h4>
                       <span className={`text-xs font-mono ${textMuted}`}>{item.period}</span>
                 </div>
                 <h2 className={`text-4xl md:text-5xl font-serif font-bold ${textMain} mb-2`}>{item.company}</h2>

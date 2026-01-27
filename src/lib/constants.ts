@@ -114,38 +114,38 @@ export const antiCardImages = [
 export const projects = [
   {
     id: 1,
-    title: 'Example Project A',
-    category: 'Example4',
-    suit: '♠',
-    tags: ['Example5', 'Example6', 'Example7'],
-    description: 'Example description for Project A. This area is currently a placeholder for future content.',
-    link: '#',
+    title: "Cinder Control",
+    category: "TAMUHack 2026 Winner",
+    suit: "♠", // Spades (Power/Action)
+    description: "Award-winning wildfire simulation platform (TAMUHack 2026). Engineered a full-stack crisis management tool leveraging OpenAI and geospatial data to simulate global fire spread and route evacuations in real-time.",
+    tags: ["Next.js", "Python FastAPI", "OpenAI", "Mapbox"],
+    link: "https://github.com/tarunls/fire-sim", // Update exact repo name
   },
   {
     id: 2,
-    title: 'Example Project B',
-    category: 'Example3',
-    suit: '♦',
-    tags: ['Example8', 'Example9', 'Example10'],
-    description: 'Example description for Project B. This area is currently a placeholder for future content.',
-    link: '#',
+    title: "SentiScrape",
+    category: "ML Engineering",
+    suit: "♦", // Diamonds (Value/Analysis)
+    description: "High-volume sentiment analysis engine. Scraped 100k+ IMDb reviews to train a bias detection model using PyTorch and NLP, correlating language tone with rating predictions to uncover hidden user biases.",
+    tags: ["Python", "PyTorch", "Selenium", "Pandas"],
+    link: "https://github.com/tarunls/sentiscrape",
   },
   {
     id: 3,
-    title: 'Example Project C',
-    category: 'Example1',
-    suit: '♥',
-    tags: ['Example11', 'Example12', 'Example13'],
-    description: 'Example description for Project C. This area is currently a placeholder for future content.',
-    link: '#',
+    title: "Real-Time Space Weather Monitor",
+    category: "Research",
+    suit: "♣", // Clubs (Work/Labor)
+    description: "Real-time space weather monitoring pipeline for UTD. Optimized edge-processing on single-board computers to calculate ionospheric scintillation indices locally, reducing satellite data transmission bandwidth by 99%.",
+    tags: ["IoT", "TensorFlow", "Edge Computing", "Azure"],
+    link: "https://github.com/tarunls/scintpi",
   },
   {
     id: 4,
-    title: 'Example Project D',
-    category: 'Example2',
-    suit: '♣',
-    tags: ['Example14', 'Example15', 'Example16'],
-    description: 'Example description for Project D. This area is currently a placeholder for future content.',
-    link: '#',
+    title: "Grimmbot",
+    category: "Automation and AI",
+    suit: "♥", // Hearts (Emotion/Feeling)
+    description: "A discord bot that could listen to user's talk, parse words, and respond with ElevenLabs text-to-speech voices. Built using Discord.js and ElevenLabs API to create an engaging, interactive experience for server members.",
+    tags: ["AI", "Discord.js", "ElevenLabs API", "Node.js", "OpenAI"],
+    link: "https://github.com/tarunls/grimmbot",
   },
 ];

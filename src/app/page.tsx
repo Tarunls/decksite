@@ -215,6 +215,7 @@ export default function App() {
   const [activeSection, setActiveSection] = useState<SectionName>('home');
   const [isSecretOpen, setIsSecretOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const isContentActive = ['chat', 'work', 'contact', 'about', 'project'].includes(activeSection);
 
   // --- NEW: REDUCED MOTION STATE ---
   const [isReducedMotion, setIsReducedMotion] = useState(false);
@@ -339,16 +340,16 @@ export default function App() {
         1. Disable mouse parallax listeners.
         2. Set animation durations to 0 or use simple fades.
       */}
-      {activeSection !== 'chat' && activeSection !== 'work' && activeSection !== 'contact' && activeSection != 'about' && activeSection != 'project' && (
-          <BackgroundCards 
-            imageUrl={backgroundCardUrl} 
-            shuffleCount={shuffleCount}
-            isShuffling={isShuffling}
-            isFlipped={isFlipped} 
-            // @ts-ignore 
-            isReducedMotion={isReducedMotion} 
-          />
-      )}
+      <BackgroundCards 
+      imageUrl={backgroundCardUrl} 
+      shuffleCount={shuffleCount}
+      isShuffling={isShuffling}
+      isFlipped={isFlipped} 
+      // If the user has reduced motion ON globally OR a section is active, reduce motion
+      // @ts-ignore
+      isReducedMotion={isReducedMotion} 
+    />
+
 
       <AboutOverlay 
         isOpen={isAboutOpen} 
