@@ -59,7 +59,7 @@ export function ChatOverlay({ onClose, isFlipped }: ChatOverlayProps) {
 
     try {
       // 2. Call the Python Backend
-      const res = await fetch('http://localhost:8000/chat', {
+      const res = await fetch('${apiUrl}chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userMsg }),
