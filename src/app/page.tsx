@@ -11,6 +11,7 @@ import { ContactSection } from './components/ContactSection';
 import { cardImages, antiCardImages } from '../lib/constants';
 import ProjectContent from './components/ProjectContent';
 import { SecretPortal } from './components/SecretPortal';
+import { ChatOverlay } from './components/ChatOverlay';
 import { cinzel } from '../lib/fonts';
 
 // --- NEW MOTION TOGGLE COMPONENT ---
@@ -213,6 +214,7 @@ export default function App() {
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<SectionName>('home');
   const [isSecretOpen, setIsSecretOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   // --- NEW: REDUCED MOTION STATE ---
   const [isReducedMotion, setIsReducedMotion] = useState(false);
@@ -315,47 +317,45 @@ export default function App() {
         {isLoading && <LoadingScreen />}
       </AnimatePresence>
 
+ 
+
+      {/* 2. Secondary "Spotlight" Layer (FIXED OVALS) */}
       <motion.div
         className="absolute inset-0"
         initial={false}
         animate={{
             background: isFlipped 
-                ? 'radial-gradient(ellipse at center, #ffffff 0%, #f0f0f0 50%, #e0e0e0 100%)' 
-                : 'radial-gradient(ellipse at center, #1a1a1a 0%, #0a0a0a 50%, #000000 100%)' 
+                // Light Mode: Very soft off-white to soft grey (Reduces glare)
+                ? 'radial-gradient(ellipse at center, #f4f3f3 0%, #eaeaea 100%)' 
+                // Dark Mode: Deep Charcoal to Black (Very low contrast = Chill)
+                : 'radial-gradient(ellipse at center, #101010 0%, #000000 100%)' 
         }}
         transition={{ duration: 1 }} 
       />
-
-      <motion.div
-        className="absolute inset-0"
-        animate={{
-            opacity: isFlipped ? 0.5 : 0.3,
-            background: isFlipped 
-                ? 'radial-gradient(circle at 30% 50%, rgba(200, 200, 255, 0.4) 0%, transparent 50%)' 
-                : 'radial-gradient(circle at 30% 50%, rgba(30, 30, 50, 0.4) 0%, transparent 50%)'
-        }}
-        transition={{ duration: 1 }}
-      />
+      
 
       {/* IMPORTANT: You need to update BackgroundCards to accept 'isReducedMotion'.
         Inside BackgroundCards, if isReducedMotion is true:
         1. Disable mouse parallax listeners.
         2. Set animation durations to 0 or use simple fades.
       */}
-      <BackgroundCards 
-          imageUrl={backgroundCardUrl} 
-          shuffleCount={shuffleCount}
-          isShuffling={isShuffling}
-          isFlipped={isFlipped} 
-          // @ts-ignore - You need to add this prop to your component interface
-          isReducedMotion={isReducedMotion} 
-      />
+      {activeSection !== 'chat' && activeSection !== 'work' && activeSection !== 'contact' && activeSection != 'about' && activeSection != 'project' && (
+          <BackgroundCards 
+            imageUrl={backgroundCardUrl} 
+            shuffleCount={shuffleCount}
+            isShuffling={isShuffling}
+            isFlipped={isFlipped} 
+            // @ts-ignore 
+            isReducedMotion={isReducedMotion} 
+          />
+      )}
 
       <AboutOverlay 
         isOpen={isAboutOpen} 
         onClose={() => setIsAboutOpen(false)} 
         isFlipped={isFlipped}
       />
+
 
       <SecretPortal 
         isOpen={isSecretOpen} 
@@ -438,6 +438,9 @@ export default function App() {
             isFlipped={isFlipped}
           />
         )}
+        {activeSection === 'chat' && (
+          <ChatOverlay isFlipped={isFlipped} onClose={() => setActiveSection('home')} />
+       )}
 
         {activeSection === 'work' && (
           <WorkSection 
