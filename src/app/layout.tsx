@@ -5,7 +5,7 @@ import './globals.css';
 
 // 1. Metadata Configuration (SEO & Social Thumbnails)
 export const metadata: Metadata = {
-  title: "Tarun Sankar | Decksite",
+  title: "Tarun Sankar",
   description: "A high-fidelity card-based digital portfolio.",
   openGraph: {
     title: "Tarun Sankar",
