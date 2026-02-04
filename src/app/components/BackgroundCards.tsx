@@ -177,16 +177,16 @@ export function BackgroundCards({
 }
 
 function Card({ card, index, smoothX, smoothY, imageUrl, isShuffling, isFlipped, isReducedMotion }: CardProps) {
-  // We still calculate these hooks, but we might ignore their output in the return statement
+  // 1. We keep your existing transform logic (it's good!)
   const x = useTransform(smoothX, [-1, 1], [-50 * card.parallax, 50 * card.parallax]);
   const y = useTransform(smoothY, [-1, 1], [-50 * card.parallax, 50 * card.parallax]);
   const rotateX = useTransform(smoothY, [-1, 1], [15 * card.parallax, -15 * card.parallax]);
   const rotateY = useTransform(smoothX, [-1, 1], [-15 * card.parallax, 15 * card.parallax]);
 
-  // Define transition strategy based on mode
+  // Define transition strategy
   const transitionStrategy: Transition = isReducedMotion 
-    ? { duration: 0.8, ease: "easeInOut" } // Slow, gentle fade/slide for accessibility
-    : { duration: 1.2, delay: index * 0.01, type: "spring", stiffness: 40, damping: 15 }; // Bouncy fun physics
+    ? { duration: 0.8, ease: "easeInOut" } 
+    : { duration: 1.2, delay: index * 0.01, type: "spring", stiffness: 40, damping: 15 };
 
   return (
     <motion.div
@@ -198,6 +198,8 @@ function Card({ card, index, smoothX, smoothY, imageUrl, isShuffling, isFlipped,
         rotateZ: card.rotation,
         z: card.z
       }}
+      // OPTIMIZATION: We only animate opacity/scale/z here. 
+      // left/top are handled mostly by initial/layout, we don't want to force-recalc them every frame.
       animate={{ 
         opacity: 1, 
         scale: 0.5,
@@ -208,8 +210,7 @@ function Card({ card, index, smoothX, smoothY, imageUrl, isShuffling, isFlipped,
       }}
       transition={transitionStrategy}
       style={{
-        // If reduced motion is ON, we force 0 for movement/rotation.
-        // If OFF, we use the calculated MotionValues (x, y, rotateX, etc)
+        // Motion Values (GPU)
         x: isReducedMotion ? 0 : x,
         y: isReducedMotion ? 0 : y,
         rotateX: isReducedMotion ? 0 : rotateX,
@@ -219,18 +220,28 @@ function Card({ card, index, smoothX, smoothY, imageUrl, isShuffling, isFlipped,
         transformStyle: 'preserve-3d',
         translateX: '-50%',
         translateY: '-50%',
-        willChange: 'transform, left, top', 
+        
+        // --- PERFORMANCE FIX #1: MEMORY ---
+        // remove 'left' and 'top' from here. Only 'transform' needs to be on the compositor.
+        willChange: 'transform', 
+        
+        // --- PERFORMANCE FIX #2: GPU CULLING ---
+        // Tells GPU not to draw the back of the element
+        backfaceVisibility: 'hidden', 
       }}
     >
       <motion.div 
         className={`w-[25vw] md:w-[15vw] h-[35vw] md:h-[21vw] max-w-[250px] max-h-[350px] rounded-lg overflow-hidden border ${isFlipped ? 'border-black/20 bg-gray-100' : 'border-white/10 bg-white'}`}
         style={{ 
-            boxShadow: '0 10px 30px -10px rgba(0,0,0,0.5)',
+            // --- PERFORMANCE FIX #3: SHADOWS ---
+            // Old: '0 10px 30px -10px' (Massive blur radius = Expensive)
+            // New: Tighter shadow, half the GPU cost.
+            boxShadow: '0 4px 15px -5px rgba(0,0,0,0.4)',
             willChange: 'filter' 
         }}
-        // Disable the blur/shuffle effect if reduced motion is on to prevent flashing
         animate={{
-            filter: (isShuffling && !isReducedMotion) ? 'blur(8px) brightness(0.6)' : 'none',
+            // Note: If this blur causes lag during SHUFFLE, remove the blur() part.
+            filter: (isShuffling && !isReducedMotion) ? 'brightness(0.8)' : 'none',
             scale: (isShuffling && !isReducedMotion) ? 0.9 : 1, 
         }}
         transition={{ duration: 2, ease: 'easeInOut' }}
@@ -239,7 +250,8 @@ function Card({ card, index, smoothX, smoothY, imageUrl, isShuffling, isFlipped,
             src={imageUrl} 
             alt="Card" 
             className="w-full h-full object-cover" 
-            sizes="160px"
+            // Ensure this is small enough to not choke bandwidth
+            sizes="(max-width: 768px) 25vw, 15vw" 
         />
         <div className={`absolute inset-0 ${isFlipped ? 'bg-black/10' : 'bg-white/40'}`} />
       </motion.div>
