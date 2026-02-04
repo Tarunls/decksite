@@ -234,40 +234,63 @@ export default function App() {
       return newValue;
     });
   };
-
-  // Unified Fail-Safe Preloader
+// --- REPLACED PRELOADER ---
   useEffect(() => {
-    const criticalImages = [
-      heroCardUrl,
-      heroBackUrl,
-      backgroundCardUrl,
-      ...cardImages,
-      ...antiCardImages
-    ];
+    // 1. Critical: The Hero Images (User sees these immediately)
+    // Make sure these match your new WebP paths in constants.ts
+    const heroImages = [heroCardUrl, heroBackUrl]; 
+    
+    // 2. Secondary: The Deck (106 images)
+    // We queue these to load silently in the background
+    const deckImages = [backgroundCardUrl, ...cardImages, ...antiCardImages]; 
 
-    const preloadAll = async () => {
-      const promises = criticalImages.map(src => {
+    const loadCritical = async () => {
+      // A. Load Hero Immediately (Parallel)
+      const promises = heroImages.map(src => {
         return new Promise((resolve) => {
           const img = new Image();
           img.src = src;
-          img.onload = () => resolve(src);
-          img.onerror = () => {
-            console.error(`❌ Missing image: ${src}`);
-            resolve(null); // Resolve anyway so loader doesn't hang
-          };
+          // Resolve even on error so the site doesn't hang
+          img.onload = resolve;
+          img.onerror = resolve; 
         });
       });
 
-      // Wait for images AND minimum animation time
+      // B. Wait for Hero + Minimum Animation Timer (2.8s)
       await Promise.all([
         Promise.all(promises),
         new Promise(resolve => setTimeout(resolve, 2800))
       ]);
 
-      setIsLoading(false);
+      // C. Unlock the site
+      setIsLoading(false); 
+
+      // D. THE SEQUENTIAL LOADER (The Fix for Stutter)
+      // This loads the 106 cards one by one to keep the Main Thread free.
+      let currentIndex = 0;
+      
+      const loadNextImage = () => {
+        if (currentIndex >= deckImages.length) return; // Finished
+        
+        const img = new Image();
+        img.src = deckImages[currentIndex];
+        
+        // When this specific image is done (or fails), start the next one
+        img.onload = () => {
+          currentIndex++;
+          loadNextImage(); 
+        };
+        img.onerror = () => {
+          currentIndex++;
+          loadNextImage();
+        };
+      };
+
+      // Start the chain reaction
+      loadNextImage();
     };
 
-    preloadAll();
+    loadCritical();
   }, [heroCardUrl, heroBackUrl, backgroundCardUrl]);
 
   const handleShuffleTrigger = useCallback(() => {

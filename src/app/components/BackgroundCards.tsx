@@ -118,17 +118,36 @@ export function BackgroundCards({
   const smoothY = useSpring(mouseY, { damping: 20, stiffness: 50 });
 
   useEffect(() => {
+    // Variable to track if a frame is already requested
+    let frameId: number | null = null;
+
     const handleMouseMove = (e: MouseEvent) => {
-      // OPTIMIZATION: Stop tracking mouse if reduced motion is on
       if (isReducedMotion) return;
 
-      const { innerWidth, innerHeight } = window;
-      mouseX.set((e.clientX / innerWidth) * 2 - 1);
-      mouseY.set((e.clientY / innerHeight) * 2 - 1);
+      // 1. If we are already waiting for a frame, ignore this update.
+      // This limits updates to your screen's refresh rate (e.g. 60fps)
+      // instead of the mouse's polling rate (1000fps).
+      if (frameId) return;
+
+      // 2. Schedule the update for the next valid frame
+      frameId = requestAnimationFrame(() => {
+        const { innerWidth, innerHeight } = window;
+        mouseX.set((e.clientX / innerWidth) * 2 - 1);
+        mouseY.set((e.clientY / innerHeight) * 2 - 1);
+        
+        // 3. Reset the flag so we can accept the next event
+        frameId = null;
+      });
     };
+
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [mouseX, mouseY, isReducedMotion]); // Add dependency
+    
+    // Cleanup: Remove listener AND cancel any pending frame
+    return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        if (frameId) cancelAnimationFrame(frameId);
+    };
+  }, [mouseX, mouseY, isReducedMotion]);
 
   return (
     <>
