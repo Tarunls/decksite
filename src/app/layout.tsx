@@ -50,9 +50,9 @@ export default function RootLayout({
         {/* 3. Critical Image Preloading */}
         <link rel="preload" href="/cover.jpg" as="image" fetchPriority="high"/>
         <link rel="preload" href="/anticover.jpeg" as="image" fetchPriority="high"/>
-        <link rel="preload" href="/darkknight.png" as="image" fetchPriority="high"/>
-        <link rel="preload" href="/lightknight.png" as="image" fetchPriority="high"/>
-        <link rel="preload" href="/cards/time702-copy-6_51163893512_l.jpg" as="image" fetchPriority="high"/>
+        <link rel="preload" href="/darkknight.webp" as="image" fetchPriority="high"/>
+        <link rel="preload" href="/lightknight.webp" as="image" fetchPriority="high"/>
+        <link rel="preload" href="/cards/time702-copy-6_51163893512_l.webp" as="image" fetchPriority="high"/>
       </head>
       
       {/* 4. Apply Inter as the default body font */}
