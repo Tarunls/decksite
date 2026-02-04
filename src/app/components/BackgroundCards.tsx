@@ -237,7 +237,6 @@ function Card({ card, index, smoothX, smoothY, imageUrl, isShuffling, isFlipped,
             // Old: '0 10px 30px -10px' (Massive blur radius = Expensive)
             // New: Tighter shadow, half the GPU cost.
             boxShadow: '0 4px 15px -5px rgba(0,0,0,0.4)',
-            willChange: 'filter' 
         }}
         animate={{
             // Note: If this blur causes lag during SHUFFLE, remove the blur() part.
