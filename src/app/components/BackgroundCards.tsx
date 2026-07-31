@@ -236,13 +236,13 @@ function Card({ card, index, smoothX, smoothY, imageUrl, isShuffling, isFlipped,
         rotateY: isReducedMotion ? 0 : rotateY,
         
         position: 'absolute',
-        transformStyle: 'preserve-3d',
+        transformStyle: isReducedMotion ? 'flat' : 'preserve-3d',
         translateX: '-50%',
         translateY: '-50%',
         
         // --- PERFORMANCE FIX #1: MEMORY ---
         // remove 'left' and 'top' from here. Only 'transform' needs to be on the compositor.
-        willChange: 'transform', 
+        willChange: isReducedMotion ? 'auto' : 'transform',
         
         // --- PERFORMANCE FIX #2: GPU CULLING ---
         // Tells GPU not to draw the back of the element

@@ -83,7 +83,6 @@ interface InspectableCardProps {
   project: any;
   index: number;
   onSelect: () => void;
-  onClose: () => void;
   isSelected: boolean;
   isOtherSelected: boolean;
   position: Position;
@@ -98,7 +97,6 @@ function InspectableCard({
   project, 
   index, 
   onSelect, 
-  onClose,
   isSelected,       
   isOtherSelected,  
   position, 
@@ -178,7 +176,16 @@ function InspectableCard({
       
       onDragStart={() => (isDragging.current = true)}
       onDragEnd={handleDragEnd}
-      onTap={() => { if (!isDragging.current) isSelected ? onClose() : onSelect(); }}
+      onTap={() => { if (!isDragging.current) onSelect(); }}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onSelect();
+        }
+      }}
+      role="button"
+      tabIndex={isSelected || isOtherSelected ? -1 : 0}
+      aria-label={`Open ${project.title} project details`}
 
       // Initial Deal Animation
       initial={isReducedMotion 
@@ -195,7 +202,6 @@ function InspectableCard({
       className="absolute w-64 h-80 rounded-xl select-none"
     >
       <CardFront project={project} isFlipped={isFlipped} />
-      <CardBack project={project} isFlipped={isFlipped} onClose={onClose} />
     </motion.div>
   );
 }
@@ -271,10 +277,9 @@ export default function ProjectContent({ onClose, isFlipped = false, isReducedMo
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <motion.div 
-        className="absolute inset-0 bg-black/0 pointer-events-none transition-colors duration-500"
-        animate={{ backgroundColor: selectedId !== null ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0)" }}
-        style={{ backdropFilter: selectedId !== null ? "blur(8px)" : "blur(0px)" }}
+      <div
+        aria-hidden="true"
+        className={`absolute inset-0 bg-black pointer-events-none transition-opacity duration-300 ${selectedId !== null ? 'opacity-75' : 'opacity-0'}`}
       />
 
       <div 
@@ -310,7 +315,6 @@ export default function ProjectContent({ onClose, isFlipped = false, isReducedMo
                 isOtherSelected={selectedId !== null && selectedId !== project.id}
                 
                 onSelect={() => setSelectedId(project.id)}
-                onClose={() => setSelectedId(null)}
                 
                 isFlipped={isFlipped} 
                 isReducedMotion={isReducedMotion}

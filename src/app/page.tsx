@@ -368,9 +368,7 @@ export default function App() {
       shuffleCount={shuffleCount}
       isShuffling={isShuffling}
       isFlipped={isFlipped} 
-      // If the user has reduced motion ON globally OR a section is active, reduce motion
-      // @ts-ignore
-      isReducedMotion={isReducedMotion} 
+      isReducedMotion={isReducedMotion || isContentActive}
     />
 
 
@@ -460,6 +458,7 @@ export default function App() {
             key="project-overlay" 
             onClose={() => setActiveSection('home')} 
             isFlipped={isFlipped}
+            isReducedMotion={isReducedMotion}
           />
         )}
         {activeSection === 'chat' && (
@@ -491,7 +490,7 @@ export default function App() {
       />
       
       {/* Scanline Effect - DISABLED when Reduced Motion is ON */}
-      {!isReducedMotion && (
+      {!isReducedMotion && !isContentActive && (
         <motion.div
             className="absolute inset-0 pointer-events-none opacity-5"
             animate={{ backgroundPosition: ['0% 0%', '0% 100%'] }}
