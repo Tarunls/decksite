@@ -78,12 +78,15 @@ export function ChatOverlay({ onClose, isFlipped }: ChatOverlayProps) {
     }
 
     // --- 2. STANDARD API CALL ---
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 30000);
+
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      const res = await fetch(`${baseUrl}/chat`, {
+      const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userMsg }),
+        signal: controller.signal,
       });
 
       const data = await res.json();
@@ -95,8 +98,12 @@ export function ChatOverlay({ onClose, isFlipped }: ChatOverlayProps) {
       }
     } catch (error) {
       console.error("Chat Error:", error);
-      setHistory(prev => [...prev, { type: 'system', text: "The connection to the spirit realm is broken." }]);
+      const message = error instanceof DOMException && error.name === 'AbortError'
+        ? "The deck took too long to answer. Please try once more."
+        : "The connection to the spirit realm is broken.";
+      setHistory(prev => [...prev, { type: 'system', text: message }]);
     } finally {
+      window.clearTimeout(timeout);
       setIsTyping(false);
     }
   };
@@ -120,12 +127,11 @@ export function ChatOverlay({ onClose, isFlipped }: ChatOverlayProps) {
                 {/* LEFT SIDE: THE CHAT CARD */}
                 <div className="relative w-full md:w-3/4 h-full flex items-center justify-center p-4 md:p-12 pointer-events-auto z-20">
                     <motion.div
-                        initial={{ x: '40vw', y: '40vh', scale: 0.2, rotateY: 180, rotateZ: 45 }}
+                        initial={{ y: 32, scale: 0.96, rotateY: 10 }}
                         animate={{ x: 0, y: 0, scale: 1, rotateY: 0, rotateZ: 0 }}
-                        exit={{ scale: 0.9, opacity: 0, y: 50, transition: { duration: 0.3 } }}
-                        transition={{ type: "spring", damping: 25, stiffness: 120, mass: 0.8 }}
-                        className="relative w-full max-w-[700px] h-[70vh] md:h-[500px] rounded-2xl shadow-2xl will-change-transform"
-                        style={{ transformStyle: 'preserve-3d' }}
+                        exit={{ scale: 0.98, opacity: 0, y: 24, transition: { duration: 0.25 } }}
+                        transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+                        className="relative w-full max-w-[700px] h-[70vh] md:h-[500px] rounded-2xl shadow-2xl"
                     >
                         {/* FRONT */}
                         <div 

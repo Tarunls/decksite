@@ -286,7 +286,6 @@ function CarouselCard({
       style={{ 
         zIndex, 
         transformStyle: 'preserve-3d',
-        willChange: 'transform' 
       }}
       whileHover={{ 
         scale: isFocused ? 1.15 : 0.95, 
@@ -358,7 +357,7 @@ function CarouselCard({
 // --- 5. EXPANDED MODAL CARD (Optimized) ---
 function ExpandedCard({ item, onClose, isDarkMode }: { item: WorkItem, onClose: () => void, isDarkMode: boolean }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center perspective-[2000px] pointer-events-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-auto">
       
       {/* Backdrop (Optimized: Removed backdrop-blur-md) */}
       <motion.div
@@ -367,79 +366,27 @@ function ExpandedCard({ item, onClose, isDarkMode }: { item: WorkItem, onClose: 
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
         onClick={onClose}
-        // Replaced blur with a stronger opacity solid color. 
-        // This removes the massive GPU overhead of live blurring.
         className="absolute inset-0 bg-black/90 cursor-pointer"
-        style={{ willChange: "opacity" }}
       />
 
       {/* MODAL CONTAINER */}
       <motion.div
-        className="relative w-[90vw] md:w-auto h-[75vh] md:h-[80vh] aspect-[5/7] z-50"
+        className="relative z-[60] w-[min(92vw,42rem)] h-[min(74vh,42rem)] md:h-[min(72vh,42rem)] rounded-xl overflow-hidden shadow-2xl"
         initial={{ 
           opacity: 0, 
-          scale: 0.6, // Less drastic scale change
-          y: 300, 
-          rotateX: 10 
+          scale: 0.96,
+          y: 32,
         }}
         animate={{ 
           opacity: 1, 
           scale: 1, 
           y: 0,
-          rotateX: 0 
         }}
-        exit={{ opacity: 0, scale: 0.6, y: 300 }}
-        // Tweaked Spring: Lower stiffness, higher damping = Creamier, less jittery movement
-        transition={{ 
-          type: "spring", 
-          damping: 30, 
-          stiffness: 80,
-          mass: 1.2
-        }}
-        style={{ 
-            transformStyle: 'preserve-3d', 
-            willChange: 'transform, opacity' 
-        }}
+        exit={{ opacity: 0, scale: 0.98, y: 20 }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        onClick={(event) => event.stopPropagation()}
       >
-        <motion.div 
-            className="w-full h-full relative"
-            initial={{ rotateY: 0 }}
-            animate={{ rotateY: 180 }} 
-            transition={{ 
-                rotateY: { 
-                    type: "spring", 
-                    damping: 25, // Increased damping to prevent overshooting the flip
-                    stiffness: 70 // Reduced stiffness for smoother rotation
-                }
-            }}
-            style={{ transformStyle: 'preserve-3d' }}
-        >
-            {/* FRONT FACE */}
-            <div 
-                className="absolute inset-0 rounded-xl bg-[#0f0f0f] border border-white/20 p-1.5 shadow-2xl"
-                style={{ backfaceVisibility: 'hidden' }}
-            >
-                <div className="relative w-full h-full rounded-lg overflow-hidden bg-black">
-                    <ImageWithFallback 
-                        src={item.frontImage} 
-                        alt={item.company} 
-                        className="w-full h-full object-cover" 
-                        sizes="(max-width: 768px) 95vw, 600px"
-                    />
-                </div>
-            </div>
-
-            {/* BACK FACE */}
-            <div 
-                className="absolute inset-0 rounded-xl overflow-hidden shadow-2xl"
-                style={{ 
-                    backfaceVisibility: 'hidden', 
-                    transform: 'rotateY(180deg)',
-                }}
-            >
-                <CardBackContent item={item} isExpanded={true} onClose={onClose} darkMode={isDarkMode} />
-            </div>
-        </motion.div>
+        <CardBackContent item={item} isExpanded={true} onClose={onClose} darkMode={isDarkMode} />
       </motion.div>
     </div>
   );

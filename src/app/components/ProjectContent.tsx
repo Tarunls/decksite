@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { motion, PanInfo, Transition } from 'motion/react';
+import { AnimatePresence, motion, PanInfo } from 'motion/react';
 import { projects } from '../../lib/constants'; // Ensure this path is correct
 
 // --- 1. FRONT FACE ---
@@ -36,7 +36,7 @@ function CardFront({ project, isFlipped }: { project: any, isFlipped: boolean })
 }
 
 // --- 2. BACK FACE ---
-function CardBack({ project, isFlipped, onClose }: { project: any, isFlipped: boolean, onClose: () => void }) {
+function CardBack({ project, isFlipped, onClose, isExpanded = false }: { project: any, isFlipped: boolean, onClose: () => void, isExpanded?: boolean }) {
   const bg = isFlipped ? "bg-[#f0f0f0]" : "bg-[#0a0a0a]";
   const textColor = isFlipped ? "text-slate-900" : "text-white";
   const subText = isFlipped ? "text-black/50" : "text-white/50";
@@ -45,11 +45,12 @@ function CardBack({ project, isFlipped, onClose }: { project: any, isFlipped: bo
 
   return (
     <div 
-      className={`absolute inset-0 w-full h-full flex flex-col p-8 rounded-xl border ${bg} ${borderColor} shadow-2xl overflow-scroll`}
-      style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+      className={`${isExpanded ? 'relative' : 'absolute inset-0'} w-full h-full flex flex-col p-8 rounded-xl border ${bg} ${borderColor} shadow-2xl overflow-y-auto overflow-x-hidden`}
+      style={isExpanded ? undefined : { backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
     >
       <button 
         onClick={(e) => { e.stopPropagation(); onClose(); }}
+        aria-label="Close project details"
         className={`absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full border ${borderColor} ${textColor} hover:scale-110 transition-transform cursor-pointer z-50`}
       >
         ✕
@@ -116,8 +117,9 @@ function InspectableCard({
   if (isReducedMotion) {
       if (isSelected) {
           animateState = { 
-              x: 0, y: 0, scale: 1.1, zIndex: 100, rotateY: 180, rotateZ: 0,
-              transition: { duration: 0.5, ease: "easeInOut" }
+              x: 0, y: 0, scale: 0.96, zIndex: 100, rotateY: 0, rotateZ: 0, opacity: 0,
+              pointerEvents: "none",
+              transition: { duration: 0.2 }
           };
       } else if (isOtherSelected) {
           animateState = { opacity: 0, pointerEvents: "none" };
@@ -131,8 +133,9 @@ function InspectableCard({
   else {
       if (isSelected) {
         animateState = {
-          x: 0, y: 0, rotateZ: 0, rotateY: 180, scale: 1.5, zIndex: 100, opacity: 1,
-          transition: { type: "spring", stiffness: 200, damping: 25 }
+          x: 0, y: 0, rotateZ: 0, rotateY: 0, scale: 0.96, zIndex: 100, opacity: 0,
+          pointerEvents: "none",
+          transition: { duration: 0.2 }
         };
       } else if (isOtherSelected) {
         animateState = {
@@ -270,19 +273,19 @@ export default function ProjectContent({ onClose, isFlipped = false, isReducedMo
     >
       <motion.div 
         className="absolute inset-0 bg-black/0 pointer-events-none transition-colors duration-500"
-        animate={{ backgroundColor: selectedId ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0)" }}
-        style={{ backdropFilter: selectedId ? "blur(8px)" : "blur(0px)" }}
+        animate={{ backgroundColor: selectedId !== null ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0)" }}
+        style={{ backdropFilter: selectedId !== null ? "blur(8px)" : "blur(0px)" }}
       />
 
       <div 
         onClick={() => {
-            if (selectedId) setSelectedId(null);
+            if (selectedId !== null) setSelectedId(null);
             else onClose();
         }}
         className="absolute inset-0 cursor-pointer"
       />
 
-      {!selectedId && (
+      {selectedId === null && (
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -315,7 +318,32 @@ export default function ProjectContent({ onClose, isFlipped = false, isReducedMo
              />
           </div>
         ))}
+
+        <AnimatePresence>
+          {selectedId !== null && (
+            <ExpandedProjectCard
+              project={projects.find(project => project.id === selectedId)!}
+              isFlipped={isFlipped}
+              onClose={() => setSelectedId(null)}
+            />
+          )}
+        </AnimatePresence>
       </div>
+    </motion.div>
+  );
+}
+
+function ExpandedProjectCard({ project, isFlipped, onClose }: { project: any, isFlipped: boolean, onClose: () => void }) {
+  return (
+    <motion.div
+      className="absolute z-[110] w-[min(90vw,28rem)] h-[min(76vh,34rem)] pointer-events-auto rounded-xl"
+      initial={{ opacity: 0, y: 28, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 18, scale: 0.98 }}
+      transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+      onClick={(event) => event.stopPropagation()}
+    >
+      <CardBack project={project} isFlipped={isFlipped} onClose={onClose} isExpanded />
     </motion.div>
   );
 }
