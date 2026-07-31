@@ -57,9 +57,13 @@ function CardBack({ project, isFlipped, onClose, isExpanded = false }: { project
       </button>
 
       <div className="mt-4">
-        <div className={`text-[10px] font-mono uppercase tracking-widest mb-4 ${subText}`}>Confidential</div>
+        <div className={`text-[10px] font-mono uppercase tracking-widest mb-4 ${subText}`}>{project.period}</div>
         <h3 className={`text-2xl font-serif font-bold mb-4 ${textColor}`}>{project.title}</h3>
-        <p className={`text-sm leading-relaxed mb-6 ${subText}`}>{project.description}</p>
+        <ul className={`text-sm leading-relaxed mb-6 space-y-3 list-disc pl-4 ${subText}`}>
+          {project.description.map((highlight: string) => (
+            <li key={highlight}>{highlight}</li>
+          ))}
+        </ul>
       </div>
 
       <div className="mt-auto">
@@ -68,9 +72,11 @@ function CardBack({ project, isFlipped, onClose, isExpanded = false }: { project
             <span key={tag} className={`text-[9px] font-mono uppercase px-2 py-1 rounded ${tagBg}`}>{tag}</span>
           ))}
         </div>
-        <a href={project.link} target="_blank" rel="noopener noreferrer" className={`block w-full text-center py-3 text-xs font-mono uppercase tracking-widest border ${borderColor} rounded hover:bg-white/10 transition-colors ${textColor}`}>
-          View Project
-        </a>
+        {project.link && (
+          <a href={project.link} target="_blank" rel="noopener noreferrer" className={`block w-full text-center py-3 text-xs font-mono uppercase tracking-widest border ${borderColor} rounded hover:bg-white/10 transition-colors ${textColor}`}>
+            View Project
+          </a>
+        )}
       </div>
     </div>
   );

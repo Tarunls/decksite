@@ -12,7 +12,7 @@ interface WorkItem {
   company: string;
   role: string;
   period: string;
-  description: string;
+  description: string[];
   technologies: string[];
   frontImage: string;
 }
@@ -32,31 +32,53 @@ interface CarouselCardProps {
 const workItems: WorkItem[] = [
   {
     id: 1,
-    company: "UT Dallas",
-    role: "Undergraduate Researcher",
-    period: "Aug 2024 - Present",
-    // Updated based on your abstract
-    technologies: ["Python", "GNSS", "Edge Computing", "Parallel Processing"], 
+    company: "Northmark Cloud & Compute (NMC²)",
+    role: "Software Engineering Intern, Network Automation",
+    period: "Jun 2026 - Present",
+    technologies: ["Slack", "ZTP", "Infrahub", "Jira"],
     frontImage: "/cards/time702-copy-6_51163893512_l.jpg",
-    description: "Engineered a real-time processing pipeline for the ScintPi 3.0, a low-cost GNSS space weather monitor. Leveraged parallel edge computing to calculate scintillation indices (S4/TEC) onboard, reducing daily data transmission from 2.4GB to <5MB. Deployed a web dashboard for live visualization of ionospheric irregularities, enabling scalable distributed monitoring." 
+    description: [
+      "Built a Slack-integrated network automation bot that monitors Zero-Touch Provisioning (ZTP) and Infrahub events across GPU infrastructure spanning several thousand GPUs and hundreds of thousands of configuration records.",
+      "Developed a one-command snapshot test harness to baseline Infrahub configuration, diff subsequent changes, and surface unintended infrastructure drift in Slack before deployment.",
+      "Implemented a tool-calling assistant integrating Jira, Slack, Infrahub, and ZTP to diagnose infrastructure issues across systems and surface likely root causes.",
+    ],
   },
   {
     id: 2,
-    company: "MyIntent.io",
-    role: "Full Stack Developer",
-    period: "Aug 2024 - Nov 2024",
-    technologies: ["Next.js", "Nest.js", "Gemini", "GPT-5"],
+    company: "The University of Texas at Dallas",
+    role: "Undergraduate Researcher",
+    period: "Aug 2024 - Present",
+    technologies: ["Python", "Bash", "TensorFlow", "Azure", "Raspberry Pi", "Plotly Dash"],
     frontImage: "/cards/time702-copy-6_51163893512_l.jpg",
-    description: "Designed and engineered a dynamic, minimalistic full-stack platform. Built an automated RFP (Request for Proposal) system using Next.js and Nest.js, integrating advanced LLMs (Gemini and GPT-5) to accurately populate business documents with carefully inputted data."
+    description: [
+      "Built an IoT and TensorFlow pipeline using satellite-receiver data to classify ionospheric scintillation events versus radio-frequency interference and multipath artifacts.",
+      "Built a one-command Bash deployment pipeline that provisions Azure storage and web apps, configures Raspberry Pi collectors, and launches real-time Plotly Dash dashboards ingesting hundreds of thousands of data points daily.",
+      "Open-sourced ScintKit, a Python library that scans legacy and current ScintPi station formats, visualizes data-availability gaps, and emails automated monitoring reports.",
+    ],
   },
   {
     id: 3,
-    company: "Mathnasium",
-    role: "Lead Instructor", 
-    period: "2023 - 2024",
-    technologies: ["Education", "Communication", "Curriculum Mgmt", "Mentorship"],
+    company: "Enky",
+    role: "Builder (Full-Stack Developer)",
+    period: "Dec 2024 - May 2025",
+    technologies: ["React", "Next.js", "Stripe"],
     frontImage: "/cards/time702-copy-6_51163893512_l.jpg",
-    description: "Provided comprehensive mathematics instruction to students of varying skill levels. Developed personalized learning plans to bridge knowledge gaps and fostered a positive, encouraging learning environment to build student confidence."
+    description: [
+      "Built and launched full-stack features for a two-sided music-promotion marketplace using React and Next.js, connecting 20+ emerging artists with influencers for paid song placements.",
+      "Implemented user authentication and Stripe payment workflows that enabled influencers to set placement rates and artists to purchase promotions through the platform.",
+    ],
+  },
+  {
+    id: 4,
+    company: "MyIntent.io",
+    role: "Software Engineering Intern, Frontend Development",
+    period: "Aug 2024 - Nov 2024",
+    technologies: ["React", "Next.js", "NestJS", "Gemini", "OpenAI"],
+    frontImage: "/cards/time702-copy-6_51163893512_l.jpg",
+    description: [
+      "Owned frontend integration for services that ingested RFPs, parsed supporting documentation, and generated AI-assisted business responses, building the associated workflows in Next.js.",
+      "Integrated React components with NestJS APIs and Gemini/OpenAI models to transform structured customer inputs into generated business documents.",
+    ],
   },
 ];
 
@@ -178,9 +200,11 @@ function CardBackContent({ item, isExpanded, onClose, darkMode = false }: CardBa
                 <h2 className={`text-4xl md:text-5xl font-serif font-bold ${textMain} mb-2`}>{item.company}</h2>
                 <h3 className={`text-xl font-medium ${textSub}`}>{item.role}</h3>
             </div>
-            <div>
-                <p className={`text-lg leading-relaxed ${darkMode ? 'text-white/80' : 'text-black/80'}`}>{item.description}</p>
-            </div>
+            <ul className={`space-y-4 text-base md:text-lg leading-relaxed list-disc pl-5 ${darkMode ? 'text-white/80' : 'text-black/80'}`}>
+              {item.description.map((highlight) => (
+                <li key={highlight}>{highlight}</li>
+              ))}
+            </ul>
             <div className="pt-4">
                 <h5 className={`text-xs font-mono uppercase tracking-widest ${darkMode ? 'text-white/30' : 'text-black/40'} mb-4`}>Technology Inventory</h5>
               <div className="grid grid-cols-2 gap-3">
@@ -191,13 +215,6 @@ function CardBackContent({ item, isExpanded, onClose, darkMode = false }: CardBa
                   </div>
                 ))}
               </div>
-            </div>
-            <div className={`pt-12 border-t ${borderClass} mt-12`}>
-                <h5 className={`text-[10px] font-mono uppercase tracking-widest ${darkMode ? 'text-white/20' : 'text-black/30'} mb-4`}>System Logs</h5>
-                <div className={`space-y-4 opacity-50 text-[10px] font-mono leading-loose ${darkMode ? 'text-white/50' : 'text-black/60'}`}>
-                   <p>LOG 01: Deployment successful. System nominal.</p>
-                   <p>LOG 02: Initializing secure handshake protocols.</p>
-                </div>
             </div>
         </div>
       </div>
@@ -300,9 +317,9 @@ function CarouselCard({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: isExpanded ? 0 : 1, y: 0 }} 
         style={{ x: textX, y: textY, z: 50 }}
-        className="absolute -top-20 left-0 right-0 text-center pointer-events-none"
+        className={`absolute -top-20 left-0 right-0 text-center pointer-events-none ${isFocused ? '' : 'hidden md:block'}`}
       >
-        <h3 className={`text-3xl font-serif font-bold transition-colors duration-300 ${titleColor}`}>
+        <h3 className={`text-2xl md:text-3xl font-serif font-bold transition-colors duration-300 ${titleColor}`}>
             {item.company}
         </h3>
         <p className={`text-xs font-mono uppercase tracking-widest mt-2 transition-colors duration-300 ${roleColor}`}>
