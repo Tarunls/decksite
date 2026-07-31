@@ -30,3 +30,5 @@ Some UI components are from shadcn/ui (MIT license), and a portion of the imager
 npm install
 npm run dev
 ```
+
+Copy `.env.example` to `.env.local` and set `OPENAI_API_KEY` to enable Dealerbot. The chat API runs as a Next.js server route at `/api/chat`, so the deployed site no longer depends on a separate Render service or its cold-start warmup.

@@ -12,16 +12,19 @@ interface AboutOverlayProps {
 
 export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) {
   const [showContent, setShowContent] = useState(false);
+  const [hasSettled, setHasSettled] = useState(false);
   const cardBackImage = "/coverotate.jpg"; // Ensure path is correct
 
   const isDarkMode = !isFlipped;
 
   useEffect(() => {
     if (isOpen) {
+      setHasSettled(false);
       const timer = setTimeout(() => setShowContent(true), 700);
       return () => clearTimeout(timer);
     } else {
       setShowContent(false);
+      setHasSettled(false);
     }
   }, [isOpen]);
 
@@ -53,6 +56,7 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
             animate={{ x: 0, y: 0, scale: 1, rotateY: 0, rotateZ: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 50, transition: { duration: 0.3 } }}
             transition={{ type: "spring", damping: 25, stiffness: 120, mass: 0.8 }}
+            onAnimationComplete={() => setHasSettled(true)}
             className={`
               relative 
               /* MOBILE: Fixed viewport based size */
@@ -63,11 +67,13 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
                  2. Set explicit Height (500px) -> This maintains your 7/5 ratio
                  3. REMOVE 'h-auto' entirely 
               */
-              md:w-[700px] md:h-[500px] md:max-h-[90vh]
+              md:w-[700px] md:h-[580px] md:max-h-[90vh]
               
               rounded-2xl shadow-2xl
             `}
-            style={{ transformStyle: 'preserve-3d' }}
+            style={hasSettled
+              ? { transform: 'none', transformStyle: 'flat' }
+              : { transformStyle: 'preserve-3d' }}
           > 
             
             {/* FRONT (CONTENT) */}
@@ -124,6 +130,35 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
                         I specialize in Next.js, React, Python, Azure, and AI integrations to build scalable solutions.
                       </p>
                     </div>
+
+                    {/* RESUME */}
+                    <a
+                      href="/Tarun-Sankar-Resume.pdf"
+                      download="Tarun-Sankar-Resume.pdf"
+                      aria-label="Download Tarun Sankar's resume as a PDF"
+                      className={`group relative overflow-hidden rounded-xl border p-5 transition-colors duration-300 ${borderColor} ${isDarkMode ? 'hover:bg-white/[0.06]' : 'hover:bg-black/[0.03]'}`}
+                    >
+                      <div className="relative z-10 flex items-center justify-between gap-5">
+                        <div className="flex items-center gap-4 min-w-0">
+                          <div className={`flex h-12 w-9 shrink-0 items-center justify-center rounded-sm border font-serif text-xl ${borderColor} ${textMain}`}>
+                            ♠
+                          </div>
+                          <div className="min-w-0">
+                            <div className={`mb-1 text-[10px] font-mono uppercase tracking-[0.24em] ${textSub}`}>
+                              Player dossier · PDF
+                            </div>
+                            <div className={`font-serif text-xl font-bold ${textMain}`}>
+                              Tarun's Resume
+                            </div>
+                          </div>
+                        </div>
+                        <div className={`shrink-0 text-right font-mono text-[10px] uppercase tracking-widest ${textSub}`}>
+                          <span className="hidden sm:inline">Download </span>
+                          <span aria-hidden="true" className={`inline-block text-lg leading-none ${textMain}`}>↓</span>
+                        </div>
+                      </div>
+                      <div className={`absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100 ${isDarkMode ? 'bg-white/60' : 'bg-black/50'}`} />
+                    </a>
 
                     {/* SKILLS */}
                     <div className="pb-8"> 
