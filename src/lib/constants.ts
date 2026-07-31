@@ -115,37 +115,28 @@ export const projects = [
   {
     id: 1,
     title: "Cinder Control",
-    category: "TAMUHack 2026 Winner",
-    suit: "♠", // Spades (Power/Action)
-    description: "Award-winning wildfire simulation platform (TAMUHack 2026). Engineered a full-stack crisis management tool leveraging OpenAI and geospatial data to simulate global fire spread and route evacuations in real-time.",
-    tags: ["Next.js", "Python FastAPI", "OpenAI", "Mapbox"],
-    link: "https://github.com/tarunls/fire-sim", // Update exact repo name
+    category: "2nd Place & Best Solo Project",
+    period: "Jan 2026",
+    suit: "♠",
+    description: [
+      "Built a full-stack wildfire decision-support platform solo in 36 hours with Next.js and FastAPI, enabling incident commanders to query fire behavior by voice or text.",
+      "Implemented a parallel cellular-automata simulation forecasting wildfire spread up to 96 hours and cross-referenced infrastructure and geospatial data to flag at-risk assets and generate evacuation routes.",
+      "Integrated OpenAI, ElevenLabs, Mapbox, OpenStreetMap, and NOAA weather APIs for natural-language control, voice narration, mapping, and live environmental data.",
+    ],
+    tags: ["Next.js", "FastAPI", "OpenAI", "ElevenLabs", "Mapbox", "OpenStreetMap", "NOAA"],
+    link: "https://github.com/Tarunls/fire-sim",
   },
   {
     id: 2,
-    title: "SentiScrape",
-    category: "ML Engineering",
-    suit: "♦", // Diamonds (Value/Analysis)
-    description: "High-volume sentiment analysis engine. Scraped 100k+ IMDb reviews to train a bias detection model using PyTorch and NLP, correlating language tone with rating predictions to uncover hidden user biases.",
-    tags: ["Python", "PyTorch", "Selenium", "Pandas"],
-    link: "https://github.com/tarunls/sentiscrape",
-  },
-  {
-    id: 3,
-    title: "Real-Time Space Weather Monitor",
-    category: "Research",
-    suit: "♣", // Clubs (Work/Labor)
-    description: "Real-time space weather monitoring pipeline for UTD. Optimized edge-processing on single-board computers to calculate ionospheric scintillation indices locally, reducing satellite data transmission bandwidth by 99%.",
-    tags: ["IoT", "TensorFlow", "Edge Computing", "Azure"],
-    link: "https://github.com/tarunls/scintpi",
-  },
-  {
-    id: 4,
-    title: "Grimmbot",
-    category: "Automation and AI",
-    suit: "♥", // Hearts (Emotion/Feeling)
-    description: "A discord bot that could listen to user's talk, parse words, and respond with ElevenLabs text-to-speech voices. Built using Discord.js and ElevenLabs API to create an engaging, interactive experience for server members.",
-    tags: ["AI", "Discord.js", "ElevenLabs API", "Node.js", "OpenAI"],
-    link: "https://github.com/tarunls/grimmbot",
+    title: "COMMerce",
+    category: "Live Social-Engagement Forecasting",
+    period: "Jul 2026",
+    suit: "♦",
+    description: [
+      "Built a live-data forecasting platform that turns fresh YouTube and Reddit comments into 1-3 hour prediction contracts, giving users a risk-free way to evaluate engagement momentum, probability, and time decay.",
+      "Designed a server-authoritative Node.js pricing and settlement engine that computes probability, live mark value, implied volatility, and theta from engagement velocity, reach, freshness, text signals, and historical acceleration.",
+      "Integrated Google OAuth, Redis-backed balances and leaderboards, quota-aware shared comment pools, early cash-outs, and automated tests covering pricing, settlement, discovery, and storage invariants.",
+    ],
+    tags: ["Node.js", "YouTube", "Reddit", "Google OAuth", "Redis"],
   },
 ];

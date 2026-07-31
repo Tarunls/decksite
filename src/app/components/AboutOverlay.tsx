@@ -110,24 +110,23 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
                         </h2>
                       </div>
                       <div className="text-right">
-                        <div className={`text-xs font-mono uppercase tracking-widest ${textSub}`}>Age</div>
-                        <div className={`text-3xl font-light ${textMain}`}>20</div>
+                        <div className={`text-xs font-mono uppercase tracking-widest ${textSub}`}>Expected Graduation</div>
+                        <div className={`text-2xl font-light ${textMain}`}>May 2027</div>
                       </div>
                     </div>
 
                     {/* STATS */}
                     <div className="grid grid-cols-3 gap-4">
-                      <StatBlock label="Class" value="Computer Engineer" textColor={textMain} subColor={textSub} borderColor={borderColor} />
-                      <StatBlock label="Guild" value="UTD" textColor={textMain} subColor={textSub} borderColor={borderColor} />
-                      <StatBlock label="Origin" value="Texas" textColor={textMain} subColor={textSub} borderColor={borderColor} />
+                      <StatBlock label="Degree" value="B.S. Computer Engineering" textColor={textMain} subColor={textSub} borderColor={borderColor} />
+                      <StatBlock label="GPA" value="3.7 / 4.0" textColor={textMain} subColor={textSub} borderColor={borderColor} />
+                      <StatBlock label="University" value="UT Dallas" textColor={textMain} subColor={textSub} borderColor={borderColor} />
                     </div>
 
                     {/* BIO */}
                     <div className={`text-base md:text-lg leading-relaxed font-light ${textSub}`}>
                       <p>
-                        I create web applications and AI tools that blend functionality with engaging user experiences. 
-
-                        I specialize in Next.js, React, Python, Azure, and AI integrations to build scalable solutions.
+                        I&apos;m a Computer Engineering student at UT Dallas building software across network automation,
+                        infrastructure, machine learning, and full-stack systems.
                       </p>
                     </div>
 
@@ -163,7 +162,12 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
                     {/* SKILLS */}
                     <div className="pb-8"> 
                       <div className="flex flex-wrap gap-2">
-                        {['React', 'Next.js', 'TypeScript', 'Tailwind', 'Motion', 'Python', 'Node.js', 'Figma'].map((tech) => (
+                        {[
+                          'Python', 'Java', 'C++', 'TypeScript', 'SQL', 'Bash',
+                          'React', 'Next.js', 'Node.js', 'NestJS', 'FastAPI', 'Flask',
+                          'PyTorch', 'TensorFlow', 'Hugging Face Transformers', 'PostgreSQL', 'Supabase',
+                          'Azure', 'GCP', 'Docker', 'Kubernetes', 'Azure Administrator Associate',
+                        ].map((tech) => (
                           <span key={tech} className={`px-3 py-1 text-[10px] font-mono uppercase tracking-wider border rounded-sm ${tagClass}`}>
                             {tech}
                           </span>
@@ -205,7 +209,7 @@ function StatBlock({ label, value, textColor, subColor, borderColor }: any) {
             <span className={`text-[10px] font-mono uppercase tracking-widest opacity-70 mb-1 ${subColor}`}>
                 {label}
             </span>
-            <span className={`text-base font-medium truncate ${textColor}`}>
+            <span className={`text-sm md:text-base font-medium leading-tight ${textColor}`}>
                 {value}
             </span>
         </div>

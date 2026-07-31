@@ -28,7 +28,7 @@ export function ContactSection({ onClose }: { onClose: () => void }) {
 
   const handleCopy = (e: React.MouseEvent) => {
     e.stopPropagation();
-    navigator.clipboard.writeText("tarun.sankar@utdallas.edu");
+    navigator.clipboard.writeText("tarunlsankar@gmail.com");
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

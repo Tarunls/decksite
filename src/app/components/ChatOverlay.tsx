@@ -400,8 +400,9 @@ function KingModal({ onClose }: { onClose: () => void }) {
                                         <div className="p-6 border border-[#E5E5E5]/10 bg-[#E5E5E5]/5 backdrop-blur-sm w-full text-left space-y-4">
                                             <h3 className="text-sm font-bold text-[#881111] uppercase tracking-widest" style={fontCinzel}>Restricted Files Unlocked</h3>
                                             <ul className="text-sm text-[#E5E5E5]/70 space-y-3 list-none font-mono">
-                                                <li>► <a href="#" className="hover:text-white hover:underline">Contact: 469-601-5763</a></li>
-                                                <li>► <a href="#" className="hover:text-white hover:underline">Private Resume (PDF)</a></li>
+                                                <li>► <a href="mailto:tarunlsankar@gmail.com" className="hover:text-white hover:underline">Email Tarun</a></li>
+                                                <li>► <a href="https://linkedin.com/in/tarunls" target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline">LinkedIn</a></li>
+                                                <li>► <a href="/Tarun-Sankar-Resume.pdf" download="Tarun-Sankar-Resume.pdf" className="hover:text-white hover:underline">Resume (PDF)</a></li>
                                             </ul>
                                         </div>
                                         <button onClick={onClose} className="mt-4 text-[10px] uppercase tracking-[0.2em] text-[#333333] hover:text-[#E5E5E5] transition-colors">Close Connection</button>

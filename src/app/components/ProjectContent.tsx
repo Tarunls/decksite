@@ -57,9 +57,13 @@ function CardBack({ project, isFlipped, onClose, isExpanded = false }: { project
       </button>
 
       <div className="mt-4">
-        <div className={`text-[10px] font-mono uppercase tracking-widest mb-4 ${subText}`}>Confidential</div>
+        <div className={`text-[10px] font-mono uppercase tracking-widest mb-4 ${subText}`}>{project.period}</div>
         <h3 className={`text-2xl font-serif font-bold mb-4 ${textColor}`}>{project.title}</h3>
-        <p className={`text-sm leading-relaxed mb-6 ${subText}`}>{project.description}</p>
+        <ul className={`text-sm leading-relaxed mb-6 space-y-3 list-disc pl-4 ${subText}`}>
+          {project.description.map((highlight: string) => (
+            <li key={highlight}>{highlight}</li>
+          ))}
+        </ul>
       </div>
 
       <div className="mt-auto">
@@ -68,9 +72,11 @@ function CardBack({ project, isFlipped, onClose, isExpanded = false }: { project
             <span key={tag} className={`text-[9px] font-mono uppercase px-2 py-1 rounded ${tagBg}`}>{tag}</span>
           ))}
         </div>
-        <a href={project.link} target="_blank" rel="noopener noreferrer" className={`block w-full text-center py-3 text-xs font-mono uppercase tracking-widest border ${borderColor} rounded hover:bg-white/10 transition-colors ${textColor}`}>
-          View Project
-        </a>
+        {project.link && (
+          <a href={project.link} target="_blank" rel="noopener noreferrer" className={`block w-full text-center py-3 text-xs font-mono uppercase tracking-widest border ${borderColor} rounded hover:bg-white/10 transition-colors ${textColor}`}>
+            View Project
+          </a>
+        )}
       </div>
     </div>
   );
@@ -83,7 +89,6 @@ interface InspectableCardProps {
   project: any;
   index: number;
   onSelect: () => void;
-  onClose: () => void;
   isSelected: boolean;
   isOtherSelected: boolean;
   position: Position;
@@ -98,7 +103,6 @@ function InspectableCard({
   project, 
   index, 
   onSelect, 
-  onClose,
   isSelected,       
   isOtherSelected,  
   position, 
@@ -178,7 +182,16 @@ function InspectableCard({
       
       onDragStart={() => (isDragging.current = true)}
       onDragEnd={handleDragEnd}
-      onTap={() => { if (!isDragging.current) isSelected ? onClose() : onSelect(); }}
+      onTap={() => { if (!isDragging.current) onSelect(); }}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onSelect();
+        }
+      }}
+      role="button"
+      tabIndex={isSelected || isOtherSelected ? -1 : 0}
+      aria-label={`Open ${project.title} project details`}
 
       // Initial Deal Animation
       initial={isReducedMotion 
@@ -195,7 +208,6 @@ function InspectableCard({
       className="absolute w-64 h-80 rounded-xl select-none"
     >
       <CardFront project={project} isFlipped={isFlipped} />
-      <CardBack project={project} isFlipped={isFlipped} onClose={onClose} />
     </motion.div>
   );
 }
@@ -271,10 +283,9 @@ export default function ProjectContent({ onClose, isFlipped = false, isReducedMo
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <motion.div 
-        className="absolute inset-0 bg-black/0 pointer-events-none transition-colors duration-500"
-        animate={{ backgroundColor: selectedId !== null ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0)" }}
-        style={{ backdropFilter: selectedId !== null ? "blur(8px)" : "blur(0px)" }}
+      <div
+        aria-hidden="true"
+        className={`absolute inset-0 bg-black pointer-events-none transition-opacity duration-300 ${selectedId !== null ? 'opacity-75' : 'opacity-0'}`}
       />
 
       <div 
@@ -310,7 +321,6 @@ export default function ProjectContent({ onClose, isFlipped = false, isReducedMo
                 isOtherSelected={selectedId !== null && selectedId !== project.id}
                 
                 onSelect={() => setSelectedId(project.id)}
-                onClose={() => setSelectedId(null)}
                 
                 isFlipped={isFlipped} 
                 isReducedMotion={isReducedMotion}
