@@ -1,7 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import {
+  motion,
+  AnimatePresence,
+  useMotionValue,
+  useReducedMotion,
+  useSpring,
+  useTransform,
+  type MotionValue,
+} from 'motion/react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 
@@ -25,6 +33,8 @@ interface CarouselCardProps {
   setExpandedId: (id: number | null) => void;
   isExpanded: boolean;
   isDarkMode: boolean;
+  tiltX: MotionValue<number>;
+  tiltY: MotionValue<number>;
 }
 
 const workItems: WorkItem[] = [
@@ -89,8 +99,34 @@ interface WorkSectionProps {
 export function WorkSection({ onGoHome, isFlipped }: WorkSectionProps) {
   const [focusedIndex, setFocusedIndex] = useState(0);
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const prefersReducedMotion = useReducedMotion();
+  const pointerX = useMotionValue(0);
+  const pointerY = useMotionValue(0);
+  const smoothX = useSpring(pointerX, { stiffness: 180, damping: 26, mass: 0.35 });
+  const smoothY = useSpring(pointerY, { stiffness: 180, damping: 26, mass: 0.35 });
+  const tiltY = useTransform(smoothX, [-1, 1], [-6, 6]);
+  const tiltX = useTransform(smoothY, [-1, 1], [4, -4]);
+  const deckX = useTransform(smoothX, [-1, 1], [-10, 10]);
+  const deckY = useTransform(smoothY, [-1, 1], [-4, 4]);
 
   const isDarkMode = !isFlipped; 
+
+  const resetPointer = () => {
+    pointerX.set(0);
+    pointerY.set(0);
+  };
+
+  const handlePointerMove = (event: React.PointerEvent<HTMLElement>) => {
+    if (prefersReducedMotion || expandedId !== null || event.pointerType !== 'mouse') return;
+
+    const bounds = event.currentTarget.getBoundingClientRect();
+    pointerX.set(((event.clientX - bounds.left) / bounds.width) * 2 - 1);
+    pointerY.set(((event.clientY - bounds.top) / bounds.height) * 2 - 1);
+  };
+
+  useEffect(() => {
+    if (expandedId !== null) resetPointer();
+  }, [expandedId]);
 
   return (
     <motion.section
@@ -98,6 +134,8 @@ export function WorkSection({ onGoHome, isFlipped }: WorkSectionProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      onPointerMove={handlePointerMove}
+      onPointerLeave={resetPointer}
     >
       {/* 1. ATMOSPHERE LAYER (Optimized: Removed backdropFilter animation) */}
       <motion.div 
@@ -117,18 +155,25 @@ export function WorkSection({ onGoHome, isFlipped }: WorkSectionProps) {
 
       {/* 2. CAROUSEL LAYER */}
       <div className="relative w-full h-full flex items-end justify-center perspective-[1600px] pointer-events-none z-10 overflow-hidden">
-        {workItems.map((item, index) => (
-          <CarouselCard 
-            key={item.id} 
-            item={item} 
-            index={index}
-            focusedIndex={focusedIndex}
-            setFocusedIndex={setFocusedIndex}
-            setExpandedId={setExpandedId}
-            isExpanded={expandedId === item.id}
-            isDarkMode={isDarkMode} 
-          />
-        ))}
+        <motion.div
+          className="absolute inset-0"
+          style={{ x: deckX, y: deckY, transformStyle: 'preserve-3d', willChange: 'transform' }}
+        >
+          {workItems.map((item, index) => (
+            <CarouselCard
+              key={item.id}
+              item={item}
+              index={index}
+              focusedIndex={focusedIndex}
+              setFocusedIndex={setFocusedIndex}
+              setExpandedId={setExpandedId}
+              isExpanded={expandedId === item.id}
+              isDarkMode={isDarkMode}
+              tiltX={tiltX}
+              tiltY={tiltY}
+            />
+          ))}
+        </motion.div>
       </div>
 
       {/* 3. MODAL LAYER */}
@@ -211,7 +256,9 @@ function CarouselCard({
   setFocusedIndex, 
   setExpandedId, 
   isExpanded, 
-  isDarkMode 
+  isDarkMode,
+  tiltX,
+  tiltY,
 }: CarouselCardProps) {
   
   // --- DETECT MOBILE ---
@@ -288,7 +335,12 @@ function CarouselCard({
       {/* INNER CARD */}
       <motion.div 
         className="w-full h-full relative"
-        style={{ transformStyle: 'preserve-3d' }}
+        style={{
+          rotateX: tiltX,
+          rotateY: tiltY,
+          transformStyle: 'preserve-3d',
+          willChange: 'transform',
+        }}
       >
         {/* FRONT FACE */}
         <div 
