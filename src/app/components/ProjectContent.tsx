@@ -1,359 +1,202 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { AnimatePresence, motion, PanInfo } from 'motion/react';
-import { projects } from '../../lib/constants'; // Ensure this path is correct
+import { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import { projects, type Project } from '../../lib/constants';
+import { ImageWithFallback } from './figma/ImageWithFallback';
 
-// --- 1. FRONT FACE ---
-function CardFront({ project, isFlipped }: { project: any, isFlipped: boolean }) {
-  const bg = isFlipped ? "bg-[#fafafa]" : "bg-[#141414]";
-  const textColor = isFlipped ? "text-slate-900" : "text-white";
-  const subText = isFlipped ? "text-black/40" : "text-white/40";
-  const lineColor = isFlipped ? "bg-black/10" : "bg-white/10";
-  const borderColor = isFlipped ? "border-black/5" : "border-white/10";
-  const suitColor = ['♥','♦'].includes(project.suit) ? "text-red-600" : textColor;
-
-  return (
-    <div 
-      className={`absolute inset-0 w-full h-full flex flex-col justify-between p-6 rounded-xl border ${bg} ${borderColor} shadow-2xl`}
-      style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', transform: 'rotateY(0deg)' }}
-    >
-      <div className="flex justify-between items-start">
-         <span className={`font-mono text-[10px] uppercase tracking-widest ${subText}`}>{project.category}</span>
-         <span className={`text-2xl font-serif ${suitColor}`}>{project.suit}</span>
-      </div>
-      <div className="text-center space-y-4">
-        <h3 className={`font-serif text-3xl font-bold leading-none tracking-tight ${textColor}`}>{project.title}</h3>
-        <div className={`w-12 h-[2px] ${lineColor} mx-auto`} />
-      </div>
-      <div className="flex justify-between items-end rotate-180">
-         <span className={`font-mono text-[10px] uppercase tracking-widest ${subText}`}>{project.category}</span>
-         <span className={`text-2xl font-serif ${suitColor}`}>{project.suit}</span>
-      </div>
-      <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/0 rounded-xl pointer-events-none" />
-    </div>
-  );
+interface Position {
+  x: number;
+  y: number;
+  rotate: number;
 }
 
-// --- 2. BACK FACE ---
-function CardBack({ project, isFlipped, onClose, isExpanded = false }: { project: any, isFlipped: boolean, onClose: () => void, isExpanded?: boolean }) {
-  const bg = isFlipped ? "bg-[#f0f0f0]" : "bg-[#0a0a0a]";
-  const textColor = isFlipped ? "text-slate-900" : "text-white";
-  const subText = isFlipped ? "text-black/50" : "text-white/50";
-  const tagBg = isFlipped ? "bg-black/5 text-black/60" : "bg-white/10 text-white/70";
-  const borderColor = isFlipped ? "border-black/10" : "border-white/10";
-
-  return (
-    <div 
-      className={`${isExpanded ? 'relative' : 'absolute inset-0'} w-full h-full flex flex-col p-8 rounded-xl border ${bg} ${borderColor} shadow-2xl overflow-y-auto overflow-x-hidden`}
-      style={isExpanded ? undefined : { backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
-    >
-      <button 
-        onClick={(e) => { e.stopPropagation(); onClose(); }}
-        aria-label="Close project details"
-        className={`absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full border ${borderColor} ${textColor} hover:scale-110 transition-transform cursor-pointer z-50`}
-      >
-        ✕
-      </button>
-
-      <div className="mt-4">
-        <div className={`text-[10px] font-mono uppercase tracking-widest mb-4 ${subText}`}>{project.period}</div>
-        <h3 className={`text-2xl font-serif font-bold mb-4 ${textColor}`}>{project.title}</h3>
-        <ul className={`text-sm leading-relaxed mb-6 space-y-3 list-disc pl-4 ${subText}`}>
-          {project.description.map((highlight: string) => (
-            <li key={highlight}>{highlight}</li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="mt-auto">
-        <div className="flex flex-wrap gap-2 mb-6">
-          {project.tags.map((tag: string) => (
-            <span key={tag} className={`text-[9px] font-mono uppercase px-2 py-1 rounded ${tagBg}`}>{tag}</span>
-          ))}
-        </div>
-        {project.link && (
-          <a href={project.link} target="_blank" rel="noopener noreferrer" className={`block w-full text-center py-3 text-xs font-mono uppercase tracking-widest border ${borderColor} rounded hover:bg-white/10 transition-colors ${textColor}`}>
-            View Project
-          </a>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// --- 3. INSPECTABLE CARD ---
-interface Position { x: number; y: number; r: number; }
-
-interface InspectableCardProps {
-  project: any;
-  index: number;
-  onSelect: () => void;
-  isSelected: boolean;
-  isOtherSelected: boolean;
-  position: Position;
-  onUpdatePosition: (index: number, x: number, y: number) => void;
-  containerRef: React.RefObject<any>;
-  isFlipped: boolean;
-  isReducedMotion: boolean; 
-  hasDealt: boolean; // <--- NEW PROP
-}
-
-function InspectableCard({ 
-  project, 
-  index, 
-  onSelect, 
-  isSelected,       
-  isOtherSelected,  
-  position, 
-  onUpdatePosition, 
-  containerRef,
-  isFlipped,
-  isReducedMotion,
-  hasDealt // <--- Destructure new prop
-}: InspectableCardProps) {
-  
-  const isDragging = useRef(false);
-
-  // --- ANIMATION LOGIC ---
-  let animateState = {};
-  
-  if (isReducedMotion) {
-      if (isSelected) {
-          animateState = { 
-              x: 0, y: 0, scale: 0.96, zIndex: 100, rotateY: 0, rotateZ: 0, opacity: 0,
-              pointerEvents: "none",
-              transition: { duration: 0.2 }
-          };
-      } else if (isOtherSelected) {
-          animateState = { opacity: 0, pointerEvents: "none" };
-      } else {
-          animateState = { 
-              x: position.x, y: position.y, scale: 1, zIndex: index, opacity: 1, rotateY: 0, rotateZ: 0,
-              transition: { duration: 0.5 }
-          };
-      }
-  } 
-  else {
-      if (isSelected) {
-        animateState = {
-          x: 0, y: 0, rotateZ: 0, rotateY: 0, scale: 0.96, zIndex: 100, opacity: 0,
-          pointerEvents: "none",
-          transition: { duration: 0.2 }
-        };
-      } else if (isOtherSelected) {
-        animateState = {
-          x: position.x, y: 1000, rotateZ: position.r, rotateY: 0, scale: 0.8, opacity: 1, zIndex: 0,
-          transition: { duration: 0.5 }
-        };
-      } else {
-        // IDLE / DEALING STATE
-        animateState = {
-          x: position.x, 
-          y: position.y, 
-          rotateZ: position.r, 
-          rotateY: 0, 
-          scale: 1, 
-          opacity: 1, 
-          zIndex: index,
-          // CRITICAL FIX: Only apply the dealer delay if we haven't dealt yet.
-          // Otherwise (when closing a card), move back instantly.
-          transition: { 
-             duration: 0.8, 
-             ease: "easeOut", 
-             delay: hasDealt ? 0 : index * 0.25 
-          }
-        };
-      }
-  }
-
-  const handleDragEnd = (event: any, info: PanInfo) => {
-    setTimeout(() => { isDragging.current = false; }, 100);
-    const newX = position.x + info.offset.x;
-    const newY = position.y + info.offset.y;
-    onUpdatePosition(index, newX, newY);
-  };
-
-  return (
-    <motion.div
-      drag={!isReducedMotion && !isSelected && !isOtherSelected} 
-      dragConstraints={containerRef}
-      dragElastic={0.2}
-      
-      onDragStart={() => (isDragging.current = true)}
-      onDragEnd={handleDragEnd}
-      onTap={() => { if (!isDragging.current) onSelect(); }}
-      onKeyDown={(event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          onSelect();
-        }
-      }}
-      role="button"
-      tabIndex={isSelected || isOtherSelected ? -1 : 0}
-      aria-label={`Open ${project.title} project details`}
-
-      // Initial Deal Animation
-      initial={isReducedMotion 
-        ? { opacity: 0, x: position.x, y: position.y, scale: 0.9 } 
-        : { x: 0, y: 1000, rotateZ: position.r + 90, rotateY: 0, scale: 0.8 }
-      }
-      
-      animate={animateState}
-
-      whileHover={(!isReducedMotion && !isSelected && !isOtherSelected) ? { scale: 1.1, zIndex: 50, cursor: "pointer" } : {}}
-      whileDrag={{ scale: 1.15, zIndex: 100, cursor: "grabbing" }}
-      
-      style={{ transformStyle: "preserve-3d", perspective: "1000px" }} 
-      className="absolute w-64 h-80 rounded-xl select-none"
-    >
-      <CardFront project={project} isFlipped={isFlipped} />
-    </motion.div>
-  );
-}
-
-// --- MAIN WRAPPER ---
 interface ProjectContentProps {
   onClose: () => void;
   isFlipped?: boolean;
   isReducedMotion?: boolean;
 }
 
-export default function ProjectContent({ onClose, isFlipped = false, isReducedMotion = false }: ProjectContentProps) {
-  const [selectedId, setSelectedId] = useState<number | null>(null);
-  const containerRef = useRef(null);
-  
-  // Track if initial deal animation is complete
-  const [hasDealt, setHasDealt] = useState(false);
+function seededNoise(seed: number, index: number, salt: number) {
+  const value = Math.sin(seed * 91.7 + index * 37.1 + salt * 17.3) * 10000;
+  return value - Math.floor(value);
+}
 
-  const [positions, setPositions] = useState<Position[]>(
-    projects.map(() => ({ x: 0, y: 0, r: 0 }))
-  );
+function buildPositions(count: number, width: number, isMobile: boolean, seed: number): Position[] {
+  const columns = isMobile ? 2 : 4;
+  const cardWidth = isMobile ? Math.min(158, (width - 46) / 2) : Math.min(236, (width - 190) / 4);
+  const horizontalStep = isMobile ? cardWidth + 14 : Math.min(270, cardWidth + 34);
+  const verticalStep = isMobile ? cardWidth * 1.55 : cardWidth * 1.2;
+  const rows = Math.ceil(count / columns);
 
-  // --- RESPONSIVE DEALING LOGIC & DEAL TIMER ---
-  useEffect(() => {
-    // 1. Position Logic
-    const calculatePositions = () => {
-      const isMobile = window.innerWidth < 768;
-      const newPositions = projects.map((_, index) => {
-        const centerOffset = index - (projects.length - 1) / 2;
-        if (isMobile) {
-          return { x: centerOffset * 10, y: centerOffset * 60, r: centerOffset * 3 };
-        } else {
-          return {
-            x: centerOffset * 250, 
-            y: (index % 2 === 0 ? -1 : 1) * 30, 
-            r: (index % 2 === 0 ? -5 : 5) 
-          };
-        }
-      });
-      setPositions(newPositions);
+  return Array.from({ length: count }, (_, index) => {
+    const row = Math.floor(index / columns);
+    const column = index % columns;
+    const itemsInRow = Math.min(columns, count - row * columns);
+    const rowCenter = (itemsInRow - 1) / 2;
+    const xJitter = (seededNoise(seed, index, 1) - 0.5) * (isMobile ? 10 : 28);
+    const yJitter = (seededNoise(seed, index, 2) - 0.5) * (isMobile ? 10 : 22);
+    const rotate = (seededNoise(seed, index, 3) - 0.5) * (isMobile ? 5 : 9);
+
+    return {
+      x: (column - rowCenter) * horizontalStep + xJitter,
+      y: (row - (rows - 1) / 2) * verticalStep + yJitter,
+      rotate,
     };
+  });
+}
 
-    calculatePositions();
-    window.addEventListener('resize', calculatePositions);
-
-    // 2. Deal Timer
-    // Calculate total time: Max Delay (last card) + Duration
-    // Example: 4 cards. Last index 3 * 0.25s = 0.75s delay + 0.8s duration = ~1.6s
-    const totalDealTime = (projects.length * 250) + 800;
-    const dealTimer = setTimeout(() => {
-        setHasDealt(true);
-    }, totalDealTime);
-
-    return () => {
-        window.removeEventListener('resize', calculatePositions);
-        clearTimeout(dealTimer);
-    };
-  }, []); 
-
-  const updatePosition = (index: number, newX: number, newY: number) => {
-    setPositions(prev => {
-      const newPos = [...prev];
-      newPos[index] = { ...newPos[index], x: newX, y: newY };
-      return newPos;
-    });
-  };
+function ProjectCard({ project, index, position, originY, isFlipped, isReducedMotion, onSelect }: {
+  project: Project;
+  index: number;
+  position: Position;
+  originY: number;
+  isFlipped: boolean;
+  isReducedMotion: boolean;
+  onSelect: () => void;
+}) {
+  const cardBg = isFlipped ? 'bg-[#f5f2eb]' : 'bg-[#121212]';
+  const text = isFlipped ? 'text-slate-950' : 'text-white';
+  const muted = isFlipped ? 'text-black/50' : 'text-white/50';
+  const border = isFlipped ? 'border-black/15' : 'border-white/15';
+  const suitColor = ['♥', '♦'].includes(project.suit) ? 'text-red-600' : text;
 
   return (
-    <motion.div 
-      ref={containerRef}
-      className="absolute inset-0 z-40 flex items-center justify-center overflow-hidden"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+    <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+    <motion.button
+      type="button"
+      aria-label={`Open ${project.title} project details`}
+      className="pointer-events-auto relative w-[min(42vw,158px)] sm:w-[210px] lg:w-[236px] aspect-[5/7] cursor-pointer rounded-2xl text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+      initial={isReducedMotion ? { opacity: 0 } : { x: 0, y: originY, rotate: 18, scale: 0.76, opacity: 0 }}
+      animate={{ x: position.x, y: position.y, rotate: position.rotate, scale: 1, opacity: 1 }}
+      exit={{ x: 0, y: originY, rotate: -12, scale: 0.78, opacity: 0 }}
+      transition={isReducedMotion
+        ? { duration: 0.16, delay: index * 0.04 }
+        : { type: 'spring', damping: 20, stiffness: 105, mass: 0.82, delay: index * 0.18 }}
+      whileHover={isReducedMotion ? undefined : { y: position.y - 18, rotate: 0, scale: 1.04, zIndex: 40 }}
+      whileTap={{ scale: 0.98 }}
+      style={{ zIndex: index + 2 }}
+      onClick={onSelect}
     >
-      <div
-        aria-hidden="true"
-        className={`absolute inset-0 bg-black pointer-events-none transition-opacity duration-300 ${selectedId !== null ? 'opacity-75' : 'opacity-0'}`}
-      />
+      <article className={`relative h-full overflow-hidden rounded-2xl border shadow-2xl ${cardBg} ${border}`}>
+        <div className="relative h-1/2 overflow-hidden border-b border-current/10 bg-black">
+          <ImageWithFallback
+            src={project.image}
+            alt={`${project.title} project screenshot`}
+            className="h-full w-full object-cover"
+            sizes="(max-width: 640px) 158px, (max-width: 1024px) 210px, 236px"
+            priority={index < 3}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/10" />
+          <span className={`absolute right-3 top-2 font-serif text-xl drop-shadow-md ${suitColor}`}>{project.suit}</span>
+        </div>
 
-      <div 
-        onClick={() => {
-            if (selectedId !== null) setSelectedId(null);
-            else onClose();
-        }}
-        className="absolute inset-0 cursor-pointer"
-      />
-
-      {selectedId === null && (
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2.5, duration: 1 }}
-          className={`absolute bottom-24 md:bottom-12 font-mono text-[10px] uppercase tracking-[0.4em] pointer-events-none select-none ${isFlipped ? 'text-black/30' : 'text-white/30'}`}
-        >
-          {isReducedMotion ? "Tap to Inspect" : "Inspect the Deck"}
-        </motion.div>
-      )}
-
-      <div className="absolute inset-0 pointer-events-none perspective-[1200px] flex items-center justify-center">
-        {projects.map((project, index) => (
-          <div key={project.id} className="absolute pointer-events-auto flex items-center justify-center">
-             <InspectableCard 
-                project={project} 
-                index={index}
-                position={positions[index]} 
-                onUpdatePosition={updatePosition} 
-                containerRef={containerRef}
-                
-                isSelected={selectedId === project.id}
-                isOtherSelected={selectedId !== null && selectedId !== project.id}
-                
-                onSelect={() => setSelectedId(project.id)}
-                
-                isFlipped={isFlipped} 
-                isReducedMotion={isReducedMotion}
-                hasDealt={hasDealt} // Pass the state
-             />
+        <div className="flex h-1/2 flex-col justify-between p-4 sm:p-5">
+          <div>
+            <p className={`mb-2 font-mono text-[8px] uppercase tracking-[0.18em] sm:text-[9px] ${muted}`}>{project.category}</p>
+            <h2 className={`font-serif text-lg font-bold leading-[1.05] sm:text-2xl ${text}`}>{project.title}</h2>
           </div>
-        ))}
-
-        <AnimatePresence>
-          {selectedId !== null && (
-            <ExpandedProjectCard
-              project={projects.find(project => project.id === selectedId)!}
-              isFlipped={isFlipped}
-              onClose={() => setSelectedId(null)}
-            />
-          )}
-        </AnimatePresence>
-      </div>
-    </motion.div>
+          <div className={`flex items-center justify-between font-mono text-[8px] uppercase tracking-[0.16em] sm:text-[9px] ${muted}`}>
+            <span>{project.period}</span>
+            <span>Inspect ↗</span>
+          </div>
+        </div>
+      </article>
+    </motion.button>
+    </div>
   );
 }
 
-function ExpandedProjectCard({ project, isFlipped, onClose }: { project: any, isFlipped: boolean, onClose: () => void }) {
+function ProjectDetails({ project, isFlipped, onClose }: { project: Project; isFlipped: boolean; onClose: () => void }) {
+  const surface = isFlipped ? 'bg-[#f5f2eb] text-slate-950' : 'bg-[#111] text-white';
+  const muted = isFlipped ? 'text-black/60' : 'text-white/60';
+  const border = isFlipped ? 'border-black/15' : 'border-white/15';
+
   return (
-    <motion.div
-      className="absolute z-[110] w-[min(90vw,28rem)] h-[min(76vh,34rem)] pointer-events-auto rounded-xl"
-      initial={{ opacity: 0, y: 28, scale: 0.96 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 18, scale: 0.98 }}
-      transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-      onClick={(event) => event.stopPropagation()}
-    >
-      <CardBack project={project} isFlipped={isFlipped} onClose={onClose} isExpanded />
-    </motion.div>
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 sm:p-8" onClick={onClose}>
+      <motion.div className="absolute inset-0 bg-black/85" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
+      <motion.article
+        className={`relative z-10 grid max-h-[88dvh] w-[min(94vw,920px)] overflow-y-auto rounded-2xl border shadow-2xl md:grid-cols-[0.92fr_1.08fr] ${surface} ${border}`}
+        initial={{ opacity: 0, y: 28, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 18, scale: 0.98 }}
+        transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="relative min-h-[240px] overflow-hidden bg-black md:min-h-full">
+          <ImageWithFallback src={project.image} alt={`${project.title} project screenshot`} className="absolute inset-0 h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/10" />
+        </div>
+
+        <div className="flex flex-col p-6 sm:p-9">
+          <button type="button" onClick={onClose} aria-label="Close project details" className={`ml-auto mb-7 flex h-9 w-9 items-center justify-center rounded-full border font-mono text-xs transition-transform hover:scale-110 ${border}`}>
+            ✕
+          </button>
+          <p className={`font-mono text-[10px] uppercase tracking-[0.22em] ${muted}`}>{project.category}</p>
+          <h2 className="mt-3 font-serif text-4xl font-bold leading-none sm:text-5xl">{project.title}</h2>
+          <p className={`mt-5 text-sm leading-relaxed sm:text-base ${muted}`}>{project.summary}</p>
+
+          <div className="mt-6 flex flex-wrap gap-2">
+            {project.tags.map((tag) => (
+              <span key={tag} className={`rounded-full border px-3 py-1 font-mono text-[9px] uppercase tracking-wider ${border} ${muted}`}>{tag}</span>
+            ))}
+          </div>
+
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <a href={project.link} target="_blank" rel="noopener noreferrer" className={`flex-1 rounded-lg border px-5 py-3 text-center font-mono text-[10px] uppercase tracking-[0.2em] transition-colors ${border} ${isFlipped ? 'hover:bg-black hover:text-white' : 'hover:bg-white hover:text-black'}`}>
+              {project.linkLabel}
+            </a>
+            {project.source && (
+              <a href={project.source} target="_blank" rel="noopener noreferrer" className={`flex-1 rounded-lg border px-5 py-3 text-center font-mono text-[10px] uppercase tracking-[0.2em] transition-colors ${border} ${isFlipped ? 'hover:bg-black hover:text-white' : 'hover:bg-white hover:text-black'}`}>
+                View source
+              </a>
+            )}
+          </div>
+        </div>
+      </motion.article>
+    </div>
+  );
+}
+
+export default function ProjectContent({ onClose, isFlipped = false, isReducedMotion = false }: ProjectContentProps) {
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [layout, setLayout] = useState({ width: 1280, height: 720, mobile: false });
+  const seed = useRef(Math.random() * 1000);
+
+  useEffect(() => {
+    const updateLayout = () => setLayout({ width: window.innerWidth, height: window.innerHeight, mobile: window.innerWidth < 640 });
+    updateLayout();
+    window.addEventListener('resize', updateLayout);
+    return () => window.removeEventListener('resize', updateLayout);
+  }, []);
+
+  const positions = buildPositions(projects.length, layout.width, layout.mobile, seed.current);
+  const rows = Math.ceil(projects.length / (layout.mobile ? 2 : 4));
+  const canvasHeight = layout.mobile ? Math.max(layout.height, rows * 255 + 190) : layout.height;
+  const originY = canvasHeight / 2 - (layout.mobile ? 145 : 105);
+  const backdrop = isFlipped ? 'rgba(245,242,235,0.95)' : 'rgba(4,4,4,0.94)';
+  const text = isFlipped ? 'text-black' : 'text-white';
+  const muted = isFlipped ? 'text-black/45' : 'text-white/45';
+
+  return (
+    <motion.section className="fixed inset-0 z-30 overflow-y-auto overflow-x-hidden" initial={{ opacity: 0 }} animate={{ opacity: 1, backgroundColor: backdrop }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }}>
+      <button type="button" onClick={onClose} className={`fixed right-5 top-20 z-50 rounded-full border border-current/20 px-4 py-2 font-mono text-[9px] uppercase tracking-[0.2em] lg:right-10 lg:top-28 ${text}`}>
+        Close
+      </button>
+      <div className="pointer-events-none fixed left-1/2 top-20 z-40 -translate-x-1/2 text-center lg:top-28">
+        <p className={`font-mono text-[9px] uppercase tracking-[0.35em] ${muted}`}>Selected work</p>
+        <h1 className={`mt-2 font-serif text-2xl font-bold sm:text-3xl ${text}`}>Projects on the table</h1>
+      </div>
+
+      <div className="relative w-full" style={{ height: canvasHeight }}>
+        {projects.map((project, index) => (
+          <ProjectCard key={project.id} project={project} index={index} position={positions[index]} originY={originY} isFlipped={isFlipped} isReducedMotion={isReducedMotion} onSelect={() => setSelectedProject(project)} />
+        ))}
+      </div>
+
+      <AnimatePresence>
+        {selectedProject && <ProjectDetails project={selectedProject} isFlipped={isFlipped} onClose={() => setSelectedProject(null)} />}
+      </AnimatePresence>
+    </motion.section>
   );
 }

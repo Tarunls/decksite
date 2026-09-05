@@ -3,8 +3,7 @@
 import { motion } from 'motion/react';
 import { useState, useEffect } from 'react';
 
-// 1. ADD 'chat' TO TYPE
-export type SectionName = 'home' | 'work' | 'project' | 'about' | 'contact' | 'chat'; 
+export type SectionName = 'home' | 'work' | 'project' | 'about' | 'contact';
 
 interface NavigationProps {
   onShuffle?: () => void;
@@ -45,15 +44,12 @@ export function Navigation({
     }
   };
 
-  // 2. ADD THE ORACLE TO NAV ITEMS
-  // Note: I changed the Dealer icon to a more standard symbol or keep '⌘' if you prefer
   const navItems = [
     { name: 'Home', suit: '♠', section: 'home' as SectionName },
     { name: 'Work', suit: '♠', section: 'work' as SectionName },
     { name: 'Projects', suit: '♣', section: 'project' as SectionName },
     { name: 'About', suit: '♥', section: 'about' as SectionName },
-    { name: 'Contact', suit: '♦', section: 'contact' as SectionName },
-    { name: 'Dealerbot', suit: '⌘', section: 'chat' as SectionName }
+    { name: 'Contact', suit: '♦', section: 'contact' as SectionName }
   ];
 
   return (
@@ -90,11 +86,9 @@ export function Navigation({
                 const hasWhiteBackground = isHovered || (isActive && hoveredIndex === null);
                 
                 const isRedSuit = ['♥','♦'].includes(item.suit);
-                const isDealer = item.section === 'chat';
                 
                 let suitColor = 'text-black';
                 if (isRedSuit) suitColor = 'text-red-600';
-                if (isDealer) suitColor = 'text-[#ffb000] drop-shadow-[0_0_5px_rgba(255,176,0,0.5)]'; 
 
                 return (
                   <button 

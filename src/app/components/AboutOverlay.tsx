@@ -125,8 +125,8 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
                     {/* BIO */}
                     <div className={`text-base md:text-lg leading-relaxed font-light ${textSub}`}>
                       <p>
-                        I&apos;m a Computer Engineering student at UT Dallas building software across network automation,
-                        infrastructure, machine learning, and full-stack systems.
+                        I&apos;m a Computer Engineering student at UT Dallas building production software across network
+                        automation, real-time GNSS systems, and full-stack generative tools.
                       </p>
                     </div>
 
@@ -163,10 +163,10 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
                     <div className="pb-8"> 
                       <div className="flex flex-wrap gap-2">
                         {[
-                          'Python', 'Java', 'C++', 'TypeScript', 'SQL', 'Bash',
-                          'React', 'Next.js', 'Node.js', 'NestJS', 'FastAPI', 'Flask',
-                          'PyTorch', 'TensorFlow', 'Hugging Face Transformers', 'PostgreSQL', 'Supabase',
-                          'Azure', 'GCP', 'Docker', 'Kubernetes', 'Azure Administrator Associate',
+                          'Python', 'TypeScript', 'JavaScript', 'Java', 'C++', 'SQL', 'Bash',
+                          'Next.js', 'React', 'Node.js', 'FastAPI', 'NestJS', 'Dash', 'TensorFlow', 'Manim',
+                          'Azure', 'Docker', 'Kubernetes', 'Terraform', 'Harness', 'Argo', 'OpenObserve', 'FFmpeg', 'REST APIs',
+                          'LLM Tool Calling', 'Agent Orchestration', 'Multi-System Context', 'Visual-Output Evaluation',
                         ].map((tech) => (
                           <span key={tech} className={`px-3 py-1 text-[10px] font-mono uppercase tracking-wider border rounded-sm ${tagClass}`}>
                             {tech}

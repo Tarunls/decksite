@@ -12,8 +12,8 @@ A high-fidelity, card-based personal portfolio. Instead of a standard scrolling 
 ## Highlights
 
 - **Deck-based navigation** — the four suits map to the site's core sections, with a shuffle animation tying the metaphor together instead of it being a gimmick bolted onto a normal navbar.
-- **Dealerbot** — a built-in conversational assistant for the site itself, so visitors can ask questions instead of hunting through sections.
 - **Custom asset library** — the card animations run on a large set of custom photography and generated imagery rather than stock UI components.
+- **Dealt project gallery** — finished projects arrive one card at a time, using real product screenshots and expandable project details.
 - **Motion-first design** — built around Framer Motion for the transitions and interactions that hold the deck concept together.
 
 ## Stack
@@ -30,5 +30,3 @@ Some UI components are from shadcn/ui (MIT license), and a portion of the imager
 npm install
 npm run dev
 ```
-
-Copy `.env.example` to `.env.local` and set `OPENAI_API_KEY` to enable Dealerbot. The chat API runs as a Next.js server route at `/api/chat`, so the deployed site no longer depends on a separate Render service or its cold-start warmup.

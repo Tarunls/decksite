@@ -11,7 +11,6 @@ import { ContactSection } from './components/ContactSection';
 import { cardImages, antiCardImages } from '../lib/constants';
 import ProjectContent from './components/ProjectContent';
 import { SecretPortal } from './components/SecretPortal';
-import { ChatOverlay } from './components/ChatOverlay';
 import { cinzel } from '../lib/fonts';
 
 // --- NEW MOTION TOGGLE COMPONENT ---
@@ -214,8 +213,7 @@ export default function App() {
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<SectionName>('home');
   const [isSecretOpen, setIsSecretOpen] = useState(false);
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const isContentActive = ['chat', 'work', 'contact', 'about', 'project'].includes(activeSection);
+  const isContentActive = ['work', 'contact', 'about', 'project'].includes(activeSection);
 
   // --- NEW: REDUCED MOTION STATE ---
   const [isReducedMotion, setIsReducedMotion] = useState(false);
@@ -461,10 +459,6 @@ export default function App() {
             isReducedMotion={isReducedMotion}
           />
         )}
-        {activeSection === 'chat' && (
-          <ChatOverlay isFlipped={isFlipped} onClose={() => setActiveSection('home')} />
-       )}
-
         {activeSection === 'work' && (
           <WorkSection 
               key="work-section" 

@@ -32,15 +32,15 @@ interface CarouselCardProps {
 const workItems: WorkItem[] = [
   {
     id: 1,
-    company: "Northmark Cloud & Compute (NMC²)",
+    company: "NorthMark Compute & Cloud",
     role: "Software Engineering Intern, Network Automation",
     period: "Jun 2026 - Present",
-    technologies: ["Slack", "ZTP", "Infrahub", "Jira"],
+    technologies: ["Python", "OpenObserve", "Slack", "ZTP", "Infrahub", "Jira", "Harness", "Argo"],
     frontImage: "/cards/time702-copy-6_51163893512_l.jpg",
     description: [
-      "Built a Slack-integrated network automation bot that monitors Zero-Touch Provisioning (ZTP) and Infrahub events across GPU infrastructure spanning several thousand GPUs and hundreds of thousands of configuration records.",
-      "Developed a one-command snapshot test harness to baseline Infrahub configuration, diff subsequent changes, and surface unintended infrastructure drift in Slack before deployment.",
-      "Implemented a tool-calling assistant integrating Jira, Slack, Infrahub, and ZTP to diagnose infrastructure issues across systems and surface likely root causes.",
+      "Built and deployed a production Python alerting service used by 10+ network engineers, consuming OpenObserve webhooks and metrics to notify Slack of failed ZTP events and Infrahub changes; delivered 1,000+ alerts and surfaced 200+ ZTP errors.",
+      "Designed a command-driven test harness that snapshots current Infrahub state as a baseline, validates subsequent changes against it, and posts configuration diffs to Slack when tests fail.",
+      "Developed a tool-calling diagnostic agent that queries Jira, Slack, Infrahub, and ZTP systems to investigate open-ended network failures and correlate likely root causes; deployed the service through Harness and Argo-based CI/CD.",
     ],
   },
   {
@@ -48,12 +48,11 @@ const workItems: WorkItem[] = [
     company: "The University of Texas at Dallas",
     role: "Undergraduate Researcher",
     period: "Aug 2024 - Present",
-    technologies: ["Python", "Bash", "TensorFlow", "Azure", "Raspberry Pi", "Plotly Dash"],
+    technologies: ["POSIX C", "GNSS", "IoT", "Raspberry Pi", "Azure Blob Storage", "Dash"],
     frontImage: "/cards/time702-copy-6_51163893512_l.jpg",
     description: [
-      "Built an IoT and TensorFlow pipeline using satellite-receiver data to classify ionospheric scintillation events versus radio-frequency interference and multipath artifacts.",
-      "Built a one-command Bash deployment pipeline that provisions Azure storage and web apps, configures Raspberry Pi collectors, and launches real-time Plotly Dash dashboards ingesting hundreds of thousands of data points daily.",
-      "Open-sourced ScintKit, a Python library that scans legacy and current ScintPi station formats, visualizes data-availability gaps, and emails automated monitoring reports.",
+      "Developed a real-time GNSS/IoT pipeline that computes S4 scintillation indices from satellite measurements sampled at up to 20 Hz, using POSIX C parallelization on a Raspberry Pi without interrupting receiver data logging.",
+      "Reduced daily network transfer from 2.4 GB of raw measurements to 4.5 MB of processed indices (>99.8%), syncing results to Azure Blob Storage and refreshing a Dash monitoring dashboard every minute.",
     ],
   },
   {
@@ -71,13 +70,13 @@ const workItems: WorkItem[] = [
   {
     id: 4,
     company: "MyIntent.io",
-    role: "Software Engineering Intern, Frontend Development",
+    role: "Software Engineering Intern, Full Stack Development",
     period: "Aug 2024 - Nov 2024",
     technologies: ["React", "Next.js", "NestJS", "Gemini", "OpenAI"],
     frontImage: "/cards/time702-copy-6_51163893512_l.jpg",
     description: [
-      "Owned frontend integration for services that ingested RFPs, parsed supporting documentation, and generated AI-assisted business responses, building the associated workflows in Next.js.",
-      "Integrated React components with NestJS APIs and Gemini/OpenAI models to transform structured customer inputs into generated business documents.",
+      "Led UI/UX design for a dynamic, minimalistic business-facing web application.",
+      "Built and shipped a production RFP automation tool with Next.js and NestJS that uses Gemini and GPT-5 to generate business documents from structured customer inputs.",
     ],
   },
 ];
@@ -89,7 +88,7 @@ interface WorkSectionProps {
 }
 
 export function WorkSection({ onGoHome, isFlipped }: WorkSectionProps) {
-  const [focusedIndex, setFocusedIndex] = useState(1);
+  const [focusedIndex, setFocusedIndex] = useState(0);
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
   const isDarkMode = !isFlipped; 
@@ -134,7 +133,7 @@ export function WorkSection({ onGoHome, isFlipped }: WorkSectionProps) {
       />
 
       {/* 2. CAROUSEL LAYER */}
-      <div className="relative w-full h-full flex items-end justify-center perspective-[2000px] pointer-events-none z-10 pb-[-10vh]">
+      <div className="relative w-full h-full flex items-center justify-center perspective-[2000px] pointer-events-none z-10">
         {workItems.map((item, index) => (
           <CarouselCard 
             key={item.id} 
@@ -253,31 +252,15 @@ function CarouselCard({
   const rotateX = useTransform(smoothMouseY, [-500, 500], [10, -10]); 
   const rotateY = useTransform(smoothMouseX, [-500, 500], [-10, 10]);
   
-  // --- FIX 1: ADJUST TEXT HEIGHT ---
-  // On Desktop: move text based on mouse. On Mobile: Keep it static and HIGHER up (-50) so it clears the card
-  const textX = useTransform(smoothMouseX, [-500, 500], [-15, 15]);
-  const textY = useTransform(smoothMouseY, [-500, 500], isMobile ? [-50, -50] : [-15, 15]);
-
   const offset = index - focusedIndex;
   const isFocused = offset === 0;
-  
-  // --- FIX 2: TIGHTER SPACING ON MOBILE ---
-  // Desktop: 180px apart. Mobile: 40px apart (very tight overlap, like a hand of cards)
-  const spacing = isFocused ? 0 : (isMobile ? 150 : 180);
-  
-  const x = offset * spacing;
-  
-  // Adjust Y: On mobile, focused card needs to pop up MORE to be clear of the "hand"
-  const y = isFocused ? (isMobile ? 100 : 120) : (isMobile ? 100 : 200); 
-  
-  const scale = isFocused ? 1.0 : (isMobile ? 0.85 : 0.8); 
-  
-  // On mobile, fan the rotation out more so the tight spacing doesn't look like a messy pile
-  const baseRotateZ = offset * (isMobile ? 8 : 12); 
-  const zIndex = 50 - Math.abs(offset) * 10;
-
-  const titleColor = isDarkMode ? (isFocused ? 'text-white' : 'text-white/40') : (isFocused ? 'text-black' : 'text-black/40');
-  const roleColor = isDarkMode ? (isFocused ? 'text-blue-400' : 'text-white/20') : (isFocused ? 'text-blue-600' : 'text-black/20');
+  const centerOffset = index - 1.5;
+  const spacing = isMobile ? 58 : 245;
+  const x = centerOffset * spacing;
+  const y = isFocused ? (isMobile ? 22 : -22) : (isMobile ? 58 : 34) + Math.abs(centerOffset) * 18;
+  const scale = isFocused ? 1 : (isMobile ? 0.86 : 0.9);
+  const baseRotateZ = centerOffset * (isMobile ? 8 : 6);
+  const zIndex = isFocused ? 90 : 20 + index;
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -289,6 +272,7 @@ function CarouselCard({
   };
 
   return (
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
     <motion.div
       initial={{ opacity: 0, y: 800 }}
       animate={{ 
@@ -305,28 +289,13 @@ function CarouselCard({
         transformStyle: 'preserve-3d',
       }}
       whileHover={{ 
-        scale: isFocused ? 1.15 : 0.95, 
+        scale: isFocused ? 1.06 : 0.95,
         zIndex: 100, 
         transition: { duration: 0.1 } 
       }}
-      className="absolute w-[220px] md:w-[350px] aspect-[5/7] cursor-pointer pointer-events-auto"
+      className="relative w-[190px] md:w-[250px] xl:w-[270px] aspect-[5/7] cursor-pointer pointer-events-auto"
       onClick={handleClick}
     >
-      {/* FLOATING TEXT */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: isExpanded ? 0 : 1, y: 0 }} 
-        style={{ x: textX, y: textY, z: 50 }}
-        className={`absolute -top-20 left-0 right-0 text-center pointer-events-none ${isFocused ? '' : 'hidden md:block'}`}
-      >
-        <h3 className={`text-2xl md:text-3xl font-serif font-bold transition-colors duration-300 ${titleColor}`}>
-            {item.company}
-        </h3>
-        <p className={`text-xs font-mono uppercase tracking-widest mt-2 transition-colors duration-300 ${roleColor}`}>
-            {item.role}
-        </p>
-      </motion.div>
-
       {/* INNER CARD */}
       <motion.div 
         className="w-full h-full relative"
@@ -352,7 +321,21 @@ function CarouselCard({
                     sizes="(max-width: 768px) 280px, 350px"
                     priority={isFocused} 
                 />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/60 pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/90 pointer-events-none" />
+                <div className="absolute inset-x-0 bottom-0 z-10 p-4 md:p-6 text-white">
+                  <p className="font-mono text-[8px] md:text-[9px] uppercase tracking-[0.2em] text-white/55 mb-2">
+                    {item.period}
+                  </p>
+                  <h3 className="font-serif text-xl md:text-2xl font-bold leading-tight">
+                    {item.company}
+                  </h3>
+                  <p className="mt-2 font-mono text-[8px] md:text-[10px] uppercase tracking-[0.13em] leading-relaxed text-blue-300">
+                    {item.role}
+                  </p>
+                  <p className="mt-3 font-mono text-[7px] md:text-[8px] uppercase tracking-[0.18em] text-white/45">
+                    {isFocused ? 'Click again to read' : 'Click to focus'}
+                  </p>
+                </div>
              </div>
         </div>
 
@@ -368,6 +351,7 @@ function CarouselCard({
         </div>
       </motion.div>
     </motion.div>
+    </div>
   );
 }
 

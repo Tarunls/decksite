@@ -111,32 +111,68 @@ export const antiCardImages = [
     '/angrygodofwealth/resized_10th/angry-god-of-wealth362-copy_50684133988_l.webp',
 ];
 
-export const projects = [
+export interface Project {
+  id: number;
+  title: string;
+  category: string;
+  period: string;
+  suit: string;
+  image: string;
+  summary: string;
+  tags: string[];
+  link: string;
+  linkLabel: string;
+  source?: string;
+}
+
+export const projects: Project[] = [
   {
     id: 1,
     title: "Cinder Control",
-    category: "2nd Place & Best Solo Project",
+    category: "TAMUHack · 2nd Place + Best Solo",
     period: "Jan 2026",
     suit: "♠",
-    description: [
-      "Built a full-stack wildfire decision-support platform solo in 36 hours with Next.js and FastAPI, enabling incident commanders to query fire behavior by voice or text.",
-      "Implemented a parallel cellular-automata simulation forecasting wildfire spread up to 96 hours and cross-referenced infrastructure and geospatial data to flag at-risk assets and generate evacuation routes.",
-      "Integrated OpenAI, ElevenLabs, Mapbox, OpenStreetMap, and NOAA weather APIs for natural-language control, voice narration, mapping, and live environmental data.",
-    ],
-    tags: ["Next.js", "FastAPI", "OpenAI", "ElevenLabs", "Mapbox", "OpenStreetMap", "NOAA"],
-    link: "https://github.com/Tarunls/fire-sim",
+    image: "/projects/cinder-control.jpg",
+    summary: "A wildfire decision-support platform built solo in 36 hours. It combines a parallel cellular-automata simulation with live weather, infrastructure risk detection, evacuation routing, and voice or text control.",
+    tags: ["Next.js", "FastAPI", "OpenAI", "Mapbox", "NOAA"],
+    link: "https://devpost.com/software/fsim",
+    linkLabel: "View project",
+    source: "https://github.com/Tarunls/fire-sim",
   },
   {
     id: 2,
+    title: "Orune",
+    category: "Generative educational animation",
+    period: "Aug 2026",
+    suit: "♥",
+    image: "/projects/orune.png",
+    summary: "A full-stack platform that turns natural-language lesson prompts into narrated mathematical videos, with visual review, frame annotations, targeted re-renders, version history, credits, billing, and MP4 export.",
+    tags: ["Next.js", "Manim", "OpenAI", "Stripe", "FFmpeg"],
+    link: "https://useorune.com",
+    linkLabel: "Visit Orune",
+  },
+  {
+    id: 3,
+    title: "SongBattle",
+    category: "Multiplayer music game",
+    period: "Sep 2026",
+    suit: "♣",
+    image: "/projects/songbattle.png",
+    summary: "A real-time song-guessing game for up to 12 players. Players choose how many seconds of a track they need, with shorter clips worth more, backed by a large indexed music catalog and persistent lobbies, chat, and scores.",
+    tags: ["Next.js", "TypeScript", "Postgres", "Apple Music"],
+    link: "https://songbattle-eta.vercel.app",
+    linkLabel: "Play SongBattle",
+  },
+  {
+    id: 4,
     title: "COMMerce",
-    category: "Live Social-Engagement Forecasting",
+    category: "Live social forecasting",
     period: "Jul 2026",
     suit: "♦",
-    description: [
-      "Built a live-data forecasting platform that turns fresh YouTube and Reddit comments into 1-3 hour prediction contracts, giving users a risk-free way to evaluate engagement momentum, probability, and time decay.",
-      "Designed a server-authoritative Node.js pricing and settlement engine that computes probability, live mark value, implied volatility, and theta from engagement velocity, reach, freshness, text signals, and historical acceleration.",
-      "Integrated Google OAuth, Redis-backed balances and leaderboards, quota-aware shared comment pools, early cash-outs, and automated tests covering pricing, settlement, discovery, and storage invariants.",
-    ],
+    image: "/projects/commerce.png",
+    summary: "A risk-free forecasting game that turns fresh YouTube and Reddit comments into short-duration prediction contracts, with a server-authoritative pricing model, settlement engine, balances, and live leaderboard.",
     tags: ["Node.js", "YouTube", "Reddit", "Google OAuth", "Redis"],
+    link: "https://socialstock-one.vercel.app",
+    linkLabel: "Visit COMMerce",
   },
 ];
