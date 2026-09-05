@@ -33,8 +33,8 @@ interface CarouselCardProps {
   setExpandedId: (id: number | null) => void;
   isExpanded: boolean;
   isDarkMode: boolean;
-  tiltX: MotionValue<number>;
-  tiltY: MotionValue<number>;
+  cursorX: MotionValue<number>;
+  cursorY: MotionValue<number>;
 }
 
 const workItems: WorkItem[] = [
@@ -104,10 +104,6 @@ export function WorkSection({ onGoHome, isFlipped }: WorkSectionProps) {
   const pointerY = useMotionValue(0);
   const smoothX = useSpring(pointerX, { stiffness: 180, damping: 26, mass: 0.35 });
   const smoothY = useSpring(pointerY, { stiffness: 180, damping: 26, mass: 0.35 });
-  const tiltY = useTransform(smoothX, [-1, 1], [-6, 6]);
-  const tiltX = useTransform(smoothY, [-1, 1], [4, -4]);
-  const deckX = useTransform(smoothX, [-1, 1], [-10, 10]);
-  const deckY = useTransform(smoothY, [-1, 1], [-4, 4]);
 
   const isDarkMode = !isFlipped; 
 
@@ -155,10 +151,7 @@ export function WorkSection({ onGoHome, isFlipped }: WorkSectionProps) {
 
       {/* 2. CAROUSEL LAYER */}
       <div className="relative w-full h-full flex items-end justify-center perspective-[1600px] pointer-events-none z-10 overflow-hidden">
-        <motion.div
-          className="absolute inset-0"
-          style={{ x: deckX, y: deckY, transformStyle: 'preserve-3d', willChange: 'transform' }}
-        >
+        <div className="absolute inset-0" style={{ transformStyle: 'preserve-3d' }}>
           {workItems.map((item, index) => (
             <CarouselCard
               key={item.id}
@@ -169,11 +162,11 @@ export function WorkSection({ onGoHome, isFlipped }: WorkSectionProps) {
               setExpandedId={setExpandedId}
               isExpanded={expandedId === item.id}
               isDarkMode={isDarkMode}
-              tiltX={tiltX}
-              tiltY={tiltY}
+              cursorX={smoothX}
+              cursorY={smoothY}
             />
           ))}
-        </motion.div>
+        </div>
       </div>
 
       {/* 3. MODAL LAYER */}
@@ -257,18 +250,21 @@ function CarouselCard({
   setExpandedId, 
   isExpanded, 
   isDarkMode,
-  tiltX,
-  tiltY,
+  cursorX,
+  cursorY,
 }: CarouselCardProps) {
   
   // --- DETECT MOBILE ---
   const [isMobile, setIsMobile] = useState(false);
+  const [viewportSize, setViewportSize] = useState({ width: 1440, height: 900 });
   useEffect(() => {
-    // Check if window is less than 768px (standard md breakpoint)
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile(); // Check on mount
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    const checkViewport = () => {
+      setIsMobile(window.innerWidth < 768);
+      setViewportSize({ width: window.innerWidth, height: window.innerHeight });
+    };
+    checkViewport();
+    window.addEventListener('resize', checkViewport);
+    return () => window.removeEventListener('resize', checkViewport);
   }, []);
 
   const offset = index - focusedIndex;
@@ -280,6 +276,24 @@ function CarouselCard({
   const scale = isFocused ? 1 : (isMobile ? 0.82 : 0.84);
   const baseRotateZ = centerOffset * (isMobile ? 9 : 10);
   const zIndex = isFocused ? 90 : 20 + index;
+  const cardWidth = isMobile ? 220 : 350;
+  const cardHeight = cardWidth * 1.4;
+  const cardCenterX = x / Math.max(viewportSize.width / 2, 1);
+  const cardCenterY = (
+    ((viewportSize.height - cardHeight / 2 + y) / Math.max(viewportSize.height, 1)) * 2
+  ) - 1;
+  const independentTiltY = useTransform([cursorX, cursorY], ([rawX, rawY]) => {
+    const currentX = Number(rawX);
+    const currentY = Number(rawY);
+    const activity = Math.min(1, (Math.abs(currentX) + Math.abs(currentY)) * 1.35);
+    return Math.max(-12, Math.min(12, (currentX - cardCenterX) * 9 * activity));
+  });
+  const independentTiltX = useTransform([cursorX, cursorY], ([rawX, rawY]) => {
+    const currentX = Number(rawX);
+    const currentY = Number(rawY);
+    const activity = Math.min(1, (Math.abs(currentX) + Math.abs(currentY)) * 1.35);
+    return Math.max(-9, Math.min(9, (cardCenterY - currentY) * 7 * activity));
+  });
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -336,8 +350,9 @@ function CarouselCard({
       <motion.div 
         className="w-full h-full relative"
         style={{
-          rotateX: tiltX,
-          rotateY: tiltY,
+          rotateX: independentTiltX,
+          rotateY: independentTiltY,
+          transformPerspective: 1100,
           transformStyle: 'preserve-3d',
           willChange: 'transform',
         }}
