@@ -22,7 +22,6 @@ export function Navigation({
   onSecretTrigger
 }: NavigationProps) {
   
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [logoClicks, setLogoClicks] = useState(0);
 
   useEffect(() => {
@@ -76,15 +75,9 @@ export function Navigation({
             transition={{ delay: 1.2, duration: 0.8 }}
             className="pointer-events-auto"
           >
-            <div 
-              className="flex items-center gap-0 p-1 rounded-xl border border-white/10 bg-black/40 backdrop-blur-md shadow-2xl"
-              onMouseLeave={() => setHoveredIndex(null)}
-            >
-              {navItems.filter(i => i.section !== 'home').map((item, index) => {
+            <div className="flex items-center gap-0 p-1 rounded-xl border border-white/10 bg-black/85 shadow-lg">
+              {navItems.filter(i => i.section !== 'home').map((item) => {
                 const isActive = activeSection === item.section;
-                const isHovered = hoveredIndex === index;
-                const hasWhiteBackground = isHovered || (isActive && hoveredIndex === null);
-                
                 const isRedSuit = ['♥','♦'].includes(item.suit);
                 
                 let suitColor = 'text-black';
@@ -94,22 +87,14 @@ export function Navigation({
                   <button 
                     key={item.name}
                     onClick={() => onNavigate?.(item.section)}
-                    onMouseEnter={() => setHoveredIndex(index)}
-                    className="relative px-6 py-2.5 text-sm uppercase tracking-widest font-medium transition-colors duration-200 cursor-pointer focus:outline-none"
+                    className={`group relative px-6 py-2.5 text-sm uppercase tracking-widest font-medium transition-colors duration-100 cursor-pointer focus:outline-none rounded-lg ${
+                      isActive ? 'bg-white text-black' : 'text-white/60 hover:bg-white hover:text-black'
+                    }`}
                   >
-                    {hasWhiteBackground && (
-                      <motion.div
-                        layoutId="active-card"
-                        className="absolute inset-0 bg-white rounded-lg shadow-sm"
-                        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                      />
-                    )}
-                    <span className={`relative z-10 flex items-center gap-2 transition-colors duration-200 ${
-                      hasWhiteBackground ? 'text-black' : 'text-white/60'
-                    }`}>
+                    <span className="relative z-10 flex items-center gap-2">
                       {item.name}
-                      <span className={`text-xs font-serif transition-opacity duration-300 ${
-                          hasWhiteBackground ? `opacity-100 ${suitColor}` : 'opacity-0'
+                      <span className={`text-xs font-serif transition-opacity duration-100 ${suitColor} ${
+                          isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
                       }`}>
                         {item.suit}
                       </span>
@@ -121,25 +106,13 @@ export function Navigation({
                 href="/Tarun-Sankar-Resume.pdf"
                 download="Tarun-Sankar-Resume.pdf"
                 aria-label="Download Tarun Sankar's resume as a PDF"
-                onMouseEnter={() => setHoveredIndex(navItems.length - 1)}
-                className="relative px-6 py-2.5 text-sm uppercase tracking-widest font-medium transition-colors duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:rounded-lg"
+                className="group relative px-6 py-2.5 text-sm uppercase tracking-widest font-medium text-white/60 transition-colors duration-100 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70 rounded-lg hover:bg-white hover:text-black"
               >
-                {hoveredIndex === navItems.length - 1 && (
-                  <motion.div
-                    layoutId="active-card"
-                    className="absolute inset-0 bg-white rounded-lg shadow-sm"
-                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                  />
-                )}
-                <span className={`relative z-10 flex items-center gap-2 transition-colors duration-200 ${
-                  hoveredIndex === navItems.length - 1 ? 'text-black' : 'text-white/60'
-                }`}>
+                <span className="relative z-10 flex items-center gap-2">
                   Resume
                   <span
                     aria-hidden="true"
-                    className={`text-sm transition-opacity duration-300 ${
-                      hoveredIndex === navItems.length - 1 ? 'opacity-100' : 'opacity-0'
-                    }`}
+                    className="text-sm opacity-0 transition-opacity duration-100 group-hover:opacity-100"
                   >
                     ↓
                   </span>

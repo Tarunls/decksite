@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, motion, type PanInfo } from 'motion/react';
 import { projects, type Project } from '../../lib/constants';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
@@ -16,6 +16,10 @@ interface ProjectContentProps {
   isFlipped?: boolean;
   isReducedMotion?: boolean;
 }
+
+const POSITION_STORAGE_KEY = 'decksite-project-positions-v2';
+const DEALT_STORAGE_KEY = 'decksite-projects-dealt-v2';
+const SEED_STORAGE_KEY = 'decksite-project-seed-v2';
 
 function seededNoise(seed: number, index: number, salt: number) {
   const value = Math.sin(seed * 91.7 + index * 37.1 + salt * 17.3) * 10000;
@@ -46,15 +50,32 @@ function buildPositions(count: number, width: number, isMobile: boolean, seed: n
   });
 }
 
-function ProjectCard({ project, index, position, originY, isFlipped, isReducedMotion, onSelect }: {
+function clampPositions(positions: Position[], width: number, height: number, isMobile: boolean) {
+  const cardWidth = isMobile ? Math.min(158, (width - 46) / 2) : 236;
+  const cardHeight = cardWidth * 1.4;
+  const maxX = Math.max(0, width / 2 - cardWidth / 2 - 16);
+  const maxY = Math.max(0, height / 2 - cardHeight / 2 - (isMobile ? 88 : 68));
+
+  return positions.map((position) => ({
+    ...position,
+    x: Math.max(-maxX, Math.min(maxX, position.x)),
+    y: Math.max(-maxY, Math.min(maxY, position.y)),
+  }));
+}
+
+function ProjectCard({ project, index, position, originY, isFlipped, isReducedMotion, hasDealt, containerRef, onSelect, onUpdatePosition }: {
   project: Project;
   index: number;
   position: Position;
   originY: number;
   isFlipped: boolean;
   isReducedMotion: boolean;
+  hasDealt: boolean;
+  containerRef: React.RefObject<HTMLElement | null>;
   onSelect: () => void;
+  onUpdatePosition: (index: number, x: number, y: number) => void;
 }) {
+  const isDragging = useRef(false);
   const cardBg = isFlipped ? 'bg-[#f5f2eb]' : 'bg-[#121212]';
   const text = isFlipped ? 'text-slate-950' : 'text-white';
   const muted = isFlipped ? 'text-black/50' : 'text-white/50';
@@ -67,18 +88,33 @@ function ProjectCard({ project, index, position, originY, isFlipped, isReducedMo
       type="button"
       aria-label={`Open ${project.title} project details`}
       className="pointer-events-auto relative w-[min(42vw,158px)] sm:w-[210px] lg:w-[236px] aspect-[5/7] cursor-pointer rounded-2xl text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
-      initial={isReducedMotion ? { opacity: 0 } : { x: 0, y: originY, rotate: 18, scale: 0.76, opacity: 0 }}
+      drag={!isReducedMotion}
+      dragConstraints={containerRef}
+      dragElastic={0.08}
+      dragMomentum={false}
+      onDragStart={() => { isDragging.current = true; }}
+      onDragEnd={(_, info: PanInfo) => {
+        onUpdatePosition(index, position.x + info.offset.x, position.y + info.offset.y);
+        window.setTimeout(() => { isDragging.current = false; }, 120);
+      }}
+      initial={hasDealt || isReducedMotion ? false : { x: 0, y: originY, rotate: 18, scale: 0.76, opacity: 0 }}
       animate={{ x: position.x, y: position.y, rotate: position.rotate, scale: 1, opacity: 1 }}
-      exit={{ x: 0, y: originY, rotate: -12, scale: 0.78, opacity: 0 }}
-      transition={isReducedMotion
-        ? { duration: 0.16, delay: index * 0.04 }
+      exit={{ x: 0, y: originY, rotate: -12, scale: 0.78, opacity: 0, transition: { duration: 0.16 } }}
+      transition={hasDealt || isReducedMotion
+        ? { duration: 0.16 }
         : { type: 'spring', damping: 20, stiffness: 105, mass: 0.82, delay: index * 0.18 }}
-      whileHover={isReducedMotion ? undefined : { y: position.y - 18, rotate: 0, scale: 1.04, zIndex: 40 }}
-      whileTap={{ scale: 0.98 }}
-      style={{ zIndex: index + 2 }}
-      onClick={onSelect}
+      whileHover={isReducedMotion ? undefined : { scale: 1.025 }}
+      whileDrag={isReducedMotion ? undefined : { scale: 1.045, cursor: 'grabbing' }}
+      style={{ zIndex: index + 2, willChange: 'transform' }}
+      onClick={(event) => {
+        if (isDragging.current) {
+          event.preventDefault();
+          return;
+        }
+        onSelect();
+      }}
     >
-      <article className={`relative h-full overflow-hidden rounded-2xl border shadow-2xl ${cardBg} ${border}`}>
+      <article className={`relative h-full overflow-hidden rounded-2xl border shadow-lg ${cardBg} ${border}`}>
         <div className="relative h-1/2 overflow-hidden border-b border-current/10 bg-black">
           <ImageWithFallback
             src={project.image}
@@ -161,16 +197,75 @@ function ProjectDetails({ project, isFlipped, onClose }: { project: Project; isF
 export default function ProjectContent({ onClose, isFlipped = false, isReducedMotion = false }: ProjectContentProps) {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [layout, setLayout] = useState({ width: 1280, height: 720, mobile: false });
-  const seed = useRef(Math.random() * 1000);
+  const [positions, setPositions] = useState<Position[]>(projects.map(() => ({ x: 0, y: 0, rotate: 0 })));
+  const [hasDealt, setHasDealt] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+  const containerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    const updateLayout = () => setLayout({ width: window.innerWidth, height: window.innerHeight, mobile: window.innerWidth < 640 });
-    updateLayout();
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const mobile = width < 640;
+    const storedSeed = sessionStorage.getItem(SEED_STORAGE_KEY);
+    const seed = storedSeed ? Number(storedSeed) : Math.random() * 1000;
+    if (!storedSeed) sessionStorage.setItem(SEED_STORAGE_KEY, String(seed));
+
+    const defaults = buildPositions(projects.length, width, mobile, seed);
+    let restored = defaults;
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(POSITION_STORAGE_KEY) ?? 'null');
+      if (Array.isArray(saved) && saved.length === projects.length) {
+        restored = saved.map((position, index) => ({
+          x: Number.isFinite(position?.x) ? position.x : defaults[index].x,
+          y: Number.isFinite(position?.y) ? position.y : defaults[index].y,
+          rotate: Number.isFinite(position?.rotate) ? position.rotate : defaults[index].rotate,
+        }));
+      }
+    } catch {
+      restored = defaults;
+    }
+
+    const nextPositions = clampPositions(restored, width, height, mobile);
+    const alreadyDealt = sessionStorage.getItem(DEALT_STORAGE_KEY) === 'true';
+    setLayout({ width, height, mobile });
+    setPositions(nextPositions);
+    setHasDealt(alreadyDealt);
+    setIsReady(true);
+    sessionStorage.setItem(POSITION_STORAGE_KEY, JSON.stringify(nextPositions));
+
+    const updateLayout = () => {
+      const nextWidth = window.innerWidth;
+      const nextHeight = window.innerHeight;
+      const nextMobile = nextWidth < 640;
+      setLayout({ width: nextWidth, height: nextHeight, mobile: nextMobile });
+      setPositions((current) => {
+        const clamped = clampPositions(current, nextWidth, nextHeight, nextMobile);
+        sessionStorage.setItem(POSITION_STORAGE_KEY, JSON.stringify(clamped));
+        return clamped;
+      });
+    };
     window.addEventListener('resize', updateLayout);
-    return () => window.removeEventListener('resize', updateLayout);
+
+    const dealTimer = alreadyDealt ? undefined : window.setTimeout(() => {
+      setHasDealt(true);
+      sessionStorage.setItem(DEALT_STORAGE_KEY, 'true');
+    }, projects.length * 180 + 650);
+
+    return () => {
+      window.removeEventListener('resize', updateLayout);
+      if (dealTimer !== undefined) window.clearTimeout(dealTimer);
+    };
   }, []);
 
-  const positions = buildPositions(projects.length, layout.width, layout.mobile, seed.current);
+  const updatePosition = (index: number, x: number, y: number) => {
+    setPositions((current) => {
+      const next = [...current];
+      next[index] = { ...next[index], x, y };
+      sessionStorage.setItem(POSITION_STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
+  };
+
   const rows = Math.ceil(projects.length / (layout.mobile ? 2 : 4));
   const canvasHeight = layout.mobile ? Math.max(layout.height, rows * 255 + 190) : layout.height;
   const originY = canvasHeight / 2 - (layout.mobile ? 145 : 105);
@@ -179,7 +274,7 @@ export default function ProjectContent({ onClose, isFlipped = false, isReducedMo
   const muted = isFlipped ? 'text-black/45' : 'text-white/45';
 
   return (
-    <motion.section className="fixed inset-0 z-30 overflow-y-auto overflow-x-hidden" initial={{ opacity: 0 }} animate={{ opacity: 1, backgroundColor: backdrop }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }}>
+    <motion.section ref={containerRef} className="fixed inset-0 z-30 overflow-y-auto overflow-x-hidden" initial={{ opacity: 0 }} animate={{ opacity: 1, backgroundColor: backdrop }} exit={{ opacity: 0 }} transition={{ duration: 0.24 }}>
       <button type="button" onClick={onClose} className={`fixed right-5 top-20 z-50 rounded-full border border-current/20 px-4 py-2 font-mono text-[9px] uppercase tracking-[0.2em] lg:right-10 lg:top-28 ${text}`}>
         Close
       </button>
@@ -189,8 +284,20 @@ export default function ProjectContent({ onClose, isFlipped = false, isReducedMo
       </div>
 
       <div className="relative w-full" style={{ height: canvasHeight }}>
-        {projects.map((project, index) => (
-          <ProjectCard key={project.id} project={project} index={index} position={positions[index]} originY={originY} isFlipped={isFlipped} isReducedMotion={isReducedMotion} onSelect={() => setSelectedProject(project)} />
+        {isReady && projects.map((project, index) => (
+          <ProjectCard
+            key={project.id}
+            project={project}
+            index={index}
+            position={positions[index]}
+            originY={originY}
+            isFlipped={isFlipped}
+            isReducedMotion={isReducedMotion}
+            hasDealt={hasDealt}
+            containerRef={containerRef}
+            onUpdatePosition={updatePosition}
+            onSelect={() => setSelectedProject(project)}
+          />
         ))}
       </div>
 

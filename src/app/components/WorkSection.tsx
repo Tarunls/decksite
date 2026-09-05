@@ -1,15 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { MotionValue } from 'motion/react';
 
 
 // --- 1. DATA (Unchanged) ---
 interface WorkItem {
   id: number;
   company: string;
+  cardLabel?: string;
   role: string;
   period: string;
   description: string[];
@@ -24,8 +24,6 @@ interface CarouselCardProps {
   setFocusedIndex: (index: number) => void;
   setExpandedId: (id: number | null) => void;
   isExpanded: boolean;
-  mouseX: MotionValue<number>;
-  mouseY: MotionValue<number>;
   isDarkMode: boolean;
 }
 
@@ -46,6 +44,7 @@ const workItems: WorkItem[] = [
   {
     id: 2,
     company: "The University of Texas at Dallas",
+    cardLabel: "UT Dallas",
     role: "Undergraduate Researcher",
     period: "Aug 2024 - Present",
     technologies: ["POSIX C", "GNSS", "IoT", "Raspberry Pi", "Azure Blob Storage", "Dash"],
@@ -93,28 +92,12 @@ export function WorkSection({ onGoHome, isFlipped }: WorkSectionProps) {
 
   const isDarkMode = !isFlipped; 
 
-  // MOUSE TRACKING
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    // Only track mouse if NOT expanded to save resources
-    if (expandedId !== null) return;
-
-    const { clientX, clientY } = e;
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
-    mouseX.set(clientX - centerX);
-    mouseY.set(clientY - centerY);
-  };
-
   return (
     <motion.section
       className="fixed inset-0 z-30 flex items-center justify-center"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      onMouseMove={handleMouseMove}
     >
       {/* 1. ATMOSPHERE LAYER (Optimized: Removed backdropFilter animation) */}
       <motion.div 
@@ -133,7 +116,7 @@ export function WorkSection({ onGoHome, isFlipped }: WorkSectionProps) {
       />
 
       {/* 2. CAROUSEL LAYER */}
-      <div className="relative w-full h-full flex items-center justify-center perspective-[2000px] pointer-events-none z-10">
+      <div className="relative w-full h-full flex items-end justify-center perspective-[1600px] pointer-events-none z-10 overflow-hidden">
         {workItems.map((item, index) => (
           <CarouselCard 
             key={item.id} 
@@ -143,8 +126,6 @@ export function WorkSection({ onGoHome, isFlipped }: WorkSectionProps) {
             setFocusedIndex={setFocusedIndex}
             setExpandedId={setExpandedId}
             isExpanded={expandedId === item.id}
-            mouseX={mouseX}
-            mouseY={mouseY}
             isDarkMode={isDarkMode} 
           />
         ))}
@@ -230,8 +211,6 @@ function CarouselCard({
   setFocusedIndex, 
   setExpandedId, 
   isExpanded, 
-  mouseX, 
-  mouseY, 
   isDarkMode 
 }: CarouselCardProps) {
   
@@ -245,21 +224,14 @@ function CarouselCard({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const springConfig = { damping: 25, stiffness: 150 }; 
-  const smoothMouseX = useSpring(mouseX, springConfig);
-  const smoothMouseY = useSpring(mouseY, springConfig);
-
-  const rotateX = useTransform(smoothMouseY, [-500, 500], [10, -10]); 
-  const rotateY = useTransform(smoothMouseX, [-500, 500], [-10, 10]);
-  
   const offset = index - focusedIndex;
   const isFocused = offset === 0;
   const centerOffset = index - 1.5;
-  const spacing = isMobile ? 58 : 245;
+  const spacing = isMobile ? 64 : 210;
   const x = centerOffset * spacing;
-  const y = isFocused ? (isMobile ? 22 : -22) : (isMobile ? 58 : 34) + Math.abs(centerOffset) * 18;
-  const scale = isFocused ? 1 : (isMobile ? 0.86 : 0.9);
-  const baseRotateZ = centerOffset * (isMobile ? 8 : 6);
+  const y = isFocused ? (isMobile ? 82 : 115) : (isMobile ? 142 : 205) + Math.abs(centerOffset) * 12;
+  const scale = isFocused ? 1 : (isMobile ? 0.82 : 0.84);
+  const baseRotateZ = centerOffset * (isMobile ? 9 : 10);
   const zIndex = isFocused ? 90 : 20 + index;
 
   const handleClick = (e: React.MouseEvent) => {
@@ -272,7 +244,7 @@ function CarouselCard({
   };
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+    <div className="absolute inset-0 flex items-end justify-center pointer-events-none">
     <motion.div
       initial={{ opacity: 0, y: 800 }}
       animate={{ 
@@ -289,29 +261,39 @@ function CarouselCard({
         transformStyle: 'preserve-3d',
       }}
       whileHover={{ 
-        scale: isFocused ? 1.06 : 0.95,
-        zIndex: 100, 
-        transition: { duration: 0.1 } 
+        scale: isFocused ? 1.025 : (isMobile ? 0.84 : 0.87),
+        transition: { duration: 0.08 }
       }}
-      className="relative w-[190px] md:w-[250px] xl:w-[270px] aspect-[5/7] cursor-pointer pointer-events-auto"
+      className="relative w-[220px] md:w-[350px] aspect-[5/7] cursor-pointer pointer-events-auto"
       onClick={handleClick}
+      role="button"
+      tabIndex={0}
+      aria-label={`${isFocused ? 'Open' : 'Focus'} ${item.company} work experience`}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          handleClick(event as unknown as React.MouseEvent);
+        }
+      }}
     >
+      <div className="absolute -top-28 left-1/2 w-[180px] md:w-[220px] -translate-x-1/2 text-center pointer-events-none">
+        <h3 className={`font-serif text-lg md:text-xl font-bold leading-tight ${isDarkMode ? (isFocused ? 'text-white' : 'text-white/55') : (isFocused ? 'text-black' : 'text-black/55')}`}>
+          {item.cardLabel ?? item.company}
+        </h3>
+        <p className={`mt-2 font-mono text-[8px] md:text-[9px] uppercase tracking-[0.12em] leading-relaxed ${isDarkMode ? (isFocused ? 'text-blue-300' : 'text-white/35') : (isFocused ? 'text-blue-700' : 'text-black/35')}`}>
+          {item.role}
+        </p>
+      </div>
+
       {/* INNER CARD */}
       <motion.div 
         className="w-full h-full relative"
-        style={{ 
-            transformStyle: 'preserve-3d',
-            rotateX: isExpanded ? 0 : rotateX, 
-            rotateY: isExpanded ? 0 : rotateY,
-        }}
+        style={{ transformStyle: 'preserve-3d' }}
       >
         {/* FRONT FACE */}
         <div 
-            className="absolute inset-0 rounded-xl bg-[#0f0f0f] border shadow-2xl"
-            style={{ 
-              backfaceVisibility: 'hidden', 
-              filter: isFocused ? 'saturate(1.2)' : 'saturate(0.5) brightness(0.8)' 
-            }}
+            className="absolute inset-0 rounded-xl bg-[#0f0f0f] border shadow-xl"
+            style={{ backfaceVisibility: 'hidden' }}
         >
               <div className="relative w-full h-full rounded-lg overflow-hidden bg-black">
                 <ImageWithFallback 
@@ -321,21 +303,8 @@ function CarouselCard({
                     sizes="(max-width: 768px) 280px, 350px"
                     priority={isFocused} 
                 />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/90 pointer-events-none" />
-                <div className="absolute inset-x-0 bottom-0 z-10 p-4 md:p-6 text-white">
-                  <p className="font-mono text-[8px] md:text-[9px] uppercase tracking-[0.2em] text-white/55 mb-2">
-                    {item.period}
-                  </p>
-                  <h3 className="font-serif text-xl md:text-2xl font-bold leading-tight">
-                    {item.company}
-                  </h3>
-                  <p className="mt-2 font-mono text-[8px] md:text-[10px] uppercase tracking-[0.13em] leading-relaxed text-blue-300">
-                    {item.role}
-                  </p>
-                  <p className="mt-3 font-mono text-[7px] md:text-[8px] uppercase tracking-[0.18em] text-white/45">
-                    {isFocused ? 'Click again to read' : 'Click to focus'}
-                  </p>
-                </div>
+                <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/35 pointer-events-none" />
+                {!isFocused && <div className="absolute inset-0 bg-black/25 pointer-events-none" />}
              </div>
         </div>
 
