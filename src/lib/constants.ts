@@ -1,3 +1,5 @@
+import { projectSkills, type SkillGroup } from './projectSkills';
+
 export const cardImages = [
     "/cards/resized_10th/time702-copy_51164800263_l.webp",
     "/cards/resized_10th/time702-copy-5_51165659585_l.webp",
@@ -119,7 +121,7 @@ export interface Project {
   suit: string;
   image: string;
   summary: string;
-  tags: string[];
+  skillGroups: SkillGroup[];
   link: string;
   linkLabel: string;
   source?: string;
@@ -133,8 +135,8 @@ export const projects: Project[] = [
     period: "Jan 2026",
     suit: "♠",
     image: "/projects/cinder-control.jpg",
-    summary: "A wildfire decision-support platform built solo in 36 hours. It combines a parallel cellular-automata simulation with live weather, infrastructure risk detection, evacuation routing, and voice or text control.",
-    tags: ["Next.js", "FastAPI", "OpenAI", "Mapbox", "NOAA"],
+    summary: "A wildfire decision-support platform built solo in 36 hours. It combines a NumPy cellular-automata simulation with live weather, infrastructure risk detection, evacuation planning, and voice or text control.",
+    skillGroups: projectSkills[1],
     link: "https://devpost.com/software/fsim",
     linkLabel: "View project",
     source: "https://github.com/Tarunls/fire-sim",
@@ -147,7 +149,7 @@ export const projects: Project[] = [
     suit: "♥",
     image: "/projects/orune.png",
     summary: "A full-stack platform that turns natural-language lesson prompts into narrated mathematical videos, with visual review, frame annotations, targeted re-renders, version history, credits, billing, and MP4 export.",
-    tags: ["Next.js", "Manim", "OpenAI", "Stripe", "FFmpeg"],
+    skillGroups: projectSkills[2],
     link: "https://useorune.com",
     linkLabel: "Visit Orune",
   },
@@ -159,7 +161,7 @@ export const projects: Project[] = [
     suit: "♣",
     image: "/projects/songbattle.png",
     summary: "A real-time song-guessing game for up to 12 players. Players choose how many seconds of a track they need, with shorter clips worth more, backed by a large indexed music catalog and persistent lobbies, chat, and scores.",
-    tags: ["Next.js", "TypeScript", "Postgres", "Apple Music"],
+    skillGroups: projectSkills[3],
     link: "https://songbattle-eta.vercel.app",
     linkLabel: "Play SongBattle",
   },
@@ -171,7 +173,7 @@ export const projects: Project[] = [
     suit: "♦",
     image: "/projects/commerce.png",
     summary: "A risk-free forecasting game that turns fresh YouTube and Reddit comments into short-duration prediction contracts, with a server-authoritative pricing model, settlement engine, balances, and live leaderboard.",
-    tags: ["Node.js", "YouTube", "Reddit", "Google OAuth", "Redis"],
+    skillGroups: projectSkills[4],
     link: "https://socialstock-one.vercel.app",
     linkLabel: "Visit COMMerce",
   },

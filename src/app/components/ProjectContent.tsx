@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, type PanInfo } from 'motion/react';
 import { projects, type Project } from '../../lib/constants';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { SkillCard } from './SkillCard';
 
 interface Position {
   x: number;
@@ -159,8 +160,8 @@ function ProjectDetails({ project, isFlipped, onClose }: { project: Project; isF
         transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="relative min-h-[240px] overflow-hidden bg-black md:min-h-full">
-          <ImageWithFallback src={project.image} alt={`${project.title} project screenshot`} className="absolute inset-0 h-full w-full object-cover" />
+        <div className="relative h-[240px] self-start overflow-hidden bg-black md:sticky md:top-0 md:h-[88dvh]">
+          <ImageWithFallback src={project.image} alt={`${project.title} project screenshot`} className="absolute inset-0 h-full w-full object-contain" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/10" />
         </div>
 
@@ -172,12 +173,6 @@ function ProjectDetails({ project, isFlipped, onClose }: { project: Project; isF
           <h2 className="mt-3 font-serif text-4xl font-bold leading-none sm:text-5xl">{project.title}</h2>
           <p className={`mt-5 text-sm leading-relaxed sm:text-base ${muted}`}>{project.summary}</p>
 
-          <div className="mt-6 flex flex-wrap gap-2">
-            {project.tags.map((tag) => (
-              <span key={tag} className={`rounded-full border px-3 py-1 font-mono text-[9px] uppercase tracking-wider ${border} ${muted}`}>{tag}</span>
-            ))}
-          </div>
-
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <a href={project.link} target="_blank" rel="noopener noreferrer" className={`flex-1 rounded-lg border px-5 py-3 text-center font-mono text-[10px] uppercase tracking-[0.2em] transition-colors ${border} ${isFlipped ? 'hover:bg-black hover:text-white' : 'hover:bg-white hover:text-black'}`}>
               {project.linkLabel}
@@ -187,6 +182,16 @@ function ProjectDetails({ project, isFlipped, onClose }: { project: Project; isF
                 View source
               </a>
             )}
+          </div>
+          <div className="mt-8 space-y-5">
+            {project.skillGroups.map((group) => (
+              <section key={group.label} aria-label={group.label}>
+                <h3 className={`mb-2 font-mono text-[10px] uppercase tracking-[0.16em] ${muted}`}>{group.label}</h3>
+                <div className="flex flex-wrap gap-2">
+                  {group.skills.map((skill) => <SkillCard key={skill} name={skill} isDark={!isFlipped} />)}
+                </div>
+              </section>
+            ))}
           </div>
         </div>
       </motion.article>
@@ -271,17 +276,12 @@ export default function ProjectContent({ onClose, isFlipped = false, isReducedMo
   const originY = canvasHeight / 2 - (layout.mobile ? 145 : 105);
   const backdrop = isFlipped ? 'rgba(245,242,235,0.95)' : 'rgba(4,4,4,0.94)';
   const text = isFlipped ? 'text-black' : 'text-white';
-  const muted = isFlipped ? 'text-black/45' : 'text-white/45';
 
   return (
-    <motion.section ref={containerRef} className="fixed inset-0 z-30 overflow-y-auto overflow-x-hidden" initial={{ opacity: 0 }} animate={{ opacity: 1, backgroundColor: backdrop }} exit={{ opacity: 0 }} transition={{ duration: 0.24 }}>
+    <motion.section ref={containerRef} className={`fixed inset-0 overflow-y-auto overflow-x-hidden ${selectedProject ? 'z-[60]' : 'z-30'}`} initial={{ opacity: 0 }} animate={{ opacity: 1, backgroundColor: backdrop }} exit={{ opacity: 0 }} transition={{ duration: 0.24 }}>
       <button type="button" onClick={onClose} className={`fixed right-5 top-20 z-50 rounded-full border border-current/20 px-4 py-2 font-mono text-[9px] uppercase tracking-[0.2em] lg:right-10 lg:top-28 ${text}`}>
         Close
       </button>
-      <div className="pointer-events-none fixed left-1/2 top-20 z-40 -translate-x-1/2 text-center lg:top-28">
-        <p className={`font-mono text-[9px] uppercase tracking-[0.35em] ${muted}`}>Selected work</p>
-        <h1 className={`mt-2 font-serif text-2xl font-bold sm:text-3xl ${text}`}>Projects on the table</h1>
-      </div>
 
       <div className="relative w-full" style={{ height: canvasHeight }}>
         {isReady && projects.map((project, index) => (

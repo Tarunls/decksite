@@ -1,6 +1,7 @@
 'use client';
 
-import { motion, useMotionValue, useSpring, useTransform, MotionValue, Transition } from 'motion/react';
+import { motion, useTransform, MotionValue, Transition } from 'motion/react';
+import { useCursorMotion } from '../../lib/useCursorMotion';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { useEffect, useMemo, useState } from 'react';
 import {cardImages, antiCardImages} from '../../lib/constants';
@@ -112,42 +113,7 @@ export function BackgroundCards({
     return indices;
   }, [shuffleCount, isMounted, cardImages.length, antiCardImages.length]);
 
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const smoothX = useSpring(mouseX, { damping: 20, stiffness: 50 });
-  const smoothY = useSpring(mouseY, { damping: 20, stiffness: 50 });
-
-  useEffect(() => {
-    // Variable to track if a frame is already requested
-    let frameId: number | null = null;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isReducedMotion) return;
-
-      // 1. If we are already waiting for a frame, ignore this update.
-      // This limits updates to your screen's refresh rate (e.g. 60fps)
-      // instead of the mouse's polling rate (1000fps).
-      if (frameId) return;
-
-      // 2. Schedule the update for the next valid frame
-      frameId = requestAnimationFrame(() => {
-        const { innerWidth, innerHeight } = window;
-        mouseX.set((e.clientX / innerWidth) * 2 - 1);
-        mouseY.set((e.clientY / innerHeight) * 2 - 1);
-        
-        // 3. Reset the flag so we can accept the next event
-        frameId = null;
-      });
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    
-    // Cleanup: Remove listener AND cancel any pending frame
-    return () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        if (frameId) cancelAnimationFrame(frameId);
-    };
-  }, [mouseX, mouseY, isReducedMotion]);
+  const { x: smoothX, y: smoothY } = useCursorMotion(isReducedMotion);
 
   return (
     <>

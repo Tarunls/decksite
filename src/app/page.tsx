@@ -210,7 +210,6 @@ export default function App() {
   const [shuffleCount, setShuffleCount] = useState(0);
   const [isShuffling, setIsShuffling] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
-  const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<SectionName>('home');
   const [isSecretOpen, setIsSecretOpen] = useState(false);
   const isContentActive = ['work', 'contact', 'about', 'project'].includes(activeSection);
@@ -312,12 +311,7 @@ export default function App() {
   }, [isShuffling]);
 
   const handleNavigation = (section: SectionName) => {
-    if (section === 'about') {
-      setIsAboutOpen(true);
-    } else {
-      setActiveSection(section);
-      setIsAboutOpen(false); 
-    }
+    setActiveSection(section);
   };
 
   // If Motion is reduced, we use a simpler transition config globally
@@ -371,8 +365,8 @@ export default function App() {
 
 
       <AboutOverlay 
-        isOpen={isAboutOpen} 
-        onClose={() => setIsAboutOpen(false)} 
+        isOpen={activeSection === 'about'}
+        onClose={() => setActiveSection('home')}
         isFlipped={isFlipped}
       />
 
@@ -387,7 +381,6 @@ export default function App() {
         isFlipped={isFlipped} 
         activeSection={activeSection} 
         onNavigate={handleNavigation} 
-        onAboutClick={() => setIsAboutOpen(true)} 
         onSecretTrigger={() => setIsSecretOpen(true)}
       />
 
@@ -464,6 +457,7 @@ export default function App() {
               key="work-section" 
               onGoHome={() => setActiveSection('home')} 
               isFlipped={isFlipped}
+              isReducedMotion={isReducedMotion}
           />
         )}
 

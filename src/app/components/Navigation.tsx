@@ -10,7 +10,6 @@ interface NavigationProps {
   isFlipped?: boolean;
   onNavigate?: (section: SectionName) => void;
   activeSection?: SectionName;
-  onAboutClick?: () => void;
   onSecretTrigger: () => void;
 }
 

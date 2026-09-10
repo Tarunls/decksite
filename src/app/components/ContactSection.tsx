@@ -1,126 +1,129 @@
 'use client';
 
-import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from 'motion/react';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import { Copy, ExternalLink, Mail } from 'lucide-react';
+
+const email = 'tarunlsankar@gmail.com';
 
 export function ContactSection({ onClose }: { onClose: () => void }) {
   const [copied, setCopied] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
 
-  const x = useMotionValue(0.5);
-  const y = useMotionValue(0.5);
-  
-  const smoothX = useSpring(x, { damping: 25, stiffness: 150 });
-  const smoothY = useSpring(y, { damping: 25, stiffness: 150 });
-
-  const rotateX = useTransform(smoothY, [0, 1], [15, -15]); 
-  const rotateY = useTransform(smoothX, [0, 1], [-15, 15]); 
-  
-  const bgX = useTransform(smoothX, [0, 1], [40, -40]);
-  const bgY = useTransform(smoothY, [0, 1], [40, -40]);
-
-  function handleMouseMove(event: React.MouseEvent) {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    x.set((event.clientX - rect.left) / rect.width);
-    y.set((event.clientY - rect.top) / rect.height);
-  }
-
-  const handleCopy = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    navigator.clipboard.writeText("tarunlsankar@gmail.com");
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(email);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    window.setTimeout(() => setCopied(false), 1800);
   };
 
   return (
     <motion.section
-      ref={containerRef}
+      className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-[#050505] p-5"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      onMouseMove={handleMouseMove}
-      className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-black/40 cursor-auto"
+      exit={{ opacity: 0, transition: { duration: 0.18 } }}
     >
-      <motion.div 
-        className="absolute inset-0 backdrop-blur-md bg-black/60 pointer-events-none" 
-        style={{ translateZ: 0 }} 
+      <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-25">
+        <span className="absolute -left-12 top-16 rotate-[-18deg] font-serif text-[18rem] leading-none text-white/10">♣</span>
+        <span className="absolute -bottom-24 -right-8 rotate-[14deg] font-serif text-[20rem] leading-none text-red-700/20">♦</span>
+      </div>
+
+      <motion.div
+        aria-hidden="true"
+        className="absolute h-[min(80dvh,580px)] w-[min(78vw,350px)] rounded-[22px] border border-white/10 bg-[#171717] shadow-2xl"
+        initial={{ rotate: -2, x: -18, y: 10, opacity: 0 }}
+        animate={{ rotate: -9, x: -44, y: 12, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 130, damping: 20 }}
+      />
+      <motion.div
+        aria-hidden="true"
+        className="absolute h-[min(80dvh,580px)] w-[min(78vw,350px)] rounded-[22px] border border-red-900/30 bg-[#0e0e0e] shadow-2xl"
+        initial={{ rotate: 2, x: 18, y: 10, opacity: 0 }}
+        animate={{ rotate: 8, x: 43, y: 14, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 130, damping: 20, delay: 0.04 }}
       />
 
-      {/* PARALLAX BACKGROUND */}
-      <motion.div 
-        style={{ x: bgX, y: bgY }}
-        className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20"
+      <motion.article
+        className="relative z-10 flex h-[min(80dvh,580px)] w-[min(78vw,350px)] flex-col overflow-y-auto rounded-[22px] border border-black/25 bg-[#f4f0e7] p-7 text-[#111] shadow-[0_30px_90px_rgba(0,0,0,0.65)]"
+        initial={{ y: 90, rotateX: 18, scale: 0.92, opacity: 0 }}
+        animate={{ y: 0, rotateX: 0, scale: 1, opacity: 1 }}
+        exit={{ y: 50, scale: 0.96, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 125, damping: 22 }}
+        style={{ transformPerspective: 1200 }}
       >
-        <span className="absolute bottom-1/4 right-1/4 text-[12rem] font-serif text-red-600/10 select-none">♥</span>
-      </motion.div>
+        <div className="font-serif text-3xl font-bold leading-[0.75] text-red-700">
+          A
+          <span className="block text-2xl">♦</span>
+        </div>
 
-      {/* MAIN 3D CONTAINER */}
-      <motion.div
-        style={{ 
-          rotateX, 
-          rotateY, 
-          transformStyle: "preserve-3d",
-        }}
-        className="relative z-10 flex flex-col items-center justify-center text-center p-8"
-      >
-        <motion.p 
-          style={{ translateZ: 50 }}
-          className="text-red-500 font-mono text-[10px] tracking-[0.5em] mb-12"
-        >
-          ♦ CONTACT ♦
-        </motion.p>
-
-        <motion.div
-          onClick={handleCopy}
-          className="group relative cursor-pointer pointer-events-auto"
-          style={{ transformStyle: "preserve-3d" }}
-          whileHover={{ translateZ: 80 }} 
-        >
-          <h2 className="font-serif text-7xl md:text-9xl text-white tracking-tighter drop-shadow-2xl">
-            Email
-          </h2>
-          
+        <div className="flex flex-1 flex-col items-center justify-center py-5 text-center">
+          <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full border border-black/15 bg-white/50">
+            <Mail aria-hidden="true" size={23} />
+          </div>
+          <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-black/50">The line is open</p>
+          <h1 className="mt-3 font-serif text-4xl font-bold leading-[0.95]">Let&apos;s make<br />something great.</h1>
+          <a
+            href={`mailto:${email}`}
+            className="mt-5 break-all font-mono text-[11px] font-bold tracking-[0.05em] underline decoration-red-700/40 underline-offset-4 transition-colors hover:text-red-700"
+          >
+            {email}
+          </a>
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="mt-4 inline-flex items-center gap-2 rounded-md border border-black/15 bg-white/55 px-4 py-2 font-mono text-[9px] uppercase tracking-[0.16em] transition-colors hover:bg-white"
+          >
+            <Copy aria-hidden="true" size={13} />
+            {copied ? 'Copied' : 'Copy email'}
+          </button>
           <AnimatePresence>
             {copied && (
-              <motion.span 
-                initial={{ opacity: 0, scale: 0.8, translateZ: 0 }}
-                animate={{ opacity: 1, scale: 1, translateZ: 120 }}
+              <motion.span
+                className="mt-2 font-mono text-[8px] uppercase tracking-[0.2em] text-green-700"
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className="absolute -top-12 left-1/2 -translate-x-1/2 text-green-400 font-mono text-[10px] uppercase tracking-widest bg-black/80 px-4 py-2 rounded-full border border-green-400/30 whitespace-nowrap"
               >
-                Copied to Clipboard
+                Ready to paste
               </motion.span>
             )}
           </AnimatePresence>
-        </motion.div>
+        </div>
 
-        {/* SOCIAL LINKS */}
-        <div className="mt-20 flex gap-12 pointer-events-auto" style={{ transformStyle: "preserve-3d" }}>
+        <div className="mb-4 grid shrink-0 grid-cols-2 gap-2">
           {[
-            { name: "GitHub", url: "https://github.com/tarunls" },
-            { name: "LinkedIn", url: "https://linkedin.com/in/tarunls" }
+            { rank: 'G', suit: '♠', name: 'GitHub', url: 'https://github.com/tarunls' },
+            { rank: 'in', suit: '♥', name: 'LinkedIn', url: 'https://linkedin.com/in/tarunls' },
           ].map((link) => (
-            <motion.a
-              key={link.name} // Unique key fixed
+            <a
+              key={link.name}
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ translateZ: 30 }}
-              className="flex flex-col items-center gap-2 text-white/30 hover:text-white transition-colors"
+              className="group flex items-center justify-between rounded-lg border border-black/15 bg-white/35 p-3 transition-all hover:-translate-y-0.5 hover:bg-white/75"
             >
-              <span className="text-xs font-mono uppercase tracking-[0.2em]">{link.name}</span>
-              <div className="w-8 h-px bg-white/20" />
-            </motion.a>
+              <span className="flex items-center gap-2">
+                <span className={`font-serif text-sm font-bold ${link.suit === '♥' ? 'text-red-700' : 'text-black'}`}>
+                  {link.rank}{link.suit}
+                </span>
+                <span className="font-mono text-[8px] uppercase tracking-[0.14em]">{link.name}</span>
+              </span>
+              <ExternalLink aria-hidden="true" size={11} className="opacity-40 transition-opacity group-hover:opacity-100" />
+            </a>
           ))}
         </div>
-      </motion.div>
+
+        <div className="self-end rotate-180 font-serif text-2xl font-bold leading-[0.75] text-red-700">
+          A
+          <span className="block text-xl">♦</span>
+        </div>
+      </motion.article>
 
       <button
+        type="button"
         onClick={onClose}
-        className="absolute bottom-10 px-6 py-2 border border-white/10 rounded-full text-[10px] font-mono text-white/40 hover:text-white hover:bg-white/5 transition-all"
+        className="absolute right-6 top-6 z-20 rounded-full border border-white/15 bg-black/65 px-5 py-2.5 font-mono text-[9px] uppercase tracking-[0.2em] text-white/65 transition-colors hover:bg-white hover:text-black"
       >
-        BACK TO DECK
+        Close
       </button>
     </motion.section>
   );

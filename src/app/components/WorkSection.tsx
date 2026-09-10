@@ -4,13 +4,12 @@ import { useEffect, useState } from 'react';
 import {
   motion,
   AnimatePresence,
-  useMotionValue,
   useReducedMotion,
-  useSpring,
   useTransform,
   type MotionValue,
 } from 'motion/react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { useCursorMotion } from '../../lib/useCursorMotion';
 
 
 // --- 1. DATA (Unchanged) ---
@@ -94,35 +93,16 @@ const workItems: WorkItem[] = [
 interface WorkSectionProps {
   onGoHome: () => void;
   isFlipped: boolean; 
+  isReducedMotion?: boolean;
 }
 
-export function WorkSection({ onGoHome, isFlipped }: WorkSectionProps) {
+export function WorkSection({ onGoHome, isFlipped, isReducedMotion = false }: WorkSectionProps) {
   const [focusedIndex, setFocusedIndex] = useState(0);
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const prefersReducedMotion = useReducedMotion();
-  const pointerX = useMotionValue(0);
-  const pointerY = useMotionValue(0);
-  const smoothX = useSpring(pointerX, { stiffness: 180, damping: 26, mass: 0.35 });
-  const smoothY = useSpring(pointerY, { stiffness: 180, damping: 26, mass: 0.35 });
+  const { x: smoothX, y: smoothY } = useCursorMotion(Boolean(prefersReducedMotion) || isReducedMotion || expandedId !== null);
 
   const isDarkMode = !isFlipped; 
-
-  const resetPointer = () => {
-    pointerX.set(0);
-    pointerY.set(0);
-  };
-
-  const handlePointerMove = (event: React.PointerEvent<HTMLElement>) => {
-    if (prefersReducedMotion || expandedId !== null || event.pointerType !== 'mouse') return;
-
-    const bounds = event.currentTarget.getBoundingClientRect();
-    pointerX.set(((event.clientX - bounds.left) / bounds.width) * 2 - 1);
-    pointerY.set(((event.clientY - bounds.top) / bounds.height) * 2 - 1);
-  };
-
-  useEffect(() => {
-    if (expandedId !== null) resetPointer();
-  }, [expandedId]);
 
   return (
     <motion.section
@@ -130,8 +110,6 @@ export function WorkSection({ onGoHome, isFlipped }: WorkSectionProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      onPointerMove={handlePointerMove}
-      onPointerLeave={resetPointer}
     >
       {/* 1. ATMOSPHERE LAYER (Optimized: Removed backdropFilter animation) */}
       <motion.div 

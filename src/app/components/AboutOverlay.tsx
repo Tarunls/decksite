@@ -3,6 +3,8 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback'; // Check your path
+import { SkillCard } from './SkillCard';
+import { aboutSkillGroups } from '../../lib/projectSkills';
 
 interface AboutOverlayProps {
   isOpen: boolean;
@@ -32,7 +34,6 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
   const textMain = isDarkMode ? 'text-white' : 'text-gray-900';
   const textSub = isDarkMode ? 'text-white/60' : 'text-gray-600';
   const borderColor = isDarkMode ? 'border-white/10' : 'border-black/10';
-  const tagClass = isDarkMode ? 'bg-white/5 border-white/10 text-white/80' : 'bg-transparent border-black/10 text-gray-900';
   const closeBtnClass = isDarkMode ? 'text-white/40 hover:text-white' : 'text-gray-400 hover:text-gray-900';
 
   return (
@@ -143,12 +144,8 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
                             ♠
                           </div>
                           <div className="min-w-0">
-                            <div className={`mb-1 text-[10px] font-mono uppercase tracking-[0.24em] ${textSub}`}>
-                              Player dossier · PDF
-                            </div>
-                            <div className={`font-serif text-xl font-bold ${textMain}`}>
-                              Tarun's Resume
-                            </div>
+                            <div className={`mb-1 text-[10px] font-mono uppercase tracking-[0.24em] ${textSub}`}>Resume · PDF</div>
+                            <div className={`font-serif text-xl font-bold ${textMain}`}>Download Resume</div>
                           </div>
                         </div>
                         <div className={`shrink-0 text-right font-mono text-[10px] uppercase tracking-widest ${textSub}`}>
@@ -161,16 +158,14 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
 
                     {/* SKILLS */}
                     <div className="pb-8"> 
-                      <div className="flex flex-wrap gap-2">
-                        {[
-                          'Python', 'TypeScript', 'JavaScript', 'Java', 'C++', 'SQL', 'Bash',
-                          'Next.js', 'React', 'Node.js', 'FastAPI', 'NestJS', 'Dash', 'TensorFlow', 'Manim',
-                          'Azure', 'Docker', 'Kubernetes', 'Terraform', 'Harness', 'Argo', 'OpenObserve', 'FFmpeg', 'REST APIs',
-                          'LLM Tool Calling', 'Agent Orchestration', 'Multi-System Context', 'Visual-Output Evaluation',
-                        ].map((tech) => (
-                          <span key={tech} className={`px-3 py-1 text-[10px] font-mono uppercase tracking-wider border rounded-sm ${tagClass}`}>
-                            {tech}
-                          </span>
+                      <div className="space-y-5">
+                        {aboutSkillGroups.map((group) => (
+                          <section key={group.label} aria-label={group.label}>
+                            <h3 className={`mb-3 font-mono text-[10px] uppercase tracking-widest ${textSub}`}>{group.label}</h3>
+                            <div className="flex flex-wrap gap-2">
+                              {group.skills.map((tech) => <SkillCard key={tech} name={tech} isDark={isDarkMode} />)}
+                            </div>
+                          </section>
                         ))}
                       </div>
                     </div>

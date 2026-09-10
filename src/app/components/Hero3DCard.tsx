@@ -1,6 +1,8 @@
 'use client';
 
-import { motion, Transition } from 'motion/react';
+import { useEffect, useRef, type PointerEvent } from 'react';
+import { animate, motion, useMotionValue, useReducedMotion, type Transition } from 'motion/react';
+import { resistedCardOffset } from '../../lib/cardPhysics';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 interface Hero3DCardProps {
@@ -18,9 +20,57 @@ export function Hero3DCard({
   onFlip,
   isReducedMotion = false,
 }: Hero3DCardProps) {
+  const systemReducedMotion = useReducedMotion();
+  const reduceMotion = isReducedMotion || Boolean(systemReducedMotion);
+  const dragX = useMotionValue(0);
+  const dragY = useMotionValue(0);
+  const gesture = useRef<{ id: number; x: number; y: number; moved: boolean } | null>(null);
+  const suppressClick = useRef(false);
+  const frame = useRef<number | null>(null);
+  const latest = useRef({ x: 0, y: 0 });
+  const springs = useRef<Array<{ stop: () => void }>>([]);
+
+  useEffect(() => () => {
+    if (frame.current !== null) cancelAnimationFrame(frame.current);
+    springs.current.forEach((spring) => spring.stop());
+  }, []);
+
+  const startDrag = (event: PointerEvent<HTMLDivElement>) => {
+    if (!event.isPrimary || event.button !== 0) return;
+    springs.current.forEach((spring) => spring.stop());
+    gesture.current = { id: event.pointerId, x: event.clientX, y: event.clientY, moved: false };
+    suppressClick.current = false;
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+  const moveDrag = (event: PointerEvent<HTMLDivElement>) => {
+    const start = gesture.current;
+    if (!start || start.id !== event.pointerId) return;
+    const dx = event.clientX - start.x;
+    const dy = event.clientY - start.y;
+    if (Math.hypot(dx, dy) > 4) start.moved = true;
+    latest.current = resistedCardOffset(dx, dy, reduceMotion ? 8 : 22);
+    if (frame.current !== null) return;
+    frame.current = requestAnimationFrame(() => {
+      frame.current = null;
+      dragX.set(latest.current.x);
+      dragY.set(latest.current.y);
+    });
+  };
+  const finishDrag = () => {
+    if (!gesture.current) return;
+    suppressClick.current = gesture.current.moved;
+    gesture.current = null;
+    if (frame.current !== null) cancelAnimationFrame(frame.current);
+    frame.current = null;
+    // Start at zero velocity so even a fast fling returns with only a small bounce.
+    const spring: Transition = reduceMotion
+      ? { duration: 0.12 }
+      : { type: 'spring', stiffness: 420, damping: 19, mass: 0.6, velocity: 0, restDelta: 0.05 };
+    springs.current = [animate(dragX, 0, spring), animate(dragY, 0, spring)];
+  };
 
   // Logic to switch between Bouncy Physics (Spring) and Gentle Sliding (Ease)
-  const flipTransition: Transition = isReducedMotion 
+  const flipTransition: Transition = reduceMotion
     ? { duration: 0.6, ease: "easeInOut" } // Gentle slide
     : { duration: 0.8, type: 'spring', stiffness: 260, damping: 20 }; // Bouncy spring
 
@@ -30,7 +80,7 @@ export function Hero3DCard({
       {/* 1. Background Glow (Blue Blob) */}
       <motion.div
         className="absolute inset-0 flex items-center justify-center pointer-events-none"
-        animate={isReducedMotion 
+        animate={reduceMotion
             ? { scale: 1, opacity: 0.3 } // Static if reduced
             : { scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] } // Pulsing if normal
         }
@@ -46,7 +96,7 @@ export function Hero3DCard({
       {/* 2. Idle Animation Container */}
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
-        animate={isReducedMotion
+        animate={reduceMotion
             // Static Position
             ? { opacity: 1, scale: 1, rotateY: 0, rotateZ: 0 }
             // Wobbly Floating Animation
@@ -66,13 +116,29 @@ export function Hero3DCard({
         style={{ transformStyle: 'preserve-3d' }}
         className="relative z-10"
       >
+        <motion.div style={{ x: dragX, y: dragY, transformStyle: 'preserve-3d' }}>
         {/* 3. The Flipper Container */}
         <motion.div
-          className="relative w-72 h-[28rem] cursor-pointer"
-          onClick={onFlip} 
+          className="relative w-72 h-[28rem] cursor-grab select-none active:cursor-grabbing focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-white"
+          role="button"
+          tabIndex={0}
+          aria-label="Flip card"
+          onPointerDown={startDrag}
+          onPointerMove={moveDrag}
+          onPointerUp={finishDrag}
+          onPointerCancel={finishDrag}
+          onLostPointerCapture={finishDrag}
+          onDragStart={(event) => event.preventDefault()}
+          onClick={() => { if (!suppressClick.current) onFlip?.(); }}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              onFlip?.();
+            }
+          }}
           animate={{ rotateY: isFlipped ? 180 : 0 }}
           transition={flipTransition} // Uses the variable defined above
-          style={{ transformStyle: 'preserve-3d' }}
+          style={{ transformStyle: 'preserve-3d', touchAction: 'none' }}
         >
           {/* --- FRONT FACE (Normal Cover) --- */}
           <div
@@ -109,7 +175,7 @@ export function Hero3DCard({
 
         {/* 4. Motion Blur / Shimmer Overlay */}
         {/* Only render shimmer if motion is NOT reduced */}
-        {!isReducedMotion && (
+        {!reduceMotion && (
             <div
                 className="absolute inset-0 rounded-2xl pointer-events-none overflow-hidden"
                 style={{ transform: 'translateZ(1px)' }} 
@@ -124,6 +190,7 @@ export function Hero3DCard({
             </div>
         )}
 
+      </motion.div>
       </motion.div>
     </motion.div>
 
