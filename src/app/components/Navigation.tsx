@@ -101,22 +101,6 @@ export function Navigation({
                   </button>
                 );
               })}
-              <a
-                href="/Tarun-Sankar-Resume.pdf"
-                download="Tarun-Sankar-Resume.pdf"
-                aria-label="Download Tarun Sankar's resume as a PDF"
-                className="group relative px-6 py-2.5 text-sm uppercase tracking-widest font-medium text-white/60 transition-colors duration-100 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70 rounded-lg hover:bg-white hover:text-black"
-              >
-                <span className="relative z-10 flex items-center gap-2">
-                  Resume
-                  <span
-                    aria-hidden="true"
-                    className="text-sm opacity-0 transition-opacity duration-100 group-hover:opacity-100"
-                  >
-                    ↓
-                  </span>
-                </span>
-              </a>
             </div>
           </motion.nav>
         </div>
@@ -132,16 +116,6 @@ export function Navigation({
 
       {/* MOBILE SHUFFLE */}
       <button onClick={onShuffle} className="lg:hidden fixed top-6 right-6 z-50 bg-black/80 backdrop-blur border border-white/10 text-white p-3 rounded-full shadow-lg cursor-pointer">↻</button>
-
-      {/* MOBILE RESUME */}
-      <a
-        href="/Tarun-Sankar-Resume.pdf"
-        download="Tarun-Sankar-Resume.pdf"
-        aria-label="Download Tarun Sankar's resume as a PDF"
-        className="lg:hidden fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-black/80 backdrop-blur border border-white/10 text-white px-4 py-3 rounded-full shadow-lg font-mono text-[9px] uppercase tracking-widest focus-visible:ring-2 focus-visible:ring-white/70"
-      >
-        Resume <span aria-hidden="true">↓</span>
-      </a>
 
       {/* MOBILE NAVIGATION */}
       <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-sm pointer-events-auto">

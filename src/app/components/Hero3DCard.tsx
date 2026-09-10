@@ -26,17 +26,15 @@ export function Hero3DCard({
   const dragY = useMotionValue(0);
   const gesture = useRef<{ id: number; x: number; y: number; moved: boolean } | null>(null);
   const suppressClick = useRef(false);
-  const frame = useRef<number | null>(null);
-  const latest = useRef({ x: 0, y: 0 });
   const springs = useRef<Array<{ stop: () => void }>>([]);
 
   useEffect(() => () => {
-    if (frame.current !== null) cancelAnimationFrame(frame.current);
     springs.current.forEach((spring) => spring.stop());
   }, []);
 
   const startDrag = (event: PointerEvent<HTMLDivElement>) => {
     if (!event.isPrimary || event.button !== 0) return;
+    event.preventDefault();
     springs.current.forEach((spring) => spring.stop());
     gesture.current = { id: event.pointerId, x: event.clientX, y: event.clientY, moved: false };
     suppressClick.current = false;
@@ -48,20 +46,15 @@ export function Hero3DCard({
     const dx = event.clientX - start.x;
     const dy = event.clientY - start.y;
     if (Math.hypot(dx, dy) > 4) start.moved = true;
-    latest.current = resistedCardOffset(dx, dy, reduceMotion ? 8 : 22);
-    if (frame.current !== null) return;
-    frame.current = requestAnimationFrame(() => {
-      frame.current = null;
-      dragX.set(latest.current.x);
-      dragY.set(latest.current.y);
-    });
+    const offset = resistedCardOffset(dx, dy, reduceMotion ? 12 : 32);
+    // Motion batches DOM writes to the next frame; never drop the final pointer sample.
+    dragX.set(offset.x);
+    dragY.set(offset.y);
   };
   const finishDrag = () => {
     if (!gesture.current) return;
     suppressClick.current = gesture.current.moved;
     gesture.current = null;
-    if (frame.current !== null) cancelAnimationFrame(frame.current);
-    frame.current = null;
     // Start at zero velocity so even a fast fling returns with only a small bounce.
     const spring: Transition = reduceMotion
       ? { duration: 0.12 }
@@ -116,13 +109,13 @@ export function Hero3DCard({
         style={{ transformStyle: 'preserve-3d' }}
         className="relative z-10"
       >
-        <motion.div style={{ x: dragX, y: dragY, transformStyle: 'preserve-3d' }}>
-        {/* 3. The Flipper Container */}
         <motion.div
-          className="relative w-72 h-[28rem] cursor-grab select-none active:cursor-grabbing focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-white"
+          data-home-card-drag
+          style={{ x: dragX, y: dragY, transformStyle: 'preserve-3d', touchAction: 'none' }}
+          className="relative cursor-grab select-none active:cursor-grabbing focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-white"
           role="button"
           tabIndex={0}
-          aria-label="Flip card"
+          aria-label="Home card: drag to move, click to flip"
           onPointerDown={startDrag}
           onPointerMove={moveDrag}
           onPointerUp={finishDrag}
@@ -136,6 +129,10 @@ export function Hero3DCard({
               onFlip?.();
             }
           }}
+        >
+        {/* The visual faces never handle native image dragging or pointer capture. */}
+        <motion.div
+          className="pointer-events-none relative w-72 h-[28rem]"
           animate={{ rotateY: isFlipped ? 180 : 0 }}
           transition={flipTransition} // Uses the variable defined above
           style={{ transformStyle: 'preserve-3d', touchAction: 'none' }}
@@ -150,6 +147,7 @@ export function Hero3DCard({
           >
             <ImageWithFallback
               src={imageUrl}
+              draggable={false}
               alt="Front Card"
               className="w-full h-full object-cover"
             />
@@ -167,6 +165,7 @@ export function Hero3DCard({
           >
             <ImageWithFallback
               src={backImageUrl}
+              draggable={false}
               alt="Back Card"
               className="w-full h-full object-cover"
             />

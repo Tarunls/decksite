@@ -417,7 +417,13 @@ export default function App() {
                   Tarun <br /> Sankar
                 </motion.h1>
                 
-                <motion.div className="h-px w-32 bg-gradient-to-r from-white via-white/50 to-transparent mix-blend-difference mx-auto lg:mx-0" />
+                <a
+                  href="/Tarun-Sankar-Resume.pdf"
+                  download="Tarun-Sankar-Resume.pdf"
+                  className={`pointer-events-auto inline-flex min-h-11 items-center gap-3 rounded-md border px-5 py-2.5 text-sm transition-colors ${isFlipped ? 'border-black/30 text-black hover:bg-black/10' : 'border-white/30 text-white hover:bg-white/10'}`}
+                >
+                  Download Resume <span aria-hidden="true">↓</span>
+                </a>
               </motion.div>
             </div>
 

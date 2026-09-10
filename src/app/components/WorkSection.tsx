@@ -43,7 +43,7 @@ const workItems: WorkItem[] = [
     role: "Software Engineering Intern, Network Automation",
     period: "Jun 2026 - Present",
     technologies: ["Python", "OpenObserve", "Slack", "ZTP", "Infrahub", "Jira", "Harness", "Argo"],
-    frontImage: "/cards/time702-copy-6_51163893512_l.jpg",
+    frontImage: "/cards/work-card-back.png",
     description: [
       "Built and deployed a production Python alerting service used by 10+ network engineers, consuming OpenObserve webhooks and metrics to notify Slack of failed ZTP events and Infrahub changes; delivered 1,000+ alerts and surfaced 200+ ZTP errors.",
       "Designed a command-driven test harness that snapshots current Infrahub state as a baseline, validates subsequent changes against it, and posts configuration diffs to Slack when tests fail.",
@@ -57,7 +57,7 @@ const workItems: WorkItem[] = [
     role: "Undergraduate Researcher",
     period: "Aug 2024 - Present",
     technologies: ["POSIX C", "GNSS", "IoT", "Raspberry Pi", "Azure Blob Storage", "Dash"],
-    frontImage: "/cards/time702-copy-6_51163893512_l.jpg",
+    frontImage: "/cards/work-card-back.png",
     description: [
       "Developed a real-time GNSS/IoT pipeline that computes S4 scintillation indices from satellite measurements sampled at up to 20 Hz, using POSIX C parallelization on a Raspberry Pi without interrupting receiver data logging.",
       "Reduced daily network transfer from 2.4 GB of raw measurements to 4.5 MB of processed indices (>99.8%), syncing results to Azure Blob Storage and refreshing a Dash monitoring dashboard every minute.",
@@ -69,7 +69,7 @@ const workItems: WorkItem[] = [
     role: "Builder (Full-Stack Developer)",
     period: "Dec 2024 - May 2025",
     technologies: ["React", "Next.js", "Stripe"],
-    frontImage: "/cards/time702-copy-6_51163893512_l.jpg",
+    frontImage: "/cards/work-card-back.png",
     description: [
       "Built and launched full-stack features for a two-sided music-promotion marketplace using React and Next.js, connecting 20+ emerging artists with influencers for paid song placements.",
       "Implemented user authentication and Stripe payment workflows that enabled influencers to set placement rates and artists to purchase promotions through the platform.",
@@ -81,7 +81,7 @@ const workItems: WorkItem[] = [
     role: "Software Engineering Intern, Full Stack Development",
     period: "Aug 2024 - Nov 2024",
     technologies: ["React", "Next.js", "NestJS", "Gemini", "OpenAI"],
-    frontImage: "/cards/time702-copy-6_51163893512_l.jpg",
+    frontImage: "/cards/work-card-back.png",
     description: [
       "Led UI/UX design for a dynamic, minimalistic business-facing web application.",
       "Built and shipped a production RFP automation tool with Next.js and NestJS that uses Gemini and GPT-5 to generate business documents from structured customer inputs.",
@@ -337,32 +337,20 @@ function CarouselCard({
       >
         {/* FRONT FACE */}
         <div 
-            className="absolute inset-0 rounded-xl bg-[#0f0f0f] border shadow-xl"
+            className="absolute inset-0"
             style={{ backfaceVisibility: 'hidden' }}
         >
-              <div className="relative w-full h-full rounded-lg overflow-hidden bg-black">
+              <div className="relative w-full h-full">
                 <ImageWithFallback 
                     src={item.frontImage} 
                     alt={item.company} 
-                    className="w-full h-full object-cover" 
+                    className={`w-full h-full object-contain ${isFocused ? '' : 'brightness-75'}`}
                     sizes="(max-width: 768px) 280px, 350px"
                     priority={isFocused} 
                 />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/35 pointer-events-none" />
-                {!isFocused && <div className="absolute inset-0 bg-black/25 pointer-events-none" />}
              </div>
         </div>
 
-        {/* BACK FACE */}
-        <div 
-            className="absolute inset-0 rounded-xl overflow-hidden shadow-2xl"
-            style={{ 
-                backfaceVisibility: 'hidden', 
-                transform: 'rotateY(180deg)' 
-            }}
-        >
-            <CardBackContent item={item} isExpanded={false} darkMode={isDarkMode} />
-        </div>
       </motion.div>
     </motion.div>
     </div>

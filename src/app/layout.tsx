@@ -53,7 +53,7 @@ export default function RootLayout({
         <link rel="preload" href="/anticover.jpeg" as="image" fetchPriority="high"/>
         <link rel="preload" href="/darkknight.webp" as="image" fetchPriority="high"/>
         <link rel="preload" href="/lightknight.webp" as="image" fetchPriority="high"/>
-        <link rel="preload" href="/cards/time702-copy-6_51163893512_l.jpg" as="image" fetchPriority="high"/>
+        <link rel="preload" href="/cards/work-card-back.png" as="image" fetchPriority="high"/>
       </head>
       
       {/* 4. Apply Inter as the default body font */}

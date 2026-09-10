@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { motion } from 'motion/react';
 import { Copy, ExternalLink, Mail } from 'lucide-react';
 
 const email = 'tarunlsankar@gmail.com';
@@ -59,11 +59,10 @@ export function ContactSection({ onClose }: { onClose: () => void }) {
           <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full border border-black/15 bg-white/50">
             <Mail aria-hidden="true" size={23} />
           </div>
-          <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-black/50">The line is open</p>
-          <h1 className="mt-3 font-serif text-4xl font-bold leading-[0.95]">Let&apos;s make<br />something great.</h1>
+          <h1 className="font-serif text-3xl font-bold">Contact</h1>
           <a
             href={`mailto:${email}`}
-            className="mt-5 break-all font-mono text-[11px] font-bold tracking-[0.05em] underline decoration-red-700/40 underline-offset-4 transition-colors hover:text-red-700"
+            className="mt-5 break-all text-base underline decoration-red-700/40 underline-offset-4 transition-colors hover:text-red-700"
           >
             {email}
           </a>
@@ -75,18 +74,6 @@ export function ContactSection({ onClose }: { onClose: () => void }) {
             <Copy aria-hidden="true" size={13} />
             {copied ? 'Copied' : 'Copy email'}
           </button>
-          <AnimatePresence>
-            {copied && (
-              <motion.span
-                className="mt-2 font-mono text-[8px] uppercase tracking-[0.2em] text-green-700"
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-              >
-                Ready to paste
-              </motion.span>
-            )}
-          </AnimatePresence>
         </div>
 
         <div className="mb-4 grid shrink-0 grid-cols-2 gap-2">
@@ -101,12 +88,7 @@ export function ContactSection({ onClose }: { onClose: () => void }) {
               rel="noopener noreferrer"
               className="group flex items-center justify-between rounded-lg border border-black/15 bg-white/35 p-3 transition-all hover:-translate-y-0.5 hover:bg-white/75"
             >
-              <span className="flex items-center gap-2">
-                <span className={`font-serif text-sm font-bold ${link.suit === '♥' ? 'text-red-700' : 'text-black'}`}>
-                  {link.rank}{link.suit}
-                </span>
-                <span className="font-mono text-[8px] uppercase tracking-[0.14em]">{link.name}</span>
-              </span>
+              <span className="text-sm">{link.name}</span>
               <ExternalLink aria-hidden="true" size={11} className="opacity-40 transition-opacity group-hover:opacity-100" />
             </a>
           ))}

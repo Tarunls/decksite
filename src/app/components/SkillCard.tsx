@@ -24,6 +24,7 @@ import {
   SiFirebase, SiDrizzle, SiNeon, SiLastdotfm, SiCloudflareworkers,
   SiSqlite, SiVercel, SiUpstash, SiHtml5, SiWikimediacommons,
   SiApplemusic,
+  SiCss,
   SiArgo,
   SiCplusplus,
   SiDocker,
@@ -160,24 +161,22 @@ for (const name of ['Cellular Automata', 'Geospatial Analysis', 'GeoJSON', 'Mome
 skillIcons.E2B = { icon: Boxes, color: '#111111' };
 skillIcons.Vinext = { icon: SiVite, color: '#646CFF' };
 skillIcons.Uvicorn = { icon: SiPython, color: '#3776AB' };
-skillIcons.CSS = { icon: Code2, color: '#663399' };
+skillIcons.CSS = { icon: SiCss, color: '#663399' };
 
 export function SkillCard({ name, isDark = true }: { name: string; isDark?: boolean }) {
   const definition = skillIcons[name] ?? { icon: Code2, color: '#64748B' };
   const Icon = definition.icon;
+  const suit = ['♠', '♥', '♣', '♦'][Array.from(name).reduce((sum, char) => sum + char.charCodeAt(0), 0) % 4];
+  const suitColor = suit === '♥' || suit === '♦' ? 'text-red-700' : 'text-slate-900';
 
   return (
     <span
-      className={`inline-flex min-h-9 items-center gap-2 rounded-md border px-2.5 py-1.5 shadow-sm ${
-        isDark
-          ? 'border-white/12 bg-white/[0.055] text-white/85'
-          : 'border-black/12 bg-black/[0.025] text-slate-900'
-      }`}
+      className={`relative inline-flex w-[84px] aspect-[5/7] shrink-0 flex-col items-center justify-center gap-3 rounded-lg border bg-[#faf8f2] px-2 py-5 text-slate-900 ${isDark ? 'border-white/30 shadow-[0_3px_8px_#0005]' : 'border-black/20 shadow-sm'}`}
     >
-      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-[4px] bg-white shadow-sm">
-        <Icon aria-hidden={true} size={13} style={{ color: definition.color }} />
-      </span>
-      <span className="font-mono text-[9px] uppercase tracking-[0.1em]">{name}</span>
+      <span aria-hidden="true" className={`absolute left-1.5 top-1 font-serif text-sm leading-none ${suitColor}`}>{suit}</span>
+      <Icon aria-hidden={true} size={26} style={{ color: definition.color }} />
+      <span className="w-full break-words text-center font-sans text-[11px] font-medium leading-tight">{name}</span>
+      <span aria-hidden="true" className={`absolute bottom-1 right-1.5 rotate-180 font-serif text-sm leading-none ${suitColor}`}>{suit}</span>
     </span>
   );
 }

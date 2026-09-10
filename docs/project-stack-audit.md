@@ -57,4 +57,4 @@ No paid AI model is required for the momentum engine. Redis is not described as 
 
 ## Presentation
 
-The skill inventory lives in `src/lib/projectSkills.ts`; project detail screens group it by purpose and keep the project links before the longer inventory. Brand icons are used where available; engineering practices use category symbols because they do not have official logos. About is a curated overview, not the union of every project-specific implementation detail.
+The displayed inventory in `src/lib/projectSkills.ts` contains technologies only, presented as miniature portrait playing cards. Architecture/security concepts and granular cloud-service badges are omitted at the owner's request; the implementation evidence above remains in this audit. About is a curated overview, not the union of every project-specific detail.
