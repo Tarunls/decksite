@@ -1,62 +1,102 @@
 'use client';
 
-import { motion, useReducedMotion } from 'motion/react';
-import { Mail, X } from 'lucide-react';
-import { FaGithub, FaLinkedinIn } from 'react-icons/fa';
+import { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion, useReducedMotion, useTransform } from 'motion/react';
+import { useCursorMotion } from '../../lib/useCursorMotion';
 
-const contacts = [
-  { name: 'Email Tarun Sankar', href: 'mailto:tarunlsankar@gmail.com', title: 'tarunlsankar@gmail.com', icon: Mail },
-  { name: 'Tarun Sankar on GitHub', href: 'https://github.com/tarunls', title: 'GitHub', icon: FaGithub },
-  { name: 'Tarun Sankar on LinkedIn', href: 'https://linkedin.com/in/tarunls', title: 'LinkedIn', icon: FaLinkedinIn },
-];
+const email = 'tarunlsankar@gmail.com';
 
-export function ContactSection({ onClose, isFlipped = false }: { onClose: () => void; isFlipped?: boolean }) {
-  const reduceMotion = useReducedMotion();
+export function ContactSection({ onClose, isFlipped = false, isReducedMotion = false }: {
+  onClose: () => void;
+  isFlipped?: boolean;
+  isReducedMotion?: boolean;
+}) {
+  const [copyStatus, setCopyStatus] = useState('');
+  const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const systemReducedMotion = useReducedMotion();
+  const { x, y } = useCursorMotion(isReducedMotion || Boolean(systemReducedMotion));
+  const rotateX = useTransform(y, [-1, 1], [7, -7]);
+  const rotateY = useTransform(x, [-1, 1], [-9, 9]);
+
+  useEffect(() => () => {
+    if (copyTimer.current) clearTimeout(copyTimer.current);
+  }, []);
+
+  const copyEmail = async () => {
+    if (copyTimer.current) clearTimeout(copyTimer.current);
+    try {
+      await navigator.clipboard.writeText(email);
+      setCopyStatus('Email copied');
+    } catch {
+      setCopyStatus(email);
+    }
+    copyTimer.current = setTimeout(() => setCopyStatus(''), 2500);
+  };
+
+  const text = isFlipped ? 'text-black' : 'text-white';
+  const muted = isFlipped ? 'text-black/55 hover:text-black' : 'text-white/55 hover:text-white';
+  const border = isFlipped ? 'border-black/20' : 'border-white/20';
 
   return (
     <motion.section
       aria-label="Contact"
       data-contact-theme={isFlipped ? 'light' : 'dark'}
-      className="contact-table fixed inset-0 z-[100] flex items-center justify-center overflow-hidden p-6"
+      className={`fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto px-6 py-24 ${isFlipped ? 'bg-[#f4f3f3]/95' : 'bg-black/90'}`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.18 }}
+      transition={{ duration: 0.2 }}
     >
-      <motion.article
-        aria-label="Contact card"
-        className="contact-card relative isolate aspect-[5/7] w-[min(78vw,350px,54dvh)]"
-        initial={reduceMotion ? false : { y: 26, rotate: -4, opacity: 0 }}
-        animate={{ y: 0, rotate: 0, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 240, damping: 25 }}
-      >
-        <div aria-hidden="true" className="contact-card-underlay absolute inset-0 -rotate-[7deg] rounded-[5%]" />
-        <div className="contact-card-face absolute inset-0 overflow-hidden rounded-[5%]">
-          <img src="/cards/work-card-back.png" alt="" draggable={false} className="contact-card-art pointer-events-none absolute inset-0 h-full w-full select-none object-contain" />
-          <div aria-hidden="true" className="contact-card-frame pointer-events-none absolute inset-[6.5%] rounded-[4%] border" />
-          <div className="absolute inset-x-[14%] inset-y-[15%] flex flex-col items-center justify-center">
-            <span aria-hidden="true" className="contact-suit mb-7 text-5xl sm:text-6xl">♠</span>
-            <h1 className="sr-only">Contact</h1>
-            <div className="contact-links flex w-full items-center justify-center gap-3">
-              {contacts.map(({ name, href, title, icon: Icon }) => (
-                <a
-                  key={href}
-                  href={href}
-                  aria-label={name}
-                  title={title}
-                  {...(href.startsWith('https:') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                  className="contact-icon flex aspect-square w-[30%] max-w-16 shrink-0 items-center justify-center rounded-xl border transition-[color,background-color,transform] duration-150 hover:-translate-y-1 focus-visible:outline-2 focus-visible:outline-offset-4"
-                >
-                  <Icon aria-hidden="true" className="h-[42%] w-[42%]" />
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
-      </motion.article>
+      <span aria-hidden="true" className="pointer-events-none absolute bottom-1/4 right-1/4 select-none font-serif text-[12rem] text-red-600/[0.035]">♥</span>
 
-      <button type="button" onClick={onClose} aria-label="Close contact" className="contact-close absolute right-6 top-6 flex h-11 w-11 items-center justify-center rounded-full border transition-colors">
-        <X aria-hidden="true" size={19} />
+      <motion.div
+        className="relative flex flex-col items-center text-center"
+        style={{ rotateX, rotateY, transformPerspective: 1000, transformStyle: 'preserve-3d' }}
+      >
+        <h1 className={`mb-10 font-mono text-xs tracking-[0.4em] ${isFlipped ? 'text-red-700' : 'text-red-500'}`}>
+          <span aria-hidden="true">♦ </span>CONTACT<span aria-hidden="true"> ♦</span>
+        </h1>
+
+        <div className="relative">
+          <button
+            type="button"
+            onClick={copyEmail}
+            aria-label="Copy email address"
+            title={email}
+            className={`cursor-pointer rounded-sm font-serif text-7xl leading-none tracking-tighter transition-opacity hover:opacity-75 focus-visible:outline-2 focus-visible:outline-offset-8 md:text-9xl ${text}`}
+          >
+            Email
+          </button>
+          <AnimatePresence>
+            {copyStatus && (
+              <motion.span
+                role="status"
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className={`absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap font-mono text-xs ${isFlipped ? 'text-green-800' : 'text-green-400'}`}
+              >
+                {copyStatus}
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </div>
+
+        <div className="mt-16 flex gap-12 md:mt-20">
+          {[
+            { name: 'GitHub', href: 'https://github.com/tarunls' },
+            { name: 'LinkedIn', href: 'https://linkedin.com/in/tarunls' },
+          ].map(({ name, href }) => (
+            <a key={name} href={href} target="_blank" rel="noopener noreferrer" className={`flex min-h-11 flex-col items-center justify-center gap-3 font-mono text-xs uppercase tracking-[0.2em] transition-colors ${muted}`}>
+              {name}
+              <span aria-hidden="true" className={`w-8 border-t ${border}`} />
+            </a>
+          ))}
+        </div>
+      </motion.div>
+
+      <button type="button" onClick={onClose} aria-label="Close contact" className={`fixed bottom-10 min-h-11 rounded-full border px-6 py-2 font-mono text-[10px] uppercase tracking-[0.2em] transition-colors ${border} ${muted}`}>
+        Back to deck
       </button>
     </motion.section>
   );

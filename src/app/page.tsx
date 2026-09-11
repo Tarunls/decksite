@@ -468,7 +468,7 @@ export default function App() {
         )}
 
         {activeSection === 'contact' && (
-           <ContactSection onClose={() => setActiveSection('home')} isFlipped={isFlipped} />
+           <ContactSection onClose={() => setActiveSection('home')} isFlipped={isFlipped} isReducedMotion={isReducedMotion} />
         )}
       </AnimatePresence>
       
