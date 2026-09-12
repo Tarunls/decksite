@@ -51,7 +51,7 @@ export function Navigation({
   ];
 
   return (
-    <>
+    <div className={activeSection === 'about' || activeSection === 'contact' ? 'invisible' : undefined}>
       {/* DESKTOP NAVIGATION */}
       <div className="hidden lg:flex fixed inset-0 z-50 pointer-events-none p-12 flex-col justify-between">
         <div className="flex justify-between items-start relative z-10">
@@ -120,11 +120,11 @@ export function Navigation({
       </div>
 
       {/* MOBILE SHUFFLE */}
-      <button type="button" onClick={onShuffle} aria-label="Shuffle deck" className="lg:hidden fixed top-6 right-6 z-50 bg-black/80 backdrop-blur border border-white/10 text-white p-3 rounded-full shadow-lg cursor-pointer">↻</button>
+      <button type="button" onClick={onShuffle} aria-label="Shuffle deck" className="lg:hidden fixed top-[max(1rem,env(safe-area-inset-top))] right-4 z-50 flex h-11 w-11 items-center justify-center bg-black/80 backdrop-blur border border-white/10 text-white rounded-full shadow-lg cursor-pointer">↻</button>
 
       {/* MOBILE NAVIGATION */}
-      <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-sm pointer-events-auto">
-        <nav aria-label="Main navigation" className="flex items-center justify-between bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl p-2 shadow-2xl overflow-x-auto scrollbar-hide">
+      <div className="lg:hidden fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] inset-x-3 mx-auto z-50 max-w-sm pointer-events-auto">
+        <nav aria-label="Main navigation" className="grid grid-cols-5 bg-black/90 backdrop-blur-xl border border-white/10 rounded-2xl p-1.5 shadow-2xl">
           {navItems.map((item) => {
              const isActive = activeSection === item.section;
              
@@ -138,7 +138,7 @@ export function Navigation({
                  key={item.name}
                  aria-current={isActive ? 'page' : undefined}
                  onClick={() => onNavigate?.(item.section)}
-                 className={`flex flex-col items-center justify-center min-w-[60px] py-2 rounded-xl transition-all duration-300 cursor-pointer ${isActive ? 'bg-white text-black' : 'text-white/60'}`}
+                 className={`flex min-w-0 min-h-14 flex-col items-center justify-center py-2 rounded-xl transition-colors duration-300 cursor-pointer ${isActive ? 'bg-white text-black' : 'text-white/60'}`}
                >
                  <span aria-hidden="true" className={`text-sm transition-opacity duration-300 ${isActive ? `opacity-100 ${suitColor}` : 'opacity-0'}`}>
                     {item.suit}
@@ -151,6 +151,6 @@ export function Navigation({
           })}
         </nav>
       </div>
-    </>
+    </div>
   );
 }

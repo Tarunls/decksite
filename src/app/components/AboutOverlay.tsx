@@ -65,7 +65,7 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
             className={`
               relative 
               /* MOBILE: Fixed viewport based size */
-              w-[95vw] h-[85vh] 
+              w-full max-w-[700px] h-[calc(100dvh-2rem)]
 
               /* DESKTOP FIX: 
                  1. Set explicit Width (700px)
@@ -83,27 +83,29 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
             
             {/* FRONT (CONTENT) */}
             <div 
-              className={`absolute inset-0 rounded-2xl overflow-hidden border transition-colors duration-500 ${bgClass} ${borderColor}`}
+              className={`absolute inset-0 flex flex-col rounded-2xl overflow-hidden border transition-colors duration-500 ${bgClass} ${borderColor}`}
               style={{ backfaceVisibility: 'hidden' }}
             >
+              <div className="flex h-16 shrink-0 items-center justify-end px-4">
               <motion.button 
                 type="button"
                 aria-label="Close about"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: showContent ? 1 : 0 }}
                 onClick={onClose}
-                className={`absolute top-4 right-6 z-50 min-h-11 rounded-md border px-3 font-mono text-xs uppercase tracking-widest shadow-sm transition-colors ${closeBtnClass}`}
+                className={`relative z-50 min-h-11 rounded-md border px-3 font-mono text-xs uppercase tracking-widest shadow-sm transition-colors ${closeBtnClass}`}
               >
                 [ Close ]
               </motion.button>
+              </div>
 
               <motion.div 
-                 className="relative z-10 w-full h-full flex flex-col"
+                 className="relative z-10 w-full min-h-0 flex-1 flex flex-col"
                  initial={{ opacity: 0, y: 20 }}
                  animate={{ opacity: showContent ? 1 : 0, y: showContent ? 0 : 20 }}
                  transition={{ duration: 0.5, delay: 0.2 }}
               >
-                <div className="flex-1 overflow-y-auto p-8 md:p-12 scrollbar-hide">
+                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-8 pt-2 md:px-12 md:pb-12 scrollbar-hide">
                   <div className="max-w-4xl mx-auto space-y-8 min-h-min flex flex-col justify-center">
                     
                     {/* HEADER */}
@@ -119,15 +121,11 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
                           Download Resume <span aria-hidden="true">↓</span>
                         </a>
                       </div>
-                      <div className="text-right">
-                        <div className={`text-xs font-mono uppercase tracking-widest ${textSub}`}>Expected Graduation</div>
-                        <div className={`text-2xl font-light ${textMain}`}>May 2027</div>
-                      </div>
                     </div>
 
                     {/* STATS */}
-                    <div className="grid grid-cols-3 gap-4">
-                      <StatBlock label="Degree" value="B.S. Computer Engineering" textColor={textMain} subColor={textSub} borderColor={borderColor} />
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-3">
+                      <StatBlock label="Degree" value="B.S. Computer Engineering" textColor={textMain} subColor={textSub} borderColor={borderColor} className="col-span-2 sm:col-span-1" />
                       <StatBlock label="GPA" value="3.7 / 4.0" textColor={textMain} subColor={textSub} borderColor={borderColor} />
                       <StatBlock label="University" value="UT Dallas" textColor={textMain} subColor={textSub} borderColor={borderColor} />
                     </div>
@@ -146,7 +144,7 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
                         {aboutSkillGroups.map((group) => (
                           <section key={group.label} aria-label={group.label}>
                             <h3 className={`mb-3 font-mono text-[10px] uppercase tracking-widest ${textSub}`}>{group.label}</h3>
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex flex-wrap justify-center gap-2 sm:justify-start">
                               {group.skills.map((tech) => <SkillCard key={tech} name={tech} isDark={isDarkMode} />)}
                             </div>
                           </section>
@@ -183,9 +181,9 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
   );
 }
 
-function StatBlock({ label, value, textColor, subColor, borderColor }: any) {
+function StatBlock({ label, value, textColor, subColor, borderColor, className = '' }: any) {
     return (
-        <div className={`flex flex-col border-l pl-3 ${borderColor}`}>
+        <div className={`min-w-0 flex flex-col border-l pl-3 ${borderColor} ${className}`}>
             <span className={`text-[10px] font-mono uppercase tracking-widest opacity-70 mb-1 ${subColor}`}>
                 {label}
             </span>

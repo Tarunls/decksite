@@ -27,3 +27,31 @@ body {
   outline-offset: 4px;
   box-shadow: 0 0 0 2px #111;
 }
+
+.home-name {
+  font-size: clamp(3rem, 12vw, 9rem);
+}
+
+@media (min-width: 640px) and (max-width: 1023px) and (max-height: 500px) {
+  .home-layout {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-name {
+    font-size: clamp(2.25rem, 7vw, 3.5rem);
+  }
+
+  .home-card-frame {
+    width: clamp(6rem, calc(65svh - 8rem), 11rem);
+  }
+
+  .work-choice-panel {
+    top: 80px;
+    bottom: 112px;
+  }
+
+  .work-choice-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

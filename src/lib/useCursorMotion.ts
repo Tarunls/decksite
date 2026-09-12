@@ -3,12 +3,22 @@
 import { useEffect } from 'react';
 import { useMotionValue, useSpring } from 'motion/react';
 
+// A short glide with a barely perceptible settle, shared by all cursor-following
+// cards. Smooth the input once, rather than adding a spring to every card.
+const cursorSpring = {
+  stiffness: 280,
+  damping: 24,
+  mass: 0.7,
+  restDelta: 0.001,
+  restSpeed: 0.01,
+};
+
 // One update per display frame, using the newest event; no idle polling or React renders.
 export function useCursorMotion(disabled: boolean) {
   const targetX = useMotionValue(0);
   const targetY = useMotionValue(0);
-  const x = useSpring(targetX, { stiffness: 1400, damping: 32, mass: 0.18 });
-  const y = useSpring(targetY, { stiffness: 1400, damping: 32, mass: 0.18 });
+  const x = useSpring(targetX, cursorSpring);
+  const y = useSpring(targetY, cursorSpring);
 
   useEffect(() => {
     targetX.set(0);

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, type PanInfo } from 'motion/react';
+import { AnimatePresence, motion, useIsPresent, type PanInfo } from 'motion/react';
 import { projects, type Project } from '../../lib/constants';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { SkillCard } from './SkillCard';
@@ -23,8 +23,24 @@ const POSITION_STORAGE_KEY = 'decksite-project-positions-v2';
 const DEALT_STORAGE_KEY = 'decksite-projects-dealt-v2';
 const SEED_STORAGE_KEY = 'decksite-project-seed-v2';
 
-function positionStorageKey(isMobile: boolean) {
-  return `${POSITION_STORAGE_KEY}-${isMobile ? 'mobile' : 'desktop'}`;
+function positionStorageKey(width: number) {
+  return `${POSITION_STORAGE_KEY}-${width < 640 ? 'mobile' : width < 1024 ? 'tablet' : 'desktop'}`;
+}
+
+function cardWidthFor(width: number) {
+  if (width < 640) return Math.min(158, (width - 48) / 2);
+  if (width < 1024) return 210;
+  return Math.min(236, (width - 160) / 4);
+}
+
+function canvasMetrics(width: number, height: number) {
+  const compact = width < 1024;
+  const rows = Math.ceil(projects.length / (compact ? 2 : 4));
+  const top = compact ? 84 : 156;
+  const bottom = compact ? 112 : 88;
+  const gap = compact ? 24 : 34;
+  const stageHeight = Math.max(height - top - bottom, rows * cardWidthFor(width) * 1.4 + (rows - 1) * gap + 32);
+  return { top, bottom, stageHeight, height: top + stageHeight + bottom };
 }
 
 function seededNoise(seed: number, index: number, salt: number) {
@@ -34,9 +50,9 @@ function seededNoise(seed: number, index: number, salt: number) {
 
 function buildPositions(count: number, width: number, isMobile: boolean, seed: number): Position[] {
   const columns = isMobile ? 2 : 4;
-  const cardWidth = isMobile ? Math.min(158, (width - 46) / 2) : Math.min(236, (width - 190) / 4);
-  const horizontalStep = isMobile ? cardWidth + 14 : Math.min(270, cardWidth + 34);
-  const verticalStep = isMobile ? cardWidth * 1.55 : cardWidth * 1.2;
+  const cardWidth = cardWidthFor(width);
+  const horizontalStep = cardWidth + (isMobile ? 20 : 34);
+  const verticalStep = cardWidth * 1.4 + 24;
   const rows = Math.ceil(count / columns);
 
   return Array.from({ length: count }, (_, index) => {
@@ -57,10 +73,10 @@ function buildPositions(count: number, width: number, isMobile: boolean, seed: n
 }
 
 function clampPositions(positions: Position[], width: number, height: number, isMobile: boolean) {
-  const cardWidth = isMobile ? Math.min(158, (width - 46) / 2) : 236;
+  const cardWidth = cardWidthFor(width);
   const cardHeight = cardWidth * 1.4;
   const maxX = Math.max(0, width / 2 - cardWidth / 2 - 16);
-  const maxY = Math.max(0, height / 2 - cardHeight / 2 - (isMobile ? 88 : 68));
+  const maxY = Math.max(0, height / 2 - cardHeight / 2 - 16);
 
   return positions.map((position) => ({
     ...position,
@@ -73,8 +89,8 @@ function restorePositions(width: number, height: number, isMobile: boolean, seed
   const defaults = buildPositions(projects.length, width, isMobile, seed);
   let restored = defaults;
   try {
-    // Old sessions only had one layout. Preserve it on desktop; start mobile as two columns.
-    const stored = sessionStorage.getItem(positionStorageKey(isMobile))
+    // Keep saved phone/desktop positions; tablets get their own two-column layout.
+    const stored = sessionStorage.getItem(positionStorageKey(width))
       ?? (isMobile ? null : sessionStorage.getItem(POSITION_STORAGE_KEY));
     const saved = JSON.parse(stored ?? 'null');
     if (Array.isArray(saved) && saved.length === projects.length) {
@@ -87,18 +103,19 @@ function restorePositions(width: number, height: number, isMobile: boolean, seed
   } catch {
     restored = defaults;
   }
-  return clampPositions(restored, width, height, isMobile);
+  return clampPositions(restored, width, canvasMetrics(width, height).stageHeight, isMobile);
 }
 
-function ProjectCard({ project, index, position, originY, isFlipped, isReducedMotion, hasDealt, containerRef, onSelect, onUpdatePosition }: {
+function ProjectCard({ project, index, position, originY, cardWidth, isFlipped, isReducedMotion, hasDealt, containerRef, onSelect, onUpdatePosition }: {
   project: Project;
   index: number;
   position: Position;
   originY: number;
+  cardWidth: number;
   isFlipped: boolean;
   isReducedMotion: boolean;
   hasDealt: boolean;
-  containerRef: React.RefObject<HTMLElement | null>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
   onSelect: () => void;
   onUpdatePosition: (index: number, x: number, y: number) => void;
 }) {
@@ -114,7 +131,7 @@ function ProjectCard({ project, index, position, originY, isFlipped, isReducedMo
     <motion.button
       type="button"
       aria-label={`Open ${project.title} project details`}
-      className="pointer-events-auto relative w-[min(42vw,158px)] sm:w-[210px] lg:w-[236px] aspect-[5/7] cursor-pointer rounded-2xl text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+      className="pointer-events-auto relative aspect-[5/7] cursor-pointer rounded-2xl text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
       drag={!isReducedMotion}
       dragConstraints={containerRef}
       dragElastic={0.08}
@@ -126,13 +143,12 @@ function ProjectCard({ project, index, position, originY, isFlipped, isReducedMo
       }}
       initial={hasDealt || isReducedMotion ? false : { x: 0, y: originY, rotate: 18, scale: 0.76, opacity: 0 }}
       animate={{ x: position.x, y: position.y, rotate: position.rotate, scale: 1, opacity: 1 }}
-      exit={{ x: 0, y: originY, rotate: -12, scale: 0.78, opacity: 0, transition: { duration: 0.16 } }}
       transition={hasDealt || isReducedMotion
         ? { duration: 0.16 }
         : { type: 'spring', damping: 20, stiffness: 105, mass: 0.82, delay: index * 0.18 }}
       whileHover={isReducedMotion ? undefined : { scale: 1.025 }}
       whileDrag={isReducedMotion ? undefined : { scale: 1.045, cursor: 'grabbing' }}
-      style={{ zIndex: index + 2, willChange: 'transform' }}
+      style={{ width: cardWidth, zIndex: index + 2, willChange: 'transform' }}
       onClick={(event) => {
         if (isDragging.current) {
           event.preventDefault();
@@ -156,8 +172,8 @@ function ProjectCard({ project, index, position, originY, isFlipped, isReducedMo
 
         <div className="flex h-1/2 flex-col justify-between p-3 sm:p-5">
           <div>
-            <p className={`mb-1 font-mono text-[8px] uppercase tracking-[0.18em] sm:mb-2 sm:text-[9px] ${muted}`}>{project.category}</p>
-            <h2 className={`font-serif text-lg font-bold leading-[1.05] sm:text-2xl ${text}`}>{project.title}</h2>
+            <p className={`mb-2 hidden font-mono text-[9px] uppercase tracking-[0.18em] sm:block ${muted}`}>{project.category}</p>
+            <h2 className={`font-serif text-xl font-bold leading-[1.05] sm:text-2xl ${text}`}>{project.title}</h2>
           </div>
           <div className={`flex items-center justify-between font-mono text-[8px] uppercase tracking-[0.16em] sm:text-[9px] ${muted}`}>
             <span>{project.period}</span>
@@ -180,24 +196,27 @@ function ProjectDetails({ project, isFlipped, onClose }: { project: Project; isF
     <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 sm:p-8" onClick={onClose}>
       <motion.div className="absolute inset-0 bg-black/85" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
       <motion.article
-        className={`relative z-10 grid max-h-[88dvh] w-[min(94vw,920px)] overflow-y-auto rounded-2xl border shadow-2xl md:grid-cols-[0.92fr_1.08fr] ${surface} ${border}`}
+        className={`relative z-10 flex max-h-[calc(100dvh-2rem)] w-full max-w-[920px] flex-col overflow-hidden rounded-2xl border shadow-2xl sm:max-h-[88dvh] ${surface} ${border}`}
         initial={{ opacity: 0, y: 28, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 18, scale: 0.98 }}
         transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="relative h-[240px] self-start overflow-hidden bg-black md:sticky md:top-0 md:h-[88dvh]">
+        <div className="flex h-16 shrink-0 items-center justify-end px-4">
+          <button type="button" onClick={onClose} aria-label="Close project details" className={`flex h-11 w-11 items-center justify-center rounded-full border font-mono text-xs shadow-sm transition-transform hover:scale-110 ${surface} ${border}`}>
+            ✕
+          </button>
+        </div>
+        <div className="grid min-h-0 overflow-y-auto overscroll-contain md:grid-cols-[0.92fr_1.08fr]">
+        <div className="relative h-[200px] self-start overflow-hidden bg-black md:sticky md:top-0 md:h-[calc(88dvh-4rem)]">
           <ImageWithFallback src={project.image} alt={`${project.title} project screenshot`} className="absolute inset-0 h-full w-full object-contain" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/10" />
         </div>
 
-        <div className="flex flex-col p-6 sm:p-9">
-          <button type="button" onClick={onClose} aria-label="Close project details" className={`sticky top-4 z-20 ml-auto mb-7 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border font-mono text-xs shadow-sm transition-transform hover:scale-110 ${surface} ${border}`}>
-            ✕
-          </button>
+        <div className="min-w-0 flex flex-col p-5 sm:p-9">
           <p className={`font-mono text-[10px] uppercase tracking-[0.22em] ${muted}`}>{project.category}</p>
-          <h2 className="mt-3 font-serif text-4xl font-bold leading-none sm:text-5xl">{project.title}</h2>
+          <h2 className="mt-3 font-serif text-3xl font-bold leading-tight sm:text-5xl">{project.title}</h2>
           <p className={`mt-5 text-sm leading-relaxed sm:text-base ${muted}`}>{project.summary}</p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -214,12 +233,13 @@ function ProjectDetails({ project, isFlipped, onClose }: { project: Project; isF
             {project.skillGroups.map((group) => (
               <section key={group.label} aria-label={group.label}>
                 <h3 className={`mb-2 font-mono text-[10px] uppercase tracking-[0.16em] ${muted}`}>{group.label}</h3>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap justify-center gap-2 sm:justify-start">
                   {group.skills.map((skill) => <SkillCard key={skill} name={skill} isDark={!isFlipped} />)}
                 </div>
               </section>
             ))}
           </div>
+        </div>
         </div>
       </motion.article>
     </div>
@@ -228,17 +248,20 @@ function ProjectDetails({ project, isFlipped, onClose }: { project: Project; isF
 }
 
 export default function ProjectContent({ onClose, isFlipped = false, isReducedMotion = false }: ProjectContentProps) {
+  const isPresent = useIsPresent();
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [layout, setLayout] = useState({ width: 1280, height: 720, mobile: false });
   const [positions, setPositions] = useState<Position[]>(projects.map(() => ({ x: 0, y: 0, rotate: 0 })));
   const [hasDealt, setHasDealt] = useState(false);
   const [isReady, setIsReady] = useState(false);
-  const containerRef = useRef<HTMLElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    // Let the exit finish against stable targets if the device rotates mid-transition.
+    if (!isPresent) return;
     const width = window.innerWidth;
     const height = window.innerHeight;
-    const mobile = width < 640;
+    const mobile = width < 1024;
     const storedSeed = sessionStorage.getItem(SEED_STORAGE_KEY);
     const seed = storedSeed ? Number(storedSeed) : Math.random() * 1000;
     if (!storedSeed) sessionStorage.setItem(SEED_STORAGE_KEY, String(seed));
@@ -249,21 +272,22 @@ export default function ProjectContent({ onClose, isFlipped = false, isReducedMo
     setPositions(nextPositions);
     setHasDealt(alreadyDealt);
     setIsReady(true);
-    sessionStorage.setItem(positionStorageKey(mobile), JSON.stringify(nextPositions));
+    sessionStorage.setItem(positionStorageKey(width), JSON.stringify(nextPositions));
 
-    let currentMobile = mobile;
+    let currentWidth = width;
     const updateLayout = () => {
       const nextWidth = window.innerWidth;
       const nextHeight = window.innerHeight;
-      const nextMobile = nextWidth < 640;
-      const changedBreakpoint = nextMobile !== currentMobile;
-      currentMobile = nextMobile;
+      const nextMobile = nextWidth < 1024;
+      const changedBreakpoint = positionStorageKey(nextWidth) !== positionStorageKey(currentWidth);
+      const scale = cardWidthFor(nextWidth) / cardWidthFor(currentWidth);
+      currentWidth = nextWidth;
       setLayout({ width: nextWidth, height: nextHeight, mobile: nextMobile });
       setPositions((current) => {
         const clamped = changedBreakpoint
           ? restorePositions(nextWidth, nextHeight, nextMobile, seed)
-          : clampPositions(current, nextWidth, nextHeight, nextMobile);
-        sessionStorage.setItem(positionStorageKey(nextMobile), JSON.stringify(clamped));
+          : clampPositions(current.map((position) => ({ ...position, x: position.x * scale, y: position.y * scale })), nextWidth, canvasMetrics(nextWidth, nextHeight).stageHeight, nextMobile);
+        sessionStorage.setItem(positionStorageKey(nextWidth), JSON.stringify(clamped));
         return clamped;
       });
     };
@@ -278,30 +302,31 @@ export default function ProjectContent({ onClose, isFlipped = false, isReducedMo
       window.removeEventListener('resize', updateLayout);
       if (dealTimer !== undefined) window.clearTimeout(dealTimer);
     };
-  }, []);
+  }, [isPresent]);
 
   const updatePosition = (index: number, x: number, y: number) => {
     setPositions((current) => {
       const next = [...current];
       next[index] = { ...next[index], x, y };
-      sessionStorage.setItem(positionStorageKey(layout.mobile), JSON.stringify(next));
-      return next;
+      const clamped = clampPositions(next, layout.width, canvasMetrics(layout.width, layout.height).stageHeight, layout.mobile);
+      sessionStorage.setItem(positionStorageKey(layout.width), JSON.stringify(clamped));
+      return clamped;
     });
   };
 
-  const rows = Math.ceil(projects.length / (layout.mobile ? 2 : 4));
-  const canvasHeight = layout.mobile ? Math.max(layout.height, rows * 255 + 190) : layout.height;
-  const originY = canvasHeight / 2 - (layout.mobile ? 145 : 105);
+  const canvas = canvasMetrics(layout.width, layout.height);
+  const originY = canvas.stageHeight / 2;
   const backdrop = isFlipped ? 'rgba(245,242,235,0.95)' : 'rgba(4,4,4,0.94)';
   const text = isFlipped ? 'text-black' : 'text-white';
 
   return (
-    <motion.section ref={containerRef} aria-label="Projects" className={`fixed inset-0 overflow-y-auto overflow-x-hidden ${selectedProject ? 'z-[60]' : 'z-30'}`} initial={{ opacity: 0 }} animate={{ opacity: 1, backgroundColor: backdrop }} exit={{ opacity: 0 }} transition={{ duration: 0.24 }}>
-      <button type="button" onClick={onClose} aria-label="Close projects" className={`fixed right-5 top-20 z-50 rounded-full border border-current/20 px-4 py-2 font-mono text-[9px] uppercase tracking-[0.2em] lg:right-10 lg:top-28 ${text}`}>
+    <motion.section aria-label="Projects" className={`fixed inset-0 overflow-y-auto overflow-x-hidden ${selectedProject ? 'z-[60]' : 'z-30'}`} initial={{ opacity: 0 }} animate={{ opacity: 1, backgroundColor: backdrop }} exit={{ opacity: 0 }} transition={{ duration: 0.24 }}>
+      <button type="button" onClick={onClose} aria-label="Close projects" className={`fixed right-10 top-28 z-50 hidden min-h-11 rounded-full border border-current/20 px-4 py-2 font-mono text-[9px] uppercase tracking-[0.2em] lg:block ${text}`}>
         Close
       </button>
 
-      <div className="relative w-full" style={{ height: canvasHeight }}>
+      <div className="relative w-full" style={{ height: canvas.height, paddingTop: canvas.top, paddingBottom: canvas.bottom }}>
+      <div ref={containerRef} className="relative w-full" style={{ height: canvas.stageHeight }}>
         {isReady && projects.map((project, index) => (
           <ProjectCard
             key={project.id}
@@ -309,6 +334,7 @@ export default function ProjectContent({ onClose, isFlipped = false, isReducedMo
             index={index}
             position={positions[index]}
             originY={originY}
+            cardWidth={cardWidthFor(layout.width)}
             isFlipped={isFlipped}
             isReducedMotion={isReducedMotion}
             hasDealt={hasDealt}
@@ -317,6 +343,7 @@ export default function ProjectContent({ onClose, isFlipped = false, isReducedMo
             onSelect={() => setSelectedProject(project)}
           />
         ))}
+      </div>
       </div>
 
       <AnimatePresence>

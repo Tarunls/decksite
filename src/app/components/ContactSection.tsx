@@ -43,7 +43,7 @@ export function ContactSection({ onClose, isFlipped = false, isReducedMotion = f
     <motion.section
       aria-label="Contact"
       data-contact-theme={isFlipped ? 'light' : 'dark'}
-      className={`fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto px-6 py-24 ${isFlipped ? 'bg-[#f4f3f3]/95' : 'bg-black/90'}`}
+      className={`fixed inset-0 z-[100] overflow-y-auto overscroll-contain ${isFlipped ? 'bg-[#f4f3f3]/95' : 'bg-black/90'}`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -51,6 +51,7 @@ export function ContactSection({ onClose, isFlipped = false, isReducedMotion = f
     >
       <span aria-hidden="true" className="pointer-events-none absolute bottom-1/4 right-1/4 select-none font-serif text-[12rem] text-red-600/[0.035]">♥</span>
 
+      <div className="flex min-h-full flex-col items-center justify-center px-6 pt-20 pb-[calc(2rem+env(safe-area-inset-bottom))]">
       <motion.div
         className="relative flex flex-col items-center text-center"
         style={{ rotateX, rotateY, transformPerspective: 1000, transformStyle: 'preserve-3d' }}
@@ -89,7 +90,7 @@ export function ContactSection({ onClose, isFlipped = false, isReducedMotion = f
           {email}
         </a>
 
-        <div className="mt-16 flex gap-12 md:mt-20">
+        <div className="mt-10 flex gap-12 md:mt-20">
           {[
             { name: 'GitHub', href: 'https://github.com/tarunls' },
             { name: 'LinkedIn', href: 'https://linkedin.com/in/tarunls' },
@@ -102,9 +103,10 @@ export function ContactSection({ onClose, isFlipped = false, isReducedMotion = f
         </div>
       </motion.div>
 
-      <button type="button" onClick={onClose} aria-label="Close contact" className={`fixed bottom-10 min-h-11 rounded-full border px-6 py-2 font-mono text-[10px] uppercase tracking-[0.2em] transition-colors ${border} ${muted}`}>
+      <button type="button" onClick={onClose} aria-label="Close contact" className={`relative mt-12 min-h-11 shrink-0 rounded-full border px-6 py-2 font-mono text-[10px] uppercase tracking-[0.2em] transition-colors ${border} ${muted}`}>
         Back to deck
       </button>
+      </div>
     </motion.section>
     </AccessibleDialog>
   );

@@ -108,12 +108,12 @@ export function Hero3DCard({
           rotateZ: { duration: 8, repeat: Infinity, ease: 'easeInOut' },
         }}
         style={{ transformStyle: 'preserve-3d' }}
-        className="relative z-10"
+        className="relative z-10 w-full"
       >
         <motion.div
           data-home-card-drag
           style={{ x: dragX, y: dragY, transformStyle: 'preserve-3d', touchAction: 'none' }}
-          className="relative cursor-grab select-none active:cursor-grabbing focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-white"
+          className="relative w-full cursor-grab select-none active:cursor-grabbing focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-white"
           role="button"
           tabIndex={0}
           aria-label="Home card: light theme"
@@ -135,7 +135,7 @@ export function Hero3DCard({
         >
         {/* The visual faces never handle native image dragging or pointer capture. */}
         <motion.div
-          className="pointer-events-none relative w-72 h-[28rem]"
+          className="pointer-events-none relative w-full aspect-[9/14]"
           animate={{ rotateY: isFlipped ? 180 : 0 }}
           transition={flipTransition} // Uses the variable defined above
           style={{ transformStyle: 'preserve-3d', touchAction: 'none' }}

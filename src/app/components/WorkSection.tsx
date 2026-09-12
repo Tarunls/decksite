@@ -42,7 +42,7 @@ const workItems: WorkItem[] = [
     id: 1,
     company: "NorthMark Compute & Cloud",
     role: "Software Engineering Intern, Network Automation",
-    period: "Jun 2026 - Present",
+    period: "Jun 2026 - Aug 2026",
     technologies: ["Python", "OpenObserve", "Slack", "ZTP", "Infrahub", "Jira", "Harness", "Argo"],
     frontImage: "/cards/work-card-back.png",
     description: [
@@ -129,7 +129,8 @@ export function WorkSection({ onGoHome, isFlipped, isReducedMotion = false }: Wo
         }} 
       />
 
-      <div className="absolute inset-x-5 bottom-60 z-20 grid grid-cols-2 gap-3 md:hidden" aria-label="Choose work experience">
+      <div className="work-choice-panel absolute inset-x-4 top-24 bottom-52 z-20 flex flex-col overflow-y-auto overscroll-contain lg:hidden" aria-label="Choose work experience">
+      <div className="work-choice-grid mt-auto grid shrink-0 grid-cols-2 gap-3">
         {workItems.map((item, index) => {
           const isFocused = focusedIndex === index;
           return (
@@ -148,6 +149,7 @@ export function WorkSection({ onGoHome, isFlipped, isReducedMotion = false }: Wo
             </button>
           );
         })}
+      </div>
       </div>
 
       {/* 2. CAROUSEL LAYER */}
@@ -201,17 +203,17 @@ function CardBackContent({ item, isExpanded, onClose, darkMode = false }: CardBa
   const tagBg = darkMode ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-black/5';
 
   return (
-    <div className={`relative w-full h-full flex flex-col pt-12 pb-6 rounded-xl overflow-hidden isolate transition-colors duration-500 ${bgClass}`}>
+    <div className={`relative w-full h-full flex flex-col pt-16 pb-4 rounded-xl overflow-hidden isolate transition-colors duration-500 ${bgClass}`}>
       <button 
         type="button"
         aria-label="Close work experience"
         onClick={(e) => { e.stopPropagation(); onClose?.(); }}
-        className={`absolute top-6 right-6 z-50 font-mono text-xs uppercase tracking-widest transition-opacity ${isExpanded ? 'opacity-100' : 'opacity-0 pointer-events-none'} ${darkMode ? 'text-white/70 hover:text-white' : 'text-black/70 hover:text-black'}`}
+        className={`absolute top-2 right-3 z-50 min-h-11 px-3 font-mono text-xs uppercase tracking-widest transition-opacity ${isExpanded ? 'opacity-100' : 'opacity-0 pointer-events-none'} ${darkMode ? 'text-white/70 hover:text-white' : 'text-black/70 hover:text-black'}`}
       >
         [ Return ]
       </button>
 
-      <div className={`flex-1 px-8 md:px-16 scrollbar-hide ${isExpanded ? 'overflow-y-auto' : 'overflow-hidden'}`}>
+      <div className={`min-h-0 flex-1 px-5 md:px-12 overscroll-contain scrollbar-hide ${isExpanded ? 'overflow-y-auto' : 'overflow-hidden'}`}>
         <div className="max-w-2xl mx-auto space-y-6 pb-12">
             <div className={`border-b ${borderClass} pb-4`}>
                 <div className="flex justify-end items-baseline mb-2">
@@ -229,9 +231,9 @@ function CardBackContent({ item, isExpanded, onClose, darkMode = false }: CardBa
                 <h5 className={`text-xs font-mono uppercase tracking-widest ${darkMode ? 'text-white/60' : 'text-black/60'} mb-4`}>Technologies</h5>
               <div className="grid grid-cols-2 gap-3">
                 {item.technologies.map((tech, idx) => (
-                  <div key={`${tech}-${idx}`} className={`flex items-center gap-2 border p-2 rounded-sm shadow-sm ${tagBg}`}>
-                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
-                      <span className={`text-xs font-mono uppercase ${textSub}`}>{tech}</span>
+                  <div key={`${tech}-${idx}`} className={`min-w-0 flex items-center gap-2 border p-2 rounded-sm shadow-sm ${tagBg}`}>
+                      <div className="w-1.5 h-1.5 shrink-0 bg-green-500 rounded-full" />
+                      <span className={`min-w-0 break-words text-xs font-mono uppercase ${textSub}`}>{tech}</span>
                   </div>
                 ))}
               </div>
@@ -261,7 +263,7 @@ function CarouselCard({
   const [viewportSize, setViewportSize] = useState({ width: 1440, height: 900 });
   useEffect(() => {
     const checkViewport = () => {
-      setIsMobile(window.innerWidth < 768);
+      setIsMobile(window.innerWidth < 1024);
       setViewportSize({ width: window.innerWidth, height: window.innerHeight });
     };
     checkViewport();
@@ -325,9 +327,9 @@ function CarouselCard({
       }}
       whileHover={{ 
         scale: isFocused ? 1.025 : (isMobile ? 0.84 : 0.87),
-        transition: { duration: 0.08 }
+        transition: { duration: 0.18, ease: [0.22, 1, 0.36, 1] }
       }}
-      className="relative w-[220px] md:w-[350px] aspect-[5/7] cursor-pointer pointer-events-auto"
+      className="relative w-[220px] lg:w-[350px] aspect-[5/7] cursor-pointer pointer-events-auto"
       onClick={handleClick}
       role="button"
       tabIndex={0}
@@ -339,7 +341,7 @@ function CarouselCard({
         }
       }}
     >
-      <div className="absolute -top-28 left-1/2 hidden w-[220px] -translate-x-1/2 text-center pointer-events-none md:block">
+      <div className="absolute -top-28 left-1/2 hidden w-[220px] -translate-x-1/2 text-center pointer-events-none lg:block">
         <h3 className={`font-serif text-lg md:text-xl font-bold leading-tight ${isDarkMode ? (isFocused ? 'text-white' : 'text-white/55') : (isFocused ? 'text-black' : 'text-black/55')}`}>
           {item.cardLabel ?? item.company}
         </h3>
@@ -385,7 +387,7 @@ function CarouselCard({
 function ExpandedCard({ item, onClose, isDarkMode }: { item: WorkItem, onClose: () => void, isDarkMode: boolean }) {
   return (
     <AccessibleDialog label={`${item.company} work experience`} onClose={onClose} modal={false}>
-    <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-3 pt-20 pb-[calc(6.5rem+env(safe-area-inset-bottom))] lg:p-0 pointer-events-auto">
       
       {/* Backdrop (Optimized: Removed backdrop-blur-md) */}
       <motion.div
@@ -399,7 +401,7 @@ function ExpandedCard({ item, onClose, isDarkMode }: { item: WorkItem, onClose: 
 
       {/* MODAL CONTAINER */}
       <motion.div
-        className="relative z-[60] w-[min(92vw,42rem)] h-[min(74vh,42rem)] md:h-[min(72vh,42rem)] rounded-xl overflow-hidden shadow-2xl"
+        className="relative z-[60] w-full max-w-2xl h-full lg:h-[min(72dvh,42rem)] rounded-xl overflow-hidden shadow-2xl"
         initial={{ 
           opacity: 0, 
           scale: 0.96,

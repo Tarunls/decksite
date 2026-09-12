@@ -23,7 +23,7 @@ function MotionToggle({ isReduced, onToggle, isFlipped }: { isReduced: boolean; 
       aria-pressed={isReduced}
       // CHANGE HERE: Added 'top-6 left-6' for mobile, and 'lg:top-auto lg:bottom-8 lg:left-8' for desktop
       className={`fixed z-[60] flex items-center gap-3 group focus:outline-none 
-        top-6 left-6 
+        top-[max(1rem,env(safe-area-inset-top))] left-4 min-h-11
         lg:top-auto lg:bottom-8 lg:left-8
       `}
     >
@@ -392,14 +392,14 @@ export default function App() {
           <motion.div 
             key="home-section"
             // CHANGE: Added 'place-items-center' and 'content-center' for mobile vertical alignment
-            className="relative min-h-[100dvh] grid grid-cols-1 lg:grid-cols-2 overflow-hidden place-items-center lg:place-items-stretch"
+            className="home-layout relative min-h-[100dvh] flex flex-col items-center justify-center gap-6 overflow-hidden px-6 pt-20 pb-[calc(6.25rem+env(safe-area-inset-bottom))] lg:grid lg:grid-cols-2 lg:gap-0 lg:p-0 lg:place-items-stretch"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 0.5 } }}
           >
             {/* Left Side: Name */}
             {/* CHANGE: Added 'pt-20' to push text down from top edge on mobile */}
-            <div className="flex items-end lg:items-center justify-center lg:justify-end px-8 lg:px-16 pt-32 lg:pt-0 pb-12 lg:pb-0">
+            <div className="flex w-full items-center justify-center lg:justify-end lg:px-16">
               <motion.div className="relative isolate z-10 max-w-2xl w-full pointer-events-none text-center lg:text-left">
                 <div
                   aria-hidden="true"
@@ -408,18 +408,12 @@ export default function App() {
                     ? 'radial-gradient(ellipse, rgba(244,243,243,0.98) 35%, rgba(244,243,243,0.9) 55%, transparent 75%)'
                     : 'radial-gradient(ellipse, rgba(0,0,0,0.98) 35%, rgba(0,0,0,0.9) 55%, transparent 75%)' }}
                 />
-                <motion.p className={`mb-4 text-sm leading-relaxed tracking-[0.06em] ${isFlipped ? 'text-black/75' : 'text-white/80'}`}>
-                  Computer Engineering · UT Dallas · Expected May 2027
-                </motion.p>
-                
                 <motion.h1
-                  className={`mb-8 ${isFlipped ? 'text-black' : 'text-white'}`}
+                  className={`home-name mb-6 lg:mb-8 ${isFlipped ? 'text-black' : 'text-white'}`}
                   style={{ 
                     fontFamily: "var(--font-cinzel), serif", 
                     fontWeight: 700, 
                     lineHeight: 0.9,
-                    // CHANGE: Adjusted clamp for better mobile sizing
-                    fontSize: "clamp(3rem, 12vw, 9rem)", 
                     letterSpacing: "-0.03em",
                     textShadow: isFlipped ? '0 0 12px #f4f3f3' : '0 0 12px #000'
                   }}
@@ -439,14 +433,9 @@ export default function App() {
 
             {/* Right Side: 3D Hero Card */}
             {/* CHANGE: Adjusted padding and alignment for mobile stacking */}
-            <div className="flex items-start lg:items-center justify-center lg:justify-start px-8 lg:pr-24 lg:pl-60 pb-20 lg:pb-0 z-20">
+            <div className="flex w-full items-center justify-center lg:justify-start lg:pr-24 lg:pl-60 z-20">
               <div 
-                className="relative"
-                style={{
-                  // CHANGE: Make card wider on mobile
-                  width: "clamp(240px, 60vw, 420px)",
-                  aspectRatio: "2.5 / 3.5"
-                }}
+                className="home-card-frame relative w-[clamp(8rem,calc(65svh_-_15rem),15.625rem)] max-w-[64vw] aspect-[9/14] lg:w-72 lg:max-w-none"
               >
                 <Hero3DCard 
                     imageUrl={heroCardUrl} 
