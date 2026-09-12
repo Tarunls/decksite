@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback'; // Check your path
 import { SkillCard } from './SkillCard';
 import { aboutSkillGroups } from '../../lib/projectSkills';
+import { AccessibleDialog } from './AccessibleDialog';
 
 interface AboutOverlayProps {
   isOpen: boolean;
@@ -34,12 +35,15 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
   const textMain = isDarkMode ? 'text-white' : 'text-gray-900';
   const textSub = isDarkMode ? 'text-white/60' : 'text-gray-600';
   const borderColor = isDarkMode ? 'border-white/10' : 'border-black/10';
-  const closeBtnClass = isDarkMode ? 'text-white/40 hover:text-white' : 'text-gray-400 hover:text-gray-900';
+  const closeBtnClass = isDarkMode
+    ? 'border-white/20 bg-[#1a1a1a] text-white/85 hover:text-white'
+    : 'border-black/20 bg-white text-gray-700 hover:text-gray-900';
 
   return (
     <AnimatePresence>
       {isOpen && (
         // Added z-[70] to ensure it sits above the MotionToggle (z-60)
+        <AccessibleDialog label="About Tarun Sankar" onClose={onClose}>
         <div className="fixed inset-0 z-[70] flex items-center justify-center perspective-[2000px] p-4">
           
           {/* BACKDROP */}
@@ -83,10 +87,12 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
               style={{ backfaceVisibility: 'hidden' }}
             >
               <motion.button 
+                type="button"
+                aria-label="Close about"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: showContent ? 1 : 0 }}
                 onClick={onClose}
-                className={`absolute top-4 right-6 z-50 font-mono text-xs uppercase tracking-widest transition-colors ${closeBtnClass}`}
+                className={`absolute top-4 right-6 z-50 min-h-11 rounded-md border px-3 font-mono text-xs uppercase tracking-widest shadow-sm transition-colors ${closeBtnClass}`}
               >
                 [ Close ]
               </motion.button>
@@ -107,7 +113,7 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
                             Hi, I'm
                         </div>
                         <h2 className={`text-4xl md:text-6xl font-serif font-bold ${textMain}`}>
-                          <br />Tarun Sankar
+                          Tarun Sankar
                         </h2>
                         <a href="/Tarun-Sankar-Resume.pdf" download="Tarun-Sankar-Resume.pdf" className={`mt-4 inline-flex min-h-11 items-center gap-3 rounded-md border px-4 py-2 text-sm ${borderColor} ${textMain}`}>
                           Download Resume <span aria-hidden="true">↓</span>
@@ -130,7 +136,7 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
                     <div className={`text-base md:text-lg leading-relaxed font-light ${textSub}`}>
                       <p>
                         I&apos;m a Computer Engineering student at UT Dallas building production software across network
-                        automation, real-time GNSS systems, and full-stack generative tools.
+                        automation, GNSS edge processing, and full-stack generative tools.
                       </p>
                     </div>
 
@@ -171,6 +177,7 @@ export function AboutOverlay({ isOpen, onClose, isFlipped }: AboutOverlayProps) 
 
           </motion.div>
         </div>
+        </AccessibleDialog>
       )}
     </AnimatePresence>
   );

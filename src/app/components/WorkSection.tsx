@@ -10,6 +10,7 @@ import {
 } from 'motion/react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { useCursorMotion } from '../../lib/useCursorMotion';
+import { AccessibleDialog } from './AccessibleDialog';
 
 
 // --- 1. DATA (Unchanged) ---
@@ -45,9 +46,9 @@ const workItems: WorkItem[] = [
     technologies: ["Python", "OpenObserve", "Slack", "ZTP", "Infrahub", "Jira", "Harness", "Argo"],
     frontImage: "/cards/work-card-back.png",
     description: [
-      "Built and deployed a production Python alerting service used by 10+ network engineers, consuming OpenObserve webhooks and metrics to notify Slack of failed ZTP events and Infrahub changes; delivered 1,000+ alerts and surfaced 200+ ZTP errors.",
-      "Designed a command-driven test harness that snapshots current Infrahub state as a baseline, validates subsequent changes against it, and posts configuration diffs to Slack when tests fail.",
-      "Developed a tool-calling diagnostic agent that queries Jira, Slack, Infrahub, and ZTP systems to investigate open-ended network failures and correlate likely root causes; deployed the service through Harness and Argo-based CI/CD.",
+      "Built and deployed a production Python/OpenObserve alerting service used by 10+ network engineers to investigate Infrahub outages and unavailable switches; delivered 1,000+ Slack alerts and surfaced 200+ zero-touch provisioning (ZTP) errors over five weeks.",
+      "Designed a command-driven Infrahub snapshot-comparison harness that flags changes from baseline state and posts configuration diffs to Slack.",
+      "Developed a tool-calling diagnostic agent used in network investigations, integrating Jira, Slack, Infrahub, and ZTP systems; deployed the service through Harness and Argo-based CI/CD.",
     ],
   },
   {
@@ -59,8 +60,8 @@ const workItems: WorkItem[] = [
     technologies: ["POSIX C", "GNSS", "IoT", "Raspberry Pi", "Azure Blob Storage", "Dash"],
     frontImage: "/cards/work-card-back.png",
     description: [
-      "Developed a real-time GNSS/IoT pipeline that computes S4 scintillation indices from satellite measurements sampled at up to 20 Hz, using POSIX C parallelization on a Raspberry Pi without interrupting receiver data logging.",
-      "Reduced daily network transfer from 2.4 GB of raw measurements to 4.5 MB of processed indices (>99.8%), syncing results to Azure Blob Storage and refreshing a Dash monitoring dashboard every minute.",
+      "Developed a multithreaded POSIX C pipeline on a Raspberry Pi to compute S4 scintillation indices every five minutes from GNSS measurements sampled at up to 20 Hz, while receiver logging continued.",
+      "Integrated Azure Blob Storage and Dash for storing and visualizing processed indices; one observed day yielded 4.5 MB of indices from 2.4 GB of raw measurements, reducing data volume by >99.8%.",
     ],
   },
   {
@@ -83,8 +84,8 @@ const workItems: WorkItem[] = [
     technologies: ["React", "Next.js", "NestJS", "Gemini", "OpenAI"],
     frontImage: "/cards/work-card-back.png",
     description: [
-      "Led UI/UX design for a dynamic, minimalistic business-facing web application.",
-      "Built and shipped a production RFP automation tool with Next.js and NestJS that uses Gemini and GPT-5 to generate business documents from structured customer inputs.",
+      "Contributed to building and shipping an RFP automation tool using Next.js and NestJS to generate business documents from structured customer inputs.",
+      "Helped design document ingestion and storage for retrieval-augmented generation (RAG), enabling the application to retrieve information from uploaded documents.",
     ],
   },
 ];
@@ -106,6 +107,7 @@ export function WorkSection({ onGoHome, isFlipped, isReducedMotion = false }: Wo
 
   return (
     <motion.section
+      aria-label="Work experience"
       className="fixed inset-0 z-30 flex items-center justify-center"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -126,6 +128,27 @@ export function WorkSection({ onGoHome, isFlipped, isReducedMotion = false }: Wo
           if (expandedId === null) onGoHome();
         }} 
       />
+
+      <div className="absolute inset-x-5 bottom-60 z-20 grid grid-cols-2 gap-3 md:hidden" aria-label="Choose work experience">
+        {workItems.map((item, index) => {
+          const isFocused = focusedIndex === index;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              aria-label={`${isFocused ? 'Open' : 'Focus'} ${item.company} work experience`}
+              aria-pressed={isFocused}
+              onClick={() => isFocused ? setExpandedId(item.id) : setFocusedIndex(index)}
+              className={`rounded-lg border px-3 py-3 text-left ${isDarkMode
+                ? `bg-black/85 ${isFocused ? 'border-white/60 text-white' : 'border-white/20 text-white/80'}`
+                : `bg-white/90 ${isFocused ? 'border-black/60 text-black' : 'border-black/20 text-black/80'}`}`}
+            >
+              <span className="block font-serif text-base font-bold leading-tight">{item.cardLabel ?? item.company}</span>
+              <span className={`mt-2 block text-[11px] leading-snug ${isDarkMode ? 'text-white/75' : 'text-black/75'}`}>{item.role}</span>
+            </button>
+          );
+        })}
+      </div>
 
       {/* 2. CAROUSEL LAYER */}
       <div className="relative w-full h-full flex items-end justify-center perspective-[1600px] pointer-events-none z-10 overflow-hidden">
@@ -178,23 +201,24 @@ function CardBackContent({ item, isExpanded, onClose, darkMode = false }: CardBa
   const tagBg = darkMode ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-black/5';
 
   return (
-    <div className={`relative w-full h-full flex flex-col pt-16 pb-12 rounded-xl overflow-hidden isolate transition-colors duration-500 ${bgClass}`}>
+    <div className={`relative w-full h-full flex flex-col pt-12 pb-6 rounded-xl overflow-hidden isolate transition-colors duration-500 ${bgClass}`}>
       <button 
+        type="button"
+        aria-label="Close work experience"
         onClick={(e) => { e.stopPropagation(); onClose?.(); }}
-        className={`absolute top-6 right-6 z-50 font-mono text-xs uppercase tracking-widest transition-opacity ${isExpanded ? 'opacity-100' : 'opacity-0 pointer-events-none'} ${darkMode ? 'text-white/40 hover:text-white' : 'text-black/40 hover:text-black'}`}
+        className={`absolute top-6 right-6 z-50 font-mono text-xs uppercase tracking-widest transition-opacity ${isExpanded ? 'opacity-100' : 'opacity-0 pointer-events-none'} ${darkMode ? 'text-white/70 hover:text-white' : 'text-black/70 hover:text-black'}`}
       >
         [ Return ]
       </button>
 
       <div className={`flex-1 px-8 md:px-16 scrollbar-hide ${isExpanded ? 'overflow-y-auto' : 'overflow-hidden'}`}>
-        <div className="max-w-2xl mx-auto space-y-8 pb-32">
-            <div className={`border-b ${borderClass} pb-6`}>
-                <div className="flex justify-between items-baseline mb-2">
-                      <h4 className={`text-xs font-mono uppercase tracking-[0.2em] ${textMuted}`}>...</h4>
+        <div className="max-w-2xl mx-auto space-y-6 pb-12">
+            <div className={`border-b ${borderClass} pb-4`}>
+                <div className="flex justify-end items-baseline mb-2">
                       <span className={`text-xs font-mono ${textMuted}`}>{item.period}</span>
                 </div>
-                <h2 className={`text-4xl md:text-5xl font-serif font-bold ${textMain} mb-2`}>{item.company}</h2>
-                <h3 className={`text-xl font-medium ${textSub}`}>{item.role}</h3>
+                <h2 className={`text-3xl md:text-4xl font-serif font-bold leading-tight ${textMain} mb-2`}>{item.company}</h2>
+                <h3 className={`text-lg font-medium ${textSub}`}>{item.role}</h3>
             </div>
             <ul className={`space-y-4 text-base md:text-lg leading-relaxed list-disc pl-5 ${darkMode ? 'text-white/80' : 'text-black/80'}`}>
               {item.description.map((highlight) => (
@@ -202,19 +226,19 @@ function CardBackContent({ item, isExpanded, onClose, darkMode = false }: CardBa
               ))}
             </ul>
             <div className="pt-4">
-                <h5 className={`text-xs font-mono uppercase tracking-widest ${darkMode ? 'text-white/30' : 'text-black/40'} mb-4`}>Technology Inventory</h5>
+                <h5 className={`text-xs font-mono uppercase tracking-widest ${darkMode ? 'text-white/60' : 'text-black/60'} mb-4`}>Technologies</h5>
               <div className="grid grid-cols-2 gap-3">
                 {item.technologies.map((tech, idx) => (
                   <div key={`${tech}-${idx}`} className={`flex items-center gap-2 border p-2 rounded-sm shadow-sm ${tagBg}`}>
                       <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
-                      <span className={`text-[10px] font-mono uppercase ${textSub}`}>{tech}</span>
+                      <span className={`text-xs font-mono uppercase ${textSub}`}>{tech}</span>
                   </div>
                 ))}
               </div>
             </div>
         </div>
       </div>
-      <div className={`absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t ${darkMode ? 'from-[#1a1a1a]' : 'from-white'} to-transparent pointer-events-none`} />
+      <div className={`absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t ${darkMode ? 'from-[#1a1a1a]' : 'from-white'} to-transparent pointer-events-none`} />
     </div>
   );
 }
@@ -315,11 +339,11 @@ function CarouselCard({
         }
       }}
     >
-      <div className="absolute -top-28 left-1/2 w-[180px] md:w-[220px] -translate-x-1/2 text-center pointer-events-none">
+      <div className="absolute -top-28 left-1/2 hidden w-[220px] -translate-x-1/2 text-center pointer-events-none md:block">
         <h3 className={`font-serif text-lg md:text-xl font-bold leading-tight ${isDarkMode ? (isFocused ? 'text-white' : 'text-white/55') : (isFocused ? 'text-black' : 'text-black/55')}`}>
           {item.cardLabel ?? item.company}
         </h3>
-        <p className={`mt-2 font-mono text-[8px] md:text-[9px] uppercase tracking-[0.12em] leading-relaxed ${isDarkMode ? (isFocused ? 'text-blue-300' : 'text-white/35') : (isFocused ? 'text-blue-700' : 'text-black/35')}`}>
+        <p className={`mt-2 font-mono text-[10px] md:text-[11px] uppercase tracking-[0.12em] leading-relaxed ${isDarkMode ? (isFocused ? 'text-blue-300' : 'text-white/65') : (isFocused ? 'text-blue-700' : 'text-black/65')}`}>
           {item.role}
         </p>
       </div>
@@ -360,6 +384,7 @@ function CarouselCard({
 // --- 5. EXPANDED MODAL CARD (Optimized) ---
 function ExpandedCard({ item, onClose, isDarkMode }: { item: WorkItem, onClose: () => void, isDarkMode: boolean }) {
   return (
+    <AccessibleDialog label={`${item.company} work experience`} onClose={onClose} modal={false}>
     <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-auto">
       
       {/* Backdrop (Optimized: Removed backdrop-blur-md) */}
@@ -392,5 +417,6 @@ function ExpandedCard({ item, onClose, isDarkMode }: { item: WorkItem, onClose: 
         <CardBackContent item={item} isExpanded={true} onClose={onClose} darkMode={isDarkMode} />
       </motion.div>
     </div>
+    </AccessibleDialog>
   );
 }

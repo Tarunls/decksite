@@ -20,3 +20,10 @@ body {
   /* Smooth transitions for your light/dark mode flip */
   transition: background-color 0.5s ease, color 0.5s ease;
 }
+
+/* A two-color focus indicator stays visible on both card themes. */
+:is(button, a, input, [role="button"]):focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 4px;
+  box-shadow: 0 0 0 2px #111;
+}

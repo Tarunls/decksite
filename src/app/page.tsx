@@ -17,7 +17,10 @@ import { cinzel } from '../lib/fonts';
 function MotionToggle({ isReduced, onToggle, isFlipped }: { isReduced: boolean; onToggle: () => void; isFlipped: boolean }) {
   return (
     <button
+      type="button"
       onClick={onToggle}
+      aria-label="Reduce motion"
+      aria-pressed={isReduced}
       // CHANGE HERE: Added 'top-6 left-6' for mobile, and 'lg:top-auto lg:bottom-8 lg:left-8' for desktop
       className={`fixed z-[60] flex items-center gap-3 group focus:outline-none 
         top-6 left-6 
@@ -397,13 +400,20 @@ export default function App() {
             {/* Left Side: Name */}
             {/* CHANGE: Added 'pt-20' to push text down from top edge on mobile */}
             <div className="flex items-end lg:items-center justify-center lg:justify-end px-8 lg:px-16 pt-32 lg:pt-0 pb-12 lg:pb-0">
-              <motion.div className="max-w-2xl w-full pointer-events-none text-center lg:text-left">
-                <motion.p className="text-white/70 tracking-[0.4em] uppercase mb-4 text-[clamp(0.7rem,1vw,0.9rem)] font-light mix-blend-difference">
-                  Hi, I'm
+              <motion.div className="relative isolate z-10 max-w-2xl w-full pointer-events-none text-center lg:text-left">
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -inset-x-16 -inset-y-16 -z-10"
+                  style={{ background: isFlipped
+                    ? 'radial-gradient(ellipse, rgba(244,243,243,0.98) 35%, rgba(244,243,243,0.9) 55%, transparent 75%)'
+                    : 'radial-gradient(ellipse, rgba(0,0,0,0.98) 35%, rgba(0,0,0,0.9) 55%, transparent 75%)' }}
+                />
+                <motion.p className={`mb-4 text-sm leading-relaxed tracking-[0.06em] ${isFlipped ? 'text-black/75' : 'text-white/80'}`}>
+                  Computer Engineering · UT Dallas · Expected May 2027
                 </motion.p>
                 
                 <motion.h1
-                  className="text-white mb-8 mix-blend-difference" 
+                  className={`mb-8 ${isFlipped ? 'text-black' : 'text-white'}`}
                   style={{ 
                     fontFamily: "var(--font-cinzel), serif", 
                     fontWeight: 700, 
@@ -411,7 +421,7 @@ export default function App() {
                     // CHANGE: Adjusted clamp for better mobile sizing
                     fontSize: "clamp(3rem, 12vw, 9rem)", 
                     letterSpacing: "-0.03em",
-                    textShadow: "0 0 30px rgba(0,0,0,0.5)" 
+                    textShadow: isFlipped ? '0 0 12px #f4f3f3' : '0 0 12px #000'
                   }}
                 >
                   Tarun <br /> Sankar
@@ -420,7 +430,7 @@ export default function App() {
                 <a
                   href="/Tarun-Sankar-Resume.pdf"
                   download="Tarun-Sankar-Resume.pdf"
-                  className={`pointer-events-auto inline-flex min-h-11 items-center gap-3 rounded-md border px-5 py-2.5 text-sm transition-colors ${isFlipped ? 'border-black/30 text-black hover:bg-black/10' : 'border-white/30 text-white hover:bg-white/10'}`}
+                  className={`pointer-events-auto inline-flex min-h-11 items-center gap-3 rounded-md border px-5 py-2.5 text-sm transition-colors ${isFlipped ? 'border-black/30 bg-[#f4f3f3]/90 text-black hover:bg-white' : 'border-white/30 bg-black/90 text-white hover:bg-zinc-900'}`}
                 >
                   Download Resume <span aria-hidden="true">↓</span>
                 </a>

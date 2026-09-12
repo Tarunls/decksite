@@ -57,7 +57,9 @@ export function Navigation({
         <div className="flex justify-between items-start relative z-10">
           
           {/* Logo */}
-          <motion.div 
+          <motion.button
+            type="button"
+            aria-label="Home"
             initial={{ opacity: 0, x: -20 }} 
             animate={{ opacity: 1, x: 0 }} 
             transition={{ delay: 1, duration: 0.8 }}
@@ -66,9 +68,10 @@ export function Navigation({
             whileTap={{ scale: 0.9 }}
           >
             TS<span className="text-xs align-top opacity-50 font-sans ml-1">©</span>
-          </motion.div>
+          </motion.button>
 
           <motion.nav 
+            aria-label="Main navigation"
             initial={{ opacity: 0, y: -20 }} 
             animate={{ opacity: 1, y: 0 }} 
             transition={{ delay: 1.2, duration: 0.8 }}
@@ -84,7 +87,9 @@ export function Navigation({
 
                 return (
                   <button 
+                    type="button"
                     key={item.name}
+                    aria-current={isActive ? 'page' : undefined}
                     onClick={() => onNavigate?.(item.section)}
                     className={`group relative px-6 py-2.5 text-sm uppercase tracking-widest font-medium transition-colors duration-100 cursor-pointer focus:outline-none rounded-lg ${
                       isActive ? 'bg-white text-black' : 'text-white/60 hover:bg-white hover:text-black'
@@ -92,7 +97,7 @@ export function Navigation({
                   >
                     <span className="relative z-10 flex items-center gap-2">
                       {item.name}
-                      <span className={`text-xs font-serif transition-opacity duration-100 ${suitColor} ${
+                      <span aria-hidden="true" className={`text-xs font-serif transition-opacity duration-100 ${suitColor} ${
                           isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
                       }`}>
                         {item.suit}
@@ -115,11 +120,11 @@ export function Navigation({
       </div>
 
       {/* MOBILE SHUFFLE */}
-      <button onClick={onShuffle} className="lg:hidden fixed top-6 right-6 z-50 bg-black/80 backdrop-blur border border-white/10 text-white p-3 rounded-full shadow-lg cursor-pointer">↻</button>
+      <button type="button" onClick={onShuffle} aria-label="Shuffle deck" className="lg:hidden fixed top-6 right-6 z-50 bg-black/80 backdrop-blur border border-white/10 text-white p-3 rounded-full shadow-lg cursor-pointer">↻</button>
 
       {/* MOBILE NAVIGATION */}
       <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-sm pointer-events-auto">
-        <nav className="flex items-center justify-between bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl p-2 shadow-2xl overflow-x-auto scrollbar-hide">
+        <nav aria-label="Main navigation" className="flex items-center justify-between bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl p-2 shadow-2xl overflow-x-auto scrollbar-hide">
           {navItems.map((item) => {
              const isActive = activeSection === item.section;
              
@@ -129,14 +134,16 @@ export function Navigation({
 
              return (
                <button
+                 type="button"
                  key={item.name}
+                 aria-current={isActive ? 'page' : undefined}
                  onClick={() => onNavigate?.(item.section)}
                  className={`flex flex-col items-center justify-center min-w-[60px] py-2 rounded-xl transition-all duration-300 cursor-pointer ${isActive ? 'bg-white text-black' : 'text-white/60'}`}
                >
-                 <span className={`text-sm transition-opacity duration-300 ${isActive ? `opacity-100 ${suitColor}` : 'opacity-0'}`}>
+                 <span aria-hidden="true" className={`text-sm transition-opacity duration-300 ${isActive ? `opacity-100 ${suitColor}` : 'opacity-0'}`}>
                     {item.suit}
                  </span>
-                 <span className="text-[8px] uppercase tracking-wider font-bold mt-1">
+                 <span className="text-[10px] uppercase tracking-wider font-bold mt-1">
                    {item.name}
                  </span>
                </button>

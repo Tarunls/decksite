@@ -131,11 +131,13 @@ export const projects: Project[] = [
   {
     id: 1,
     title: "Cinder Control",
-    category: "TAMUHack · 2nd Place + Best Solo",
+    category: "TAMUHack · 2nd, NorthMark HPC Track · Best Solo",
     period: "Jan 2026",
     suit: "♠",
-    image: "/projects/cinder-control.jpg",
-    summary: "A wildfire decision-support platform built solo in 36 hours. It combines a NumPy cellular-automata simulation with live weather, infrastructure risk detection, evacuation planning, and voice or text control.",
+    // Authentic simulation screenshot from https://devpost.com/software/fsim
+    // Original: https://d112y698adiu2z.cloudfront.net/photos/production/software_photos/004/206/509/datas/original.png
+    image: "/projects/cinder-simulation.webp",
+    summary: "A wildfire simulation prototype built solo in 36 hours for TAMUHack 2026, earning second place in the NorthMark HPC sponsor track and Best Solo Project. NumPy cellular automata model fire spread using fuel, wind, and slope; Mapbox visualizes scenarios alongside nearby OpenStreetMap infrastructure, with NOAA/NWS weather data and OpenAI/ElevenLabs voice and text controls.",
     skillGroups: projectSkills[1],
     link: "https://devpost.com/software/fsim",
     linkLabel: "View project",
@@ -148,7 +150,7 @@ export const projects: Project[] = [
     period: "Aug 2026",
     suit: "♥",
     image: "/projects/orune.png",
-    summary: "A full-stack platform that turns natural-language lesson prompts into narrated mathematical videos, with visual review, frame annotations, targeted re-renders, version history, credits, billing, and MP4 export.",
+    summary: "A publicly launched platform that turns lesson prompts into narrated, downloadable Manim videos. It supports frame annotations, model-assisted visual review, and immutable render history. Cloud Tasks queues generation in isolated E2B workers, with private Google Cloud Storage artifacts, usage credits, and Stripe billing.",
     skillGroups: projectSkills[2],
     link: "https://useorune.com",
     linkLabel: "Visit Orune",

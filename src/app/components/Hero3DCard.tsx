@@ -4,6 +4,7 @@ import { useEffect, useRef, type PointerEvent } from 'react';
 import { animate, motion, useMotionValue, useReducedMotion, type Transition } from 'motion/react';
 import { resistedCardOffset } from '../../lib/cardPhysics';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { Moon, Sun } from 'lucide-react';
 
 interface Hero3DCardProps {
   imageUrl: string;
@@ -115,7 +116,9 @@ export function Hero3DCard({
           className="relative cursor-grab select-none active:cursor-grabbing focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-white"
           role="button"
           tabIndex={0}
-          aria-label="Home card: drag to move, click to flip"
+          aria-label="Home card: light theme"
+          aria-pressed={isFlipped}
+          title={`Click card to switch to ${isFlipped ? 'dark' : 'light'} theme; drag to move`}
           onPointerDown={startDrag}
           onPointerMove={moveDrag}
           onPointerUp={finishDrag}
@@ -189,7 +192,10 @@ export function Hero3DCard({
             </div>
         )}
 
-      </motion.div>
+        </motion.div>
+        <span aria-hidden="true" className={`pointer-events-none absolute bottom-4 right-4 flex h-8 w-8 items-center justify-center rounded-full border shadow-sm ${isFlipped ? 'border-black/25 bg-white/90 text-black' : 'border-white/25 bg-black/80 text-white'}`}>
+          {isFlipped ? <Sun size={16} /> : <Moon size={16} />}
+        </span>
       </motion.div>
     </motion.div>
 

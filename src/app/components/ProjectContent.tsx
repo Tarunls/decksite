@@ -5,6 +5,7 @@ import { AnimatePresence, motion, type PanInfo } from 'motion/react';
 import { projects, type Project } from '../../lib/constants';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { SkillCard } from './SkillCard';
+import { AccessibleDialog } from './AccessibleDialog';
 
 interface Position {
   x: number;
@@ -21,6 +22,10 @@ interface ProjectContentProps {
 const POSITION_STORAGE_KEY = 'decksite-project-positions-v2';
 const DEALT_STORAGE_KEY = 'decksite-projects-dealt-v2';
 const SEED_STORAGE_KEY = 'decksite-project-seed-v2';
+
+function positionStorageKey(isMobile: boolean) {
+  return `${POSITION_STORAGE_KEY}-${isMobile ? 'mobile' : 'desktop'}`;
+}
 
 function seededNoise(seed: number, index: number, salt: number) {
   const value = Math.sin(seed * 91.7 + index * 37.1 + salt * 17.3) * 10000;
@@ -62,6 +67,27 @@ function clampPositions(positions: Position[], width: number, height: number, is
     x: Math.max(-maxX, Math.min(maxX, position.x)),
     y: Math.max(-maxY, Math.min(maxY, position.y)),
   }));
+}
+
+function restorePositions(width: number, height: number, isMobile: boolean, seed: number) {
+  const defaults = buildPositions(projects.length, width, isMobile, seed);
+  let restored = defaults;
+  try {
+    // Old sessions only had one layout. Preserve it on desktop; start mobile as two columns.
+    const stored = sessionStorage.getItem(positionStorageKey(isMobile))
+      ?? (isMobile ? null : sessionStorage.getItem(POSITION_STORAGE_KEY));
+    const saved = JSON.parse(stored ?? 'null');
+    if (Array.isArray(saved) && saved.length === projects.length) {
+      restored = saved.map((position, index) => ({
+        x: Number.isFinite(position?.x) ? position.x : defaults[index].x,
+        y: Number.isFinite(position?.y) ? position.y : defaults[index].y,
+        rotate: Number.isFinite(position?.rotate) ? position.rotate : defaults[index].rotate,
+      }));
+    }
+  } catch {
+    restored = defaults;
+  }
+  return clampPositions(restored, width, height, isMobile);
 }
 
 function ProjectCard({ project, index, position, originY, isFlipped, isReducedMotion, hasDealt, containerRef, onSelect, onUpdatePosition }: {
@@ -128,9 +154,9 @@ function ProjectCard({ project, index, position, originY, isFlipped, isReducedMo
           <span className={`absolute right-3 top-2 font-serif text-xl drop-shadow-md ${suitColor}`}>{project.suit}</span>
         </div>
 
-        <div className="flex h-1/2 flex-col justify-between p-4 sm:p-5">
+        <div className="flex h-1/2 flex-col justify-between p-3 sm:p-5">
           <div>
-            <p className={`mb-2 font-mono text-[8px] uppercase tracking-[0.18em] sm:text-[9px] ${muted}`}>{project.category}</p>
+            <p className={`mb-1 font-mono text-[8px] uppercase tracking-[0.18em] sm:mb-2 sm:text-[9px] ${muted}`}>{project.category}</p>
             <h2 className={`font-serif text-lg font-bold leading-[1.05] sm:text-2xl ${text}`}>{project.title}</h2>
           </div>
           <div className={`flex items-center justify-between font-mono text-[8px] uppercase tracking-[0.16em] sm:text-[9px] ${muted}`}>
@@ -150,6 +176,7 @@ function ProjectDetails({ project, isFlipped, onClose }: { project: Project; isF
   const border = isFlipped ? 'border-black/15' : 'border-white/15';
 
   return (
+    <AccessibleDialog label={`${project.title} project details`} onClose={onClose}>
     <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 sm:p-8" onClick={onClose}>
       <motion.div className="absolute inset-0 bg-black/85" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
       <motion.article
@@ -166,7 +193,7 @@ function ProjectDetails({ project, isFlipped, onClose }: { project: Project; isF
         </div>
 
         <div className="flex flex-col p-6 sm:p-9">
-          <button type="button" onClick={onClose} aria-label="Close project details" className={`ml-auto mb-7 flex h-9 w-9 items-center justify-center rounded-full border font-mono text-xs transition-transform hover:scale-110 ${border}`}>
+          <button type="button" onClick={onClose} aria-label="Close project details" className={`sticky top-4 z-20 ml-auto mb-7 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border font-mono text-xs shadow-sm transition-transform hover:scale-110 ${surface} ${border}`}>
             ✕
           </button>
           <p className={`font-mono text-[10px] uppercase tracking-[0.22em] ${muted}`}>{project.category}</p>
@@ -196,6 +223,7 @@ function ProjectDetails({ project, isFlipped, onClose }: { project: Project; isF
         </div>
       </motion.article>
     </div>
+    </AccessibleDialog>
   );
 }
 
@@ -215,37 +243,27 @@ export default function ProjectContent({ onClose, isFlipped = false, isReducedMo
     const seed = storedSeed ? Number(storedSeed) : Math.random() * 1000;
     if (!storedSeed) sessionStorage.setItem(SEED_STORAGE_KEY, String(seed));
 
-    const defaults = buildPositions(projects.length, width, mobile, seed);
-    let restored = defaults;
-    try {
-      const saved = JSON.parse(sessionStorage.getItem(POSITION_STORAGE_KEY) ?? 'null');
-      if (Array.isArray(saved) && saved.length === projects.length) {
-        restored = saved.map((position, index) => ({
-          x: Number.isFinite(position?.x) ? position.x : defaults[index].x,
-          y: Number.isFinite(position?.y) ? position.y : defaults[index].y,
-          rotate: Number.isFinite(position?.rotate) ? position.rotate : defaults[index].rotate,
-        }));
-      }
-    } catch {
-      restored = defaults;
-    }
-
-    const nextPositions = clampPositions(restored, width, height, mobile);
+    const nextPositions = restorePositions(width, height, mobile, seed);
     const alreadyDealt = sessionStorage.getItem(DEALT_STORAGE_KEY) === 'true';
     setLayout({ width, height, mobile });
     setPositions(nextPositions);
     setHasDealt(alreadyDealt);
     setIsReady(true);
-    sessionStorage.setItem(POSITION_STORAGE_KEY, JSON.stringify(nextPositions));
+    sessionStorage.setItem(positionStorageKey(mobile), JSON.stringify(nextPositions));
 
+    let currentMobile = mobile;
     const updateLayout = () => {
       const nextWidth = window.innerWidth;
       const nextHeight = window.innerHeight;
       const nextMobile = nextWidth < 640;
+      const changedBreakpoint = nextMobile !== currentMobile;
+      currentMobile = nextMobile;
       setLayout({ width: nextWidth, height: nextHeight, mobile: nextMobile });
       setPositions((current) => {
-        const clamped = clampPositions(current, nextWidth, nextHeight, nextMobile);
-        sessionStorage.setItem(POSITION_STORAGE_KEY, JSON.stringify(clamped));
+        const clamped = changedBreakpoint
+          ? restorePositions(nextWidth, nextHeight, nextMobile, seed)
+          : clampPositions(current, nextWidth, nextHeight, nextMobile);
+        sessionStorage.setItem(positionStorageKey(nextMobile), JSON.stringify(clamped));
         return clamped;
       });
     };
@@ -266,7 +284,7 @@ export default function ProjectContent({ onClose, isFlipped = false, isReducedMo
     setPositions((current) => {
       const next = [...current];
       next[index] = { ...next[index], x, y };
-      sessionStorage.setItem(POSITION_STORAGE_KEY, JSON.stringify(next));
+      sessionStorage.setItem(positionStorageKey(layout.mobile), JSON.stringify(next));
       return next;
     });
   };
@@ -278,8 +296,8 @@ export default function ProjectContent({ onClose, isFlipped = false, isReducedMo
   const text = isFlipped ? 'text-black' : 'text-white';
 
   return (
-    <motion.section ref={containerRef} className={`fixed inset-0 overflow-y-auto overflow-x-hidden ${selectedProject ? 'z-[60]' : 'z-30'}`} initial={{ opacity: 0 }} animate={{ opacity: 1, backgroundColor: backdrop }} exit={{ opacity: 0 }} transition={{ duration: 0.24 }}>
-      <button type="button" onClick={onClose} className={`fixed right-5 top-20 z-50 rounded-full border border-current/20 px-4 py-2 font-mono text-[9px] uppercase tracking-[0.2em] lg:right-10 lg:top-28 ${text}`}>
+    <motion.section ref={containerRef} aria-label="Projects" className={`fixed inset-0 overflow-y-auto overflow-x-hidden ${selectedProject ? 'z-[60]' : 'z-30'}`} initial={{ opacity: 0 }} animate={{ opacity: 1, backgroundColor: backdrop }} exit={{ opacity: 0 }} transition={{ duration: 0.24 }}>
+      <button type="button" onClick={onClose} aria-label="Close projects" className={`fixed right-5 top-20 z-50 rounded-full border border-current/20 px-4 py-2 font-mono text-[9px] uppercase tracking-[0.2em] lg:right-10 lg:top-28 ${text}`}>
         Close
       </button>
 

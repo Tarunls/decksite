@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion, useTransform } from 'motion/react';
 import { useCursorMotion } from '../../lib/useCursorMotion';
+import { AccessibleDialog } from './AccessibleDialog';
 
 const email = 'tarunlsankar@gmail.com';
 
@@ -28,7 +29,7 @@ export function ContactSection({ onClose, isFlipped = false, isReducedMotion = f
       await navigator.clipboard.writeText(email);
       setCopyStatus('Email copied');
     } catch {
-      setCopyStatus(email);
+      setCopyStatus('Copy unavailable');
     }
     copyTimer.current = setTimeout(() => setCopyStatus(''), 2500);
   };
@@ -38,6 +39,7 @@ export function ContactSection({ onClose, isFlipped = false, isReducedMotion = f
   const border = isFlipped ? 'border-black/20' : 'border-white/20';
 
   return (
+    <AccessibleDialog label="Contact Tarun Sankar" onClose={onClose}>
     <motion.section
       aria-label="Contact"
       data-contact-theme={isFlipped ? 'light' : 'dark'}
@@ -66,6 +68,7 @@ export function ContactSection({ onClose, isFlipped = false, isReducedMotion = f
             className={`cursor-pointer rounded-sm font-serif text-7xl leading-none tracking-tighter transition-opacity hover:opacity-75 focus-visible:outline-2 focus-visible:outline-offset-8 md:text-9xl ${text}`}
           >
             Email
+            <span className={`mt-4 block font-mono text-xs font-normal tracking-normal ${isFlipped ? 'text-black/60' : 'text-white/60'}`}>Click to copy address</span>
           </button>
           <AnimatePresence>
             {copyStatus && (
@@ -81,6 +84,10 @@ export function ContactSection({ onClose, isFlipped = false, isReducedMotion = f
             )}
           </AnimatePresence>
         </div>
+
+        <a href={`mailto:${email}`} className={`mt-5 rounded-sm text-sm underline decoration-current/30 underline-offset-4 ${muted}`}>
+          {email}
+        </a>
 
         <div className="mt-16 flex gap-12 md:mt-20">
           {[
@@ -99,5 +106,6 @@ export function ContactSection({ onClose, isFlipped = false, isReducedMotion = f
         Back to deck
       </button>
     </motion.section>
+    </AccessibleDialog>
   );
 }
