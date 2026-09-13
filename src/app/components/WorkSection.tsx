@@ -46,7 +46,7 @@ const workItems: WorkItem[] = [
     technologies: ["Python", "OpenObserve", "Slack", "ZTP", "Infrahub", "Jira", "Harness", "Argo"],
     frontImage: "/cards/work-card-back.png",
     description: [
-      "Built and deployed a production Python/OpenObserve alerting service used by 10+ network engineers to investigate Infrahub outages and unavailable switches; delivered 1,000+ Slack alerts and surfaced 200+ zero-touch provisioning (ZTP) errors over five weeks.",
+      "Replaced reliance on manual log checks and outage reports with a production Python/OpenObserve alerting service, giving 10+ network engineers early visibility into Infrahub and zero-touch provisioning (ZTP) issues; delivered 1,000+ Slack alerts and surfaced 200+ ZTP errors over five weeks.",
       "Designed a command-driven Infrahub snapshot-comparison harness that flags changes from baseline state and posts configuration diffs to Slack.",
       "Developed a tool-calling diagnostic agent used in network investigations, integrating Jira, Slack, Infrahub, and ZTP systems; deployed the service through Harness and Argo-based CI/CD.",
     ],
@@ -84,8 +84,8 @@ const workItems: WorkItem[] = [
     technologies: ["React", "Next.js", "NestJS", "Gemini", "OpenAI"],
     frontImage: "/cards/work-card-back.png",
     description: [
-      "Contributed to building and shipping an RFP automation tool using Next.js and NestJS to generate business documents from structured customer inputs.",
-      "Helped design document ingestion and storage for retrieval-augmented generation (RAG), enabling the application to retrieve information from uploaded documents.",
+      "Built the document-upload UI for a Next.js/NestJS RFP automation tool that generates business documents from structured customer inputs.",
+      "Implemented document storage and retrieval for retrieval-augmented generation (RAG), enabling the application to use uploaded documents as context for business-document generation.",
     ],
   },
 ];

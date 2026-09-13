@@ -63,6 +63,19 @@ The displayed inventory in `src/lib/projectSkills.ts` contains technologies only
 
 - The NorthMark alert/error counts cover five weeks, not unique incidents or measured time savings. The Infrahub harness compares snapshots rather than establishing configuration correctness.
 - GNSS measurements are sampled at up to 20 Hz; threaded C processing on the Raspberry Pi runs every five minutes. The 2.4 GB raw / 4.5 MB processed comparison is one observed day, not a sustained daily average.
-- MyIntent describes a contribution to building the RFP tool and helping design document ingestion/storage for RAG. GPT-5 was added after the internship, and the earlier exact model is uncertain, so model versions are omitted.
+- MyIntent ownership was clarified during the September 12 engineer-feedback review: Tarun implemented the document-upload UI, storage writes, and retrieval. The approved resume and website name these components, not ownership of the entire RFP tool. GPT-5 was added after the internship, and the earlier exact model is uncertain, so model versions are omitted.
 - Cinder's second-place award is in the NorthMark HPC sponsor track, not overall. It was strictly a hackathon prototype. Its route feature exports selected stops to Google Maps; the resume and project summary do not claim fire-aware evacuation routing or parallel execution.
 - Website-only work and projects remain visible. The reviewed resume intentionally contains three experience entries and two projects.
+
+### Approved impact and ownership clarification
+
+- NorthMark previously relied on manual log checks or noticed/reported outages. Tarun confirmed that the alerting service exposed developing issues so engineers could act earlier. The approved wording claims early visibility, not measured latency, time savings, or prevented downtime. Alert/error totals still cover five weeks and are not unique incident counts.
+- Applied only the approved NorthMark first bullet and two MyIntent bullets. No additional AI skills, project capabilities, metrics, or technologies were added.
+
+### Confirmed AI and MCP skills
+
+- In a subsequent clarification, Tarun confirmed using Claude, Codex, and GitHub Copilot for AI-assisted development, extending MCP tools as part of Orune, and using Blender MCP. The label remains Claude rather than assuming the specific Claude Code product.
+- Resume skills now include OpenAI API, RAG, LLM tool calling, and Model Context Protocol (MCP) tool development, plus a separate AI-assisted development row. Existing experience and project bullets remain unchanged.
+- About includes these skills and Blender MCP as a used tool. Orune includes MCP under project tooling; this does not claim its current web generation pipeline runs through MCP or that Blender MCP is part of Orune.
+- MCP implementation evidence: `Tarunls/manim-mcp-server` at `2ad5492789f95d652c3d373239e803d3f018e626`, `src/manim_server.py`, contains Python FastMCP tools and stdio transport. The README credits the original MCP server to upstream authors; the resume claims tool development based on Tarun's confirmed extensions, not original authorship of the entire server.
+- No Anthropic API, pgvector, embedding/chunking architecture, measured token optimization, or formal LLM evaluation claims were added.

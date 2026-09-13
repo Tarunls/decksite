@@ -12,7 +12,8 @@ export const projectSkills: Record<number, SkillGroup[]> = {
   ],
   2: [
     { label: 'Application', skills: ['TypeScript', 'React', 'Vite', 'Node.js', 'Express', 'Python', 'PostgreSQL', 'Firebase Admin', 'Stripe'] },
-    { label: 'Media & APIs', skills: ['Manim', 'FFmpeg', 'OpenAI', 'E2B', 'Speechify', 'ElevenLabs', 'Wikimedia Commons'] },
+    { label: 'AI & project tooling', skills: ['OpenAI', 'MCP'] },
+    { label: 'Media & APIs', skills: ['Manim', 'FFmpeg', 'E2B', 'Speechify', 'ElevenLabs', 'Wikimedia Commons'] },
     { label: 'Infrastructure & testing', skills: ['Google Cloud', 'Docker', 'Terraform', 'Playwright'] },
   ],
   3: [
@@ -30,6 +31,8 @@ export const aboutSkillGroups: SkillGroup[] = [
   { label: 'Languages', skills: ['Python', 'TypeScript', 'JavaScript', 'C', 'C++', 'Java', 'SQL', 'Bash', 'HTML', 'CSS'] },
   { label: 'Application & data', skills: ['React', 'Next.js', 'Vite', 'Node.js', 'Express', 'FastAPI', 'NestJS', 'Dash', 'Tailwind CSS', 'TanStack Query', 'PostgreSQL', 'Neon', 'Drizzle Migrations', 'Upstash Redis', 'Pydantic', 'NumPy'] },
   { label: 'Cloud & infrastructure', skills: ['Azure', 'Google Cloud', 'Docker', 'Kubernetes', 'Terraform', 'Harness', 'Argo', 'OpenObserve', 'Vercel'] },
-  { label: 'AI, media & integrations', skills: ['OpenAI', 'Manim', 'FFmpeg', 'E2B', 'Speechify', 'ElevenLabs', 'Web Audio API', 'Mapbox GL JS', 'Stripe', 'Firebase Admin', 'Google OAuth'] },
+  { label: 'AI & LLMs', skills: ['OpenAI', 'RAG', 'LLM Tool Calling', 'MCP'] },
+  { label: 'AI-assisted development & tools', skills: ['Claude', 'Codex', 'GitHub Copilot', 'Blender MCP'] },
+  { label: 'Media & integrations', skills: ['Manim', 'FFmpeg', 'E2B', 'Speechify', 'ElevenLabs', 'Web Audio API', 'Mapbox GL JS', 'Stripe', 'Firebase Admin', 'Google OAuth'] },
   { label: 'Testing', skills: ['Playwright'] },
 ];
