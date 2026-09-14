@@ -400,22 +400,15 @@ export default function App() {
             {/* Left Side: Name */}
             {/* CHANGE: Added 'pt-20' to push text down from top edge on mobile */}
             <div className="flex w-full items-center justify-center lg:justify-end lg:px-16">
-              <motion.div className="relative isolate z-10 max-w-2xl w-full pointer-events-none text-center lg:text-left">
-                <div
-                  aria-hidden="true"
-                  className="pointer-events-none absolute -inset-x-16 -inset-y-16 -z-10"
-                  style={{ background: isFlipped
-                    ? 'radial-gradient(ellipse, rgba(244,243,243,0.98) 35%, rgba(244,243,243,0.9) 55%, transparent 75%)'
-                    : 'radial-gradient(ellipse, rgba(0,0,0,0.98) 35%, rgba(0,0,0,0.9) 55%, transparent 75%)' }}
-                />
+              <motion.div className="max-w-2xl w-full pointer-events-none text-center lg:text-left">
+                {/* The name intentionally blends with the moving card background in both themes. */}
                 <motion.h1
-                  className={`home-name mb-6 lg:mb-8 ${isFlipped ? 'text-black' : 'text-white'}`}
+                  className="home-name mb-6 lg:mb-8 text-white mix-blend-difference"
                   style={{ 
                     fontFamily: "var(--font-cinzel), serif", 
                     fontWeight: 700, 
                     lineHeight: 0.9,
                     letterSpacing: "-0.03em",
-                    textShadow: isFlipped ? '0 0 12px #f4f3f3' : '0 0 12px #000'
                   }}
                 >
                   Tarun <br /> Sankar
